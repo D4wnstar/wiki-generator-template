@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="it" class="dark">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
+		<meta name="viewport" content="width=device-width" />
+
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<script>
+			document.body.setAttribute(
+				'data-theme',
+				localStorage.getItem('current-theme')?.replaceAll('"', '') ?? 'starry'
+			)
+		</script>
+		<div style="display: contents" class="h-full overflow-hidden">%sveltekit.body%</div>
+	</body>
+</html>
