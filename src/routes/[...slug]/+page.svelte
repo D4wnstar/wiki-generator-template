@@ -13,7 +13,7 @@
 	}
 
 	setupPopups('note-content', popupSettings, data.supabase)
-	
+
 	$: page_title = `${data.alt_title ?? data.title} - ${$wikiTitle}`
 </script>
 
@@ -22,9 +22,7 @@
 </svelte:head>
 
 <div class="h-full w-full flex flex-col md:flex-row">
-	<div
-		class="flex flex-col w-full items-center md:pb-8 pt-10 px-8"
-	>
+	<div class="flex flex-col w-full items-center md:pb-8 pt-10 px-8">
 		<h1 id="note-title" class="h1 pb-4 text-center">{data.alt_title ?? data.title}</h1>
 		<div id="note-content" class="flex flex-col md:max-w-[800px] w-full space-y-4">
 			<hr />

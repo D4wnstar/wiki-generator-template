@@ -4,7 +4,8 @@
 	import { currentTheme } from '$lib/stores'
 	import { browser } from '$app/environment'
 	import { onMount } from 'svelte'
-	import { afterNavigate, invalidate } from '$app/navigation'
+	import { afterNavigate, goto, invalidate } from '$app/navigation'
+	import 'highlight.js/styles/github-dark.css'
 
 	export let data
 
@@ -48,11 +49,20 @@
 		const elemPage = document.querySelector('#page')
 		if (isNewPage && elemPage !== null) elemPage.scrollTop = 0
 	})
+
+	function autocompleteRedirect(e: CustomEvent) {
+		goto(`/${e.detail.slug}`)
+	}
 </script>
 
 <Drawer>
 	<div class="flex flex-col h-full">
-		<NavTree title={data.settings.title} notesTreeView={data.notesTreeView} />
+		<NavTree
+			title={data.settings.title}
+			notesTreeView={data.notesTreeView}
+			noteTitles={data.noteTitles}
+			on:autocomplete={autocompleteRedirect}
+		/>
 		<hr />
 		<ThemeSwitcher />
 	</div>
@@ -81,7 +91,12 @@
 	</svelte:fragment>
 
 	<svelte:fragment slot="sidebarLeft">
-		<NavTree title={data.settings.title} notesTreeView={data.notesTreeView} />
+		<NavTree
+			title={data.settings.title}
+			notesTreeView={data.notesTreeView}
+			noteTitles={data.noteTitles}
+			on:autocomplete={autocompleteRedirect}
+		/>
 		<hr />
 		<ThemeSwitcher />
 	</svelte:fragment>

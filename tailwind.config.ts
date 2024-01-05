@@ -80,5 +80,8 @@ export default {
 		'stroke-warning-400',
 		'stroke-error-400',
 		'stroke-surface-400',
+		'codeblock-base',
+		'codeblock-header',
+		'codeblock-pre',
 	]
 } satisfies Config

@@ -4,6 +4,7 @@ import { error } from '@sveltejs/kit'
 import type { Database } from '$lib/database.types.js'
 import { createNotesTree } from '$lib/notes.js'
 import { wikiTitle } from '$lib/stores.js'
+import type { AutocompleteOption } from '@skeletonlabs/skeleton'
 
 export const load = async ({ fetch, data, depends }) => {
 	depends('supabase:auth')
@@ -19,10 +20,13 @@ export const load = async ({ fetch, data, depends }) => {
 		data: { session }
 	} = await supabase.auth.getSession()
 
-    const { data: notes, error: dbError } = await supabase
+    // eslint-disable-next-line prefer-const
+    let { data: notes, error: dbError } = await supabase
         .from('notes')
         .select(`
-            path
+			title,
+            path,
+			slug
         `)
 		.eq('frontpage', false)
 
@@ -33,10 +37,18 @@ export const load = async ({ fetch, data, depends }) => {
         error(404, `Could not find notes during layout loading.`)
 	}
 
-	const paths = notes.map((note) => note.path).sort((a, b) => a.localeCompare(b))
+	notes = notes.sort((a, b) => a.path.localeCompare(b.path))
+	const paths = notes.map((note) => note.path)
 	const notesTreeView = createNotesTree(paths)
 
-    
+	const noteTitles: AutocompleteOption<string>[] = notes.map((note) => {
+		return {
+			label: note.title,
+			value: note.title.toLocaleLowerCase(),
+			meta: { slug: note.slug }
+		}
+	})
+
 	const { data: wikiSettings, error: titleError } = await supabase
 		.from('wiki_settings')
 		.select('*')
@@ -53,7 +65,7 @@ export const load = async ({ fetch, data, depends }) => {
 	wikiTitle.set(wikiSettings.settings.title)
 
 	const settings = wikiSettings.settings
-	return { supabase, session, paths, notesTreeView, settings }
+	return { supabase, session, paths, noteTitles, notesTreeView, settings }
 }
 
 export const prerender = true

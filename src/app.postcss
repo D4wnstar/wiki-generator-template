@@ -97,9 +97,6 @@ a[href^="https://"]::after {
 .callout-primary {
 	@apply card w-full px-6 py-4 variant-soft-primary
 }
-.callout-primary-icon {
-	@apply w-8;
-}
 
 .callout-secondary {
 	@apply card w-full px-6 py-4 variant-soft-secondary
@@ -125,3 +122,14 @@ a[href^="https://"]::after {
 	@apply card w-full px-6 py-4 variant-soft-surface
 }
 
+.codeblock-base {
+	@apply codeblock w-full overflow-hidden shadow text-sm text-white rounded-container-token bg-gray-900
+}
+
+.codeblock-header {
+	@apply text-xs text-white/50 uppercase flex justify-between items-center p-2 pl-4
+}
+
+.codeblock-pre {
+	@apply whitespace-pre-wrap break-all p-4 pt-1
+}
