@@ -1,6 +1,14 @@
 <script lang="ts">
 	import '../app.postcss'
-	import { AppBar, AppShell, type DrawerSettings } from '@skeletonlabs/skeleton'
+	import {
+		AppBar,
+		AppShell,
+		Modal,
+		type DrawerSettings,
+		getModalStore,
+		type ModalSettings,
+		type ModalComponent
+	} from '@skeletonlabs/skeleton'
 	import { currentTheme } from '$lib/stores'
 	import { browser } from '$app/environment'
 	import { onMount } from 'svelte'
@@ -19,6 +27,28 @@
 	import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte'
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow })
 
+	// Supabase authentication client updates
+	let { supabase, session } = data
+	$: ({ supabase, session } = data)
+
+	let loggedIn = false
+
+	onMount(() => {
+		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
+			if (_session?.expires_at !== session?.expires_at) {
+				invalidate('supabase:auth')
+			}
+
+			if (event === 'SIGNED_IN') {
+				loggedIn = true
+			} else if (event === 'SIGNED_OUT') {
+				loggedIn = false
+			}
+		})
+
+		return () => data.subscription.unsubscribe()
+	})
+
 	// Drawer initialization
 	import { initializeStores, Drawer, getDrawerStore } from '@skeletonlabs/skeleton'
 	import type { AfterNavigate } from '@sveltejs/kit'
@@ -29,19 +59,30 @@
 		width: 'w-3/4 md:w-1/3'
 	}
 
-	// Supabase authentication client updates
-	let { supabase, session } = data
-	$: ({ supabase, session } = data)
-
-	onMount(() => {
-		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
-			if (_session?.expires_at !== session?.expires_at) {
-				invalidate('supabase:auth')
+	// Modal initialization
+	import AuthModal from '$lib/components/AuthModal.svelte'
+	const modalStore = getModalStore()
+	const modalRegistry: Record<string, ModalComponent> = {
+		auth: { ref: AuthModal }
+	}
+	const componentModal: ModalSettings = {
+		type: 'component',
+		component: 'auth',
+		meta: { supabase: supabase }
+	}
+	const logOutModal: ModalSettings = {
+		type: 'confirm',
+		// Data
+		title: 'Log Out',
+		body: 'Are you sure you want to log out?',
+		// TRUE if confirm pressed, FALSE if cancel pressed
+		response: async (r: boolean) => {
+			if (r) {
+				const { error } = await supabase.auth.signOut()
+				console.log(error)
 			}
-		})
-
-		return () => data.subscription.unsubscribe()
-	})
+		}
+	}
 
 	// Autoscroll to top of page on navigation
 	afterNavigate((params: AfterNavigate) => {
@@ -67,6 +108,8 @@
 		<ThemeSwitcher />
 	</div>
 </Drawer>
+
+<Modal components={modalRegistry} />
 
 <AppShell
 	slotSidebarLeft="hidden lg:flex lg:flex-col lg:w-[16em] h-screen variant-glass-surface border-r-[1px] border-surface-300-600-token"
@@ -98,6 +141,17 @@
 			on:autocomplete={autocompleteRedirect}
 		/>
 		<hr />
+		{#if !loggedIn}
+			<button
+				class="btn variant-filled-surface mt-4 mx-6"
+				on:click={() => modalStore.trigger(componentModal)}>Log In</button
+			>
+		{:else}
+			<button
+				class="btn variant-filled-surface mt-4 mx-6"
+				on:click={() => modalStore.trigger(logOutModal)}>Log Out</button
+			>
+		{/if}
 		<ThemeSwitcher />
 	</svelte:fragment>
 

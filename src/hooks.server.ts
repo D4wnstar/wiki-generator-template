@@ -1,15 +1,26 @@
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
-import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
+import { createServerClient } from '@supabase/ssr'
 import type { Handle } from '@sveltejs/kit'
 import type { Database } from './lib/database.types'
 
 export const handle: Handle = async ({ event, resolve }) => {
-	event.locals.supabase = createSupabaseServerClient<Database>({
-		supabaseUrl: PUBLIC_SUPABASE_URL,
-		supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
-		event,
-		cookieOptions: { path: "/" } // Maybe workaround for SvelteKit 2 cookie breaking change
-	})
+	event.locals.supabase = createServerClient<Database>(
+		PUBLIC_SUPABASE_URL,
+		PUBLIC_SUPABASE_ANON_KEY,
+		{
+			cookies: {
+				get: (key) => event.cookies.get(key),
+				set: (key, value, options) => {
+					options.path = "/"
+					event.cookies.set(key, value, options)
+				},
+				remove(key, options) {
+					options.path = "/"
+					event.cookies.delete(key, options)
+				},
+			}
+		}
+	)
 
 	/**
 	 * A convenience helper so we can just call await getSession() instead const { data: { session } } = await supabase.auth.getSession()
