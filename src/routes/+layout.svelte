@@ -5,14 +5,12 @@
 		AppShell,
 		Modal,
 		type DrawerSettings,
-		getModalStore,
-		type ModalSettings,
 		type ModalComponent
 	} from '@skeletonlabs/skeleton'
 	import { currentTheme } from '$lib/stores'
 	import { browser } from '$app/environment'
 	import { onMount } from 'svelte'
-	import { afterNavigate, goto, invalidate } from '$app/navigation'
+	import { afterNavigate, invalidate } from '$app/navigation'
 	import 'highlight.js/styles/github-dark.css'
 
 	export let data
@@ -23,8 +21,6 @@
 	// Floating UI for Popups
 	import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom'
 	import { storePopup } from '@skeletonlabs/skeleton'
-	import NavTree from '$lib/components/NavTree.svelte'
-	import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte'
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow })
 
 	// Supabase authentication client updates
