@@ -31,18 +31,10 @@
 	let { supabase, session } = data
 	$: ({ supabase, session } = data)
 
-	let loggedIn = false
-
 	onMount(() => {
 		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
 			if (_session?.expires_at !== session?.expires_at) {
 				invalidate('supabase:auth')
-			}
-
-			if (event === 'SIGNED_IN') {
-				loggedIn = true
-			} else if (event === 'SIGNED_OUT') {
-				loggedIn = false
 			}
 		})
 
@@ -61,27 +53,10 @@
 
 	// Modal initialization
 	import AuthModal from '$lib/components/AuthModal.svelte'
-	const modalStore = getModalStore()
+	import { Menu } from 'lucide-svelte'
+	import NavigationSidebar from '$lib/components/NavigationSidebar.svelte'
 	const modalRegistry: Record<string, ModalComponent> = {
 		auth: { ref: AuthModal }
-	}
-	const componentModal: ModalSettings = {
-		type: 'component',
-		component: 'auth',
-		meta: { supabase: supabase }
-	}
-	const logOutModal: ModalSettings = {
-		type: 'confirm',
-		// Data
-		title: 'Log Out',
-		body: 'Are you sure you want to log out?',
-		// TRUE if confirm pressed, FALSE if cancel pressed
-		response: async (r: boolean) => {
-			if (r) {
-				const { error } = await supabase.auth.signOut()
-				console.log(error)
-			}
-		}
 	}
 
 	// Autoscroll to top of page on navigation
@@ -90,22 +65,17 @@
 		const elemPage = document.querySelector('#page')
 		if (isNewPage && elemPage !== null) elemPage.scrollTop = 0
 	})
-
-	function autocompleteRedirect(e: CustomEvent) {
-		goto(`/${e.detail.slug}`)
-	}
 </script>
 
 <Drawer>
 	<div class="flex flex-col h-full">
-		<NavTree
-			title={data.settings.title}
+		<NavigationSidebar
 			notesTreeView={data.notesTreeView}
-			noteTitles={data.noteTitles}
-			on:autocomplete={autocompleteRedirect}
+			notesTitles={data.noteTitles}
+			title={data.settings.title}
+			{supabase}
+			{session}
 		/>
-		<hr />
-		<ThemeSwitcher />
 	</div>
 </Drawer>
 
@@ -119,13 +89,7 @@
 			<svelte:fragment slot="lead">
 				<div class="flex items-center">
 					<button class="btn btn-sm mr-4" on:click={() => drawerStore.open(drawerSettings)}>
-						<span>
-							<svg viewBox="0 0 100 80" class="fill-token w-4 h-4">
-								<rect width="100" height="10" />
-								<rect y="30" width="100" height="10" />
-								<rect y="60" width="100" height="10" />
-							</svg>
-						</span>
+						<Menu />
 					</button>
 					<a href="/"><strong class="text-xl uppercase">{data.settings.title}</strong></a>
 				</div>
@@ -134,25 +98,13 @@
 	</svelte:fragment>
 
 	<svelte:fragment slot="sidebarLeft">
-		<NavTree
-			title={data.settings.title}
+		<NavigationSidebar
 			notesTreeView={data.notesTreeView}
-			noteTitles={data.noteTitles}
-			on:autocomplete={autocompleteRedirect}
+			notesTitles={data.noteTitles}
+			title={data.settings.title}
+			{supabase}
+			{session}
 		/>
-		<hr />
-		{#if !loggedIn}
-			<button
-				class="btn variant-filled-surface mt-4 mx-6"
-				on:click={() => modalStore.trigger(componentModal)}>Log In</button
-			>
-		{:else}
-			<button
-				class="btn variant-filled-surface mt-4 mx-6"
-				on:click={() => modalStore.trigger(logOutModal)}>Log Out</button
-			>
-		{/if}
-		<ThemeSwitcher />
 	</svelte:fragment>
 
 	<slot />

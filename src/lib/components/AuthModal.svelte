@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto, invalidateAll } from '$app/navigation'
 	import { logIn, signUp } from '$lib/auth'
 	import { Tab, TabGroup, getModalStore } from '@skeletonlabs/skeleton'
 	import { AuthError } from '@supabase/supabase-js'
@@ -34,6 +33,7 @@
         const res = await signUp($modalStore[0].meta.supabase, authData.email, authData.password, authData.username)
         if (res instanceof AuthError) {
             signUpResultMessage = `Failed to sign up. ${res.message}`
+            console.error(res.name, res.message, res.cause, res.status)
             signUpResultColor = "error"
             signUpResultVisibility = ""
         } else {
@@ -73,11 +73,11 @@
 	<div class="card p-4 w-modal shadow-xl space-y-4">
         <TabGroup>
             <Tab bind:group={tabSet} name="signup" value={0} on:change={clearData}>
-                <svelte:fragment slot="lead"><UserPlus /></svelte:fragment>
+                <svelte:fragment slot="lead"><UserPlus class="inline" /></svelte:fragment>
                 <span>Sign Up</span>
             </Tab>
             <Tab bind:group={tabSet} name="login" value={1} on:change={clearData}>
-                <svelte:fragment slot="lead"><User /></svelte:fragment>
+                <svelte:fragment slot="lead"><User class="inline" /></svelte:fragment>
                 <span>Log In</span>
             </Tab>
             <svelte:fragment slot="panel">

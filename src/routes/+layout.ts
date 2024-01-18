@@ -24,9 +24,6 @@ export const load = async ({ fetch, data, depends }) => {
 					return cookie[key]
 				}
 			},
-			auth: {
-				flowType: 'pkce'
-			}
 		}
 	)
 

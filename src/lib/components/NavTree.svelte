@@ -7,7 +7,7 @@
 
     export let title: string
     export let notesTreeView: TreeViewNode[]
-    export let noteTitles: AutocompleteOption<string>[]
+    export let notesTitles: AutocompleteOption<string>[]
 
     const drawerStore = getDrawerStore()
     let expandedNodes: string[] = []
@@ -69,7 +69,7 @@
 	<Autocomplete
         regionButton="text-left w-full"
 		bind:input={searchQuery}
-		options={noteTitles}
+		options={notesTitles}
 		on:selection={onAutocompleteSelection}
 	/>
 </div>
