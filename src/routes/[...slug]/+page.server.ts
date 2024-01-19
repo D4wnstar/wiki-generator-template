@@ -1,4 +1,5 @@
-import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
+import { PUBLIC_SUPABASE_URL } from '$env/static/public'
+import { SUPABASE_SERVICE_ROLE_KEY } from '$env/static/private';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad, EntryGenerator } from './$types';
 import type { Database } from '$lib/database.types';
@@ -28,20 +29,20 @@ export const load = (async ({ locals: { supabase }, params: { slug }}) => {
     }
 }) satisfies PageServerLoad;
 
-export const entries: EntryGenerator = async () => {
-    const supabase = createClient<Database>(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY)
+// export const entries: EntryGenerator = async () => {
+//     const supabase = createClient<Database>(PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
-    const { data, error } = await supabase
-        .from('notes')
-        .select("slug")
+//     const { data, error } = await supabase
+//         .from('notes')
+//         .select("slug")
 
-    if (error) {
-        throw error
-    } else if (!data) {
-        throw new Error("Could not access data when generating prerendering entries")
-    }
+//     if (error) {
+//         throw error
+//     } else if (!data) {
+//         throw new Error("Could not access data when generating prerendering entries")
+//     }
 
-    return data.map((row) => {
-        return { slug: row.slug }
-    })
-}
+//     return data.map((row) => {
+//         return { slug: row.slug }
+//     })
+// }

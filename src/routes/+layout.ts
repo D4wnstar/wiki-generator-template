@@ -79,4 +79,4 @@ export const load = async ({ fetch, data, depends }) => {
 	return { supabase, session, paths, noteTitles, notesTreeView, settings }
 }
 
-export const prerender = true
+// export const prerender = true
