@@ -68,7 +68,7 @@
 		<NavigationSidebar
 			notesTreeView={data.notesTreeView}
 			notesTitles={data.noteTitles}
-			title={data.settings.title}
+			title={data.settings?.title}
 			{supabase}
 			{session}
 		/>
@@ -87,7 +87,7 @@
 					<button class="btn btn-sm mr-4" on:click={() => drawerStore.open(drawerSettings)}>
 						<Menu />
 					</button>
-					<a href="/"><strong class="text-xl uppercase">{data.settings.title}</strong></a>
+					<a href="/"><strong class="text-xl uppercase">{data.settings?.title}</strong></a>
 				</div>
 			</svelte:fragment>
 		</AppBar>
@@ -97,7 +97,7 @@
 		<NavigationSidebar
 			notesTreeView={data.notesTreeView}
 			notesTitles={data.noteTitles}
-			title={data.settings.title}
+			title={data.settings?.title}
 			{supabase}
 			{session}
 		/>

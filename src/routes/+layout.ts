@@ -73,7 +73,7 @@ export const load = async ({ fetch, data, depends }) => {
         error(500, `Could not find wiki title.`)
     }
 
-	wikiTitle.set(wikiSettings.settings.title)
+	wikiTitle.set(wikiSettings.settings?.title)
 
 	const settings = wikiSettings.settings
 	return { supabase, session, paths, noteTitles, notesTreeView, settings }
