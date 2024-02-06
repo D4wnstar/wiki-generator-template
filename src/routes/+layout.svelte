@@ -28,7 +28,7 @@
 	$: ({ supabase, session } = data)
 
 	onMount(() => {
-		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
+		const { data } = supabase.auth.onAuthStateChange((_event, _session) => {
 			if (_session?.expires_at !== session?.expires_at) {
 				invalidate('supabase:auth')
 			}
@@ -55,11 +55,18 @@
 		auth: { ref: AuthModal }
 	}
 
-	// Autoscroll to top of page on navigation
+	// Autoscroll to top of page or hashed header on navigation
 	afterNavigate((params: AfterNavigate) => {
-		const isNewPage = params.from?.url.pathname !== params.to?.url.pathname
-		const elemPage = document.querySelector('#page')
-		if (isNewPage && elemPage !== null) elemPage.scrollTop = 0
+		if (params.from?.url.pathname === params.to?.url.pathname) return
+
+		const hash = params.to?.url.hash
+		if (hash) {
+			const header = document.getElementById(hash.slice(1))
+			if (header) header.scrollIntoView({ behavior: 'instant' })
+		} else {
+			const elemPage = document.querySelector('#page')
+			if (elemPage) elemPage.scrollTop = 0
+		}
 	})
 </script>
 

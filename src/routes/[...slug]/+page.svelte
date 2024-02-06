@@ -3,6 +3,8 @@
 	import { setupPopups } from '$lib/popups'
 	import type { PopupSettings } from '@skeletonlabs/skeleton'
 	import Extras from '$lib/components/Extras.svelte'
+	import { hideUnauthorizedLinks } from '$lib/auth.js'
+
 	export let data
 
 	const popupSettings: PopupSettings = {
@@ -12,8 +14,8 @@
 		middleware: { autoPlacement: { allowedPlacements: ['top', 'bottom'] } }
 	}
 
+	hideUnauthorizedLinks('note-content', data.refNotes.map((r) => r.slug))
 	setupPopups('note-content', popupSettings, data.supabase)
-
 	$: page_title = `${data.alt_title ?? data.title} - ${$wikiTitle}`
 </script>
 
@@ -24,7 +26,7 @@
 <div class="h-full w-full flex flex-col md:flex-row">
 	<div class="flex flex-col w-full items-center md:pb-8 pt-10 px-8">
 		<h1 id="note-title" class="h1 pb-4 text-center">{data.alt_title ?? data.title}</h1>
-		<div id="note-content" class="flex flex-col md:max-w-[800px] w-full space-y-4">
+		<div id="note-content" class="flex flex-col md:max-w-3xl w-full space-y-4">
 			<hr />
 			{@html data.content}
 			<hr />
@@ -40,8 +42,8 @@
 				sidebar_images={data.sidebar_images}
 				details={data.details}
 				backreferences={data.backreferences}
-				supabase={data.supabase}
 				{popupSettings}
+				supabase={data.supabase}
 			/>
 		</div>
 		<div class="md:hidden px-8 pt-4 pb-8 space-y-4">
@@ -49,8 +51,8 @@
 				sidebar_images={data.sidebar_images}
 				details={data.details}
 				backreferences={data.backreferences}
-				supabase={data.supabase}
 				{popupSettings}
+				supabase={data.supabase}
 			/>
 		</div>
 	{/if}

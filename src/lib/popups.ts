@@ -30,10 +30,9 @@ let timeoutIdPopup: NodeJS.Timeout
 
 async function fetchContent(e: MouseEvent, supabase: SupabaseClient) {
 	const elem = e.target as HTMLAnchorElement
-	const path = elem.href
-	if (!path) return { title: undefined, content: undefined }
+	const slug = elem.pathname.slice(1)
+	if (!slug) return false
 
-	const slug = path.replace(/^https?:\/\/.*?\//, '')
 	const { data: out } = await supabase
 		.from('notes')
 		.select('title,content')
@@ -41,10 +40,14 @@ async function fetchContent(e: MouseEvent, supabase: SupabaseClient) {
 		.limit(1)
 		.maybeSingle()
 
+	if (!out?.title) return false
+
 	popupNote.set({
 		title: out?.title,
 		content: out?.content
 	})
+
+	return true
 }
 
 export function initializePopup(
@@ -140,6 +143,7 @@ export function initializePopup(
 				// Implement optional middleware
 				...optionalMiddleware
 			]
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		}).then(({ x, y, placement, middlewareData }: any) => {
 			Object.assign(elemPopup.style, {
 				left: `${x}px`,
@@ -170,9 +174,9 @@ export function initializePopup(
 	// State Handlers
 	open = (e: Event): void => {
 		timeoutIdDB = setTimeout(async () => {
-			await fetchContent(e as MouseEvent, supabase)
+			const isPopupValid = await fetchContent(e as MouseEvent, supabase)
 
-			if (!elemPopup) return
+			if (!elemPopup || !isPopupValid) return
 			// Set open state to on
 			popupState.open = true
 			// Return the current state
@@ -315,6 +319,7 @@ export function initializePopup(
 
 
 export function destroyPopup(triggerNode: HTMLElement) {
+	closeInstantly()
 	// Trigger Events
 	triggerNode.removeEventListener('click', () => closeInstantly(), true)
 	triggerNode.removeEventListener('mouseover', open, true)

@@ -2,7 +2,7 @@
 	import { destroyPopup, initializePopup } from '$lib/popups'
 	import type { BackreferenceObject } from '$lib/shorthand.types'
 	import type { PopupSettings } from '@skeletonlabs/skeleton'
-	import type { SupabaseClient } from '@supabase/supabase-js'
+	import type { AuthSession, SupabaseClient } from '@supabase/supabase-js'
 	import { Link } from 'lucide-svelte'
 
 	export let backRefs: BackreferenceObject[]

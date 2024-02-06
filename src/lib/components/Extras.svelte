@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { BackreferenceObject, DetailsObject, SidebarImageObject } from "$lib/shorthand.types"
-	import type { SupabaseClient } from "@supabase/supabase-js"
+	import type { AuthSession, SupabaseClient } from "@supabase/supabase-js"
 	import Backreferences from "./Backreferences.svelte"
 	import Details from "./Details.svelte"
 	import SidebarImage from "./SidebarImage.svelte"
