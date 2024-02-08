@@ -1,6 +1,7 @@
 import { afterNavigate } from '$app/navigation'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { onMount } from 'svelte'
+import type { ContentChunk } from './shorthand.types'
 
 export async function signUp(
 	supabase: SupabaseClient,
@@ -46,23 +47,36 @@ export async function logIn(supabase: SupabaseClient, email: string, password: s
  * @param refSlugs The slugs of the pages that are authorized. Links to pages with any other slugs will be hidden
  */
 export async function hideUnauthorizedLinks(id: string, refSlugs: string[]) {
-    let anchors: NodeListOf<HTMLAnchorElement> | undefined
-    const removeLinks = (a: HTMLAnchorElement) => {
-        if (!refSlugs.includes(a.pathname.slice(1))) {
-            console.log(a)
-            a.addEventListener('click', (e) => e.preventDefault())
-            a.classList.add('pointer-events-none')
-            a.classList.remove('anchor')
-        }
-    }
+	let anchors: NodeListOf<HTMLAnchorElement> | undefined
+	const removeLinks = (a: HTMLAnchorElement) => {
+		if (!refSlugs.includes(a.pathname.slice(1))) {
+			a.addEventListener('click', (e) => e.preventDefault())
+			a.classList.add('pointer-events-none')
+			a.classList.remove('anchor')
+		}
+	}
 
-    onMount(() => {
+	onMount(() => {
 		anchors = document.getElementById(id)?.querySelectorAll('a')
-        anchors?.forEach((a) => removeLinks(a))
-    })
-    
-    afterNavigate(() => {
+		anchors?.forEach((a) => removeLinks(a))
+	})
+
+	afterNavigate(() => {
 		anchors = document.getElementById(id)?.querySelectorAll('a')
-        anchors?.forEach((a) => removeLinks(a))
-    })
+		anchors?.forEach((a) => removeLinks(a))
+	})
+}
+
+export function mergeContent(chunks: ContentChunk[], username: string | undefined) {
+	let content = ''
+	chunks.forEach((chunk) => {
+		if (
+			(chunk.allowed_users?.length === 0) ||
+			(username && chunk.allowed_users?.includes(username))
+		) {
+			content += chunk.text
+		}
+	})
+
+	return content
 }

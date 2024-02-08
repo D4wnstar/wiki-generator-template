@@ -1,16 +1,18 @@
 // import { PUBLIC_SUPABASE_URL } from '$env/static/public'
 // import { SUPABASE_SERVICE_ROLE_KEY } from '$env/static/private';
 import { error } from '@sveltejs/kit'
-import type { PageServerLoad, EntryGenerator } from './$types'
+import type { PageServerLoad } from './$types'
+import { mergeContent } from '$lib/auth'
 // import type { Database } from '$lib/database.types';
 // import { createClient } from '@supabase/supabase-js';
 
-export const load = (async ({ locals: { supabase }, params: { slug } }) => {
+export const load = (async ({ locals: { supabase, getSession }, params: { slug } }) => {
 	const { data: note, error: dbError } = await supabase
 		.from('notes')
 		.select(
 			`
             *,
+			note_contents (*),
             backreferences (*),
             details (*),
             sidebar_images (*)
@@ -73,7 +75,10 @@ export const load = (async ({ locals: { supabase }, params: { slug } }) => {
         )
     }
 
-    return { ...note, refNotes }
+	const session = await getSession()
+	const pageContent = mergeContent(note.note_contents, session?.user?.user_metadata?.username)
+
+    return { ...note, refNotes, pageContent }
 }) satisfies PageServerLoad
 
 // export const entries: EntryGenerator = async () => {

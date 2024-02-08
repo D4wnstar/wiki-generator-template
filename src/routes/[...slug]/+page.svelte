@@ -3,7 +3,7 @@
 	import { setupPopups } from '$lib/popups'
 	import type { PopupSettings } from '@skeletonlabs/skeleton'
 	import Extras from '$lib/components/Extras.svelte'
-	import { hideUnauthorizedLinks } from '$lib/auth.js'
+	import { hideUnauthorizedLinks, mergeContent } from '$lib/auth.js'
 
 	export let data
 
@@ -16,11 +16,11 @@
 
 	hideUnauthorizedLinks('note-content', data.refNotes.map((r) => r.slug))
 	setupPopups('note-content', popupSettings, data.supabase)
-	$: page_title = `${data.alt_title ?? data.title} - ${$wikiTitle}`
+	$: pageTitle = `${data.alt_title ?? data.title} - ${$wikiTitle}`
 </script>
 
 <svelte:head>
-	<title>{page_title}</title>
+	<title>{pageTitle}</title>
 </svelte:head>
 
 <div class="h-full w-full flex flex-col md:flex-row">
@@ -28,7 +28,7 @@
 		<h1 id="note-title" class="h1 pb-4 text-center">{data.alt_title ?? data.title}</h1>
 		<div id="note-content" class="flex flex-col md:max-w-3xl w-full space-y-4">
 			<hr />
-			{@html data.content}
+			{@html data.pageContent}
 			<hr />
 		</div>
 	</div>
@@ -58,7 +58,7 @@
 	{/if}
 </div>
 
-<div class="card p-4 variant-outline-secondary w-80 h-80 overflow-hidden" data-popup="popupHover">
+<div class="card p-4 variant-outline-secondary w-80 max-h-80 overflow-hidden" data-popup="popupHover">
 	<div class="text-center pb-2 text-2xl"><strong>{$popupNote.title}</strong></div>
 	<hr />
 	<div class="text-sm py-2 space-y-2">{@html $popupNote.content}</div>

@@ -35,7 +35,7 @@ async function fetchContent(e: MouseEvent, supabase: SupabaseClient) {
 
 	const { data: out } = await supabase
 		.from('notes')
-		.select('title,content')
+		.select('title, lead')
 		.eq('slug', slug)
 		.limit(1)
 		.maybeSingle()
@@ -44,7 +44,7 @@ async function fetchContent(e: MouseEvent, supabase: SupabaseClient) {
 
 	popupNote.set({
 		title: out?.title,
-		content: out?.content
+		content: out?.lead
 	})
 
 	return true
