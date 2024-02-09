@@ -1,10 +1,11 @@
 import { afterNavigate } from '$app/navigation'
-import type { SupabaseClient } from '@supabase/supabase-js'
 import { onMount } from 'svelte'
 import type { ContentChunk } from './shorthand.types'
+import type { Database } from './database.types'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
 export async function signUp(
-	supabase: SupabaseClient,
+	supabase: SupabaseClient<Database>,
 	email: string,
 	password: string,
 	username: string

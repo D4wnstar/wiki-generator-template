@@ -3,8 +3,13 @@
 	import { setupPopups } from '$lib/popups'
 	import type { PopupSettings } from '@skeletonlabs/skeleton'
 	import Extras from '$lib/components/Extras.svelte'
-	export let data
+	import { hideUnauthorizedLinks, mergeContent } from '$lib/auth.js'
+	import { page } from '$app/stores'
 
+	export let data
+	const refNotes = data.refNotes.map((r) => r.slug)
+	refNotes.push($page.params.slug) // Add current page as a referenced page
+	
 	const popupSettings: PopupSettings = {
 		event: 'hover',
 		target: 'popupHover',
@@ -12,23 +17,21 @@
 		middleware: { autoPlacement: { allowedPlacements: ['top', 'bottom'] } }
 	}
 
+	hideUnauthorizedLinks('note-content', refNotes)
 	setupPopups('note-content', popupSettings, data.supabase)
-	
-	$: page_title = `${data.alt_title ?? data.title} - ${$wikiTitle}`
+	$: pageTitle = `${data.alt_title ?? data.title} - ${$wikiTitle}`
 </script>
 
 <svelte:head>
-	<title>{page_title}</title>
+	<title>{pageTitle}</title>
 </svelte:head>
 
 <div class="h-full w-full flex flex-col md:flex-row">
-	<div
-		class="flex flex-col w-full items-center md:pb-8 pt-10 px-8"
-	>
+	<div class="flex flex-col w-full items-center md:pb-8 pt-10 px-8">
 		<h1 id="note-title" class="h1 pb-4 text-center">{data.alt_title ?? data.title}</h1>
-		<div id="note-content" class="flex flex-col md:max-w-[800px] w-full space-y-4">
+		<div id="note-content" class="flex flex-col md:max-w-3xl w-full space-y-4">
 			<hr />
-			{@html data.content}
+			{@html data.pageContent}
 			<hr />
 		</div>
 	</div>
@@ -42,8 +45,8 @@
 				sidebar_images={data.sidebar_images}
 				details={data.details}
 				backreferences={data.backreferences}
-				supabase={data.supabase}
 				{popupSettings}
+				supabase={data.supabase}
 			/>
 		</div>
 		<div class="md:hidden px-8 pt-4 pb-8 space-y-4">
@@ -51,14 +54,14 @@
 				sidebar_images={data.sidebar_images}
 				details={data.details}
 				backreferences={data.backreferences}
-				supabase={data.supabase}
 				{popupSettings}
+				supabase={data.supabase}
 			/>
 		</div>
 	{/if}
 </div>
 
-<div class="card p-4 variant-outline-secondary w-80 h-80 overflow-hidden" data-popup="popupHover">
+<div class="card p-4 variant-outline-secondary w-80 max-h-80 overflow-hidden" data-popup="popupHover">
 	<div class="text-center pb-2 text-2xl"><strong>{$popupNote.title}</strong></div>
 	<hr />
 	<div class="text-sm py-2 space-y-2">{@html $popupNote.content}</div>

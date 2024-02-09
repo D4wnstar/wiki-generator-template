@@ -29,10 +29,11 @@
 		title: 'Log Out',
 		body: 'Are you sure you want to log out?',
 		// TRUE if confirm pressed, FALSE if cancel pressed
-		response: async (r: boolean) => {
-			if (r) {
+		response: async (res: boolean) => {
+			if (res) {
 				const { error } = await supabase.auth.signOut()
-				console.log(error)
+				if (error) console.log(error)
+				window.location.assign("/")
 			}
 		}
 	}
