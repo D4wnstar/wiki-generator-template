@@ -10,13 +10,13 @@
 	/**
 	 * Username must be:
 	 * 1. Alphanumeric with dots and underscores
-	 * 2. At least two characters long
+	 * 2. At least three characters long
 	 * 3. Can't have more than one dot in a row (e.g. no 'the..legend')
 	 * 4. Can't start or end in a dot or underscore
 	 */
-	const usernameRules = /^(?=[a-zA-Z0-9._]{2,}$)(?!.*[.]{2})[^_.].*[^_.]$/
+	const usernameRules = /^(?=[a-zA-Z0-9._]{3,}$)(?!.*[.]{2})[^_.].*[^_.]$/
 	/**
-	 * RFC2822 standard email validation. From the .net helpfiles.
+	 * RFC2822 standard email validation. From the .NET helpfiles.
 	 */
 	const emailRules =
 		/[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
@@ -31,13 +31,13 @@
 	let signUpResultColor = 'warning'
 	let tabSet: number = 0
 
-	// let loadingUsername = false
-	// let loadingEmail = false
+	let loadingUsername = false
+	let loadingEmail = false
 
-	// let isUsernameAvailable = false
-	// let isEmailAvailable = false
+	let isUsernameAvailable = false
+	let isEmailAvailable = false
 
-	// let debounceTimer: NodeJS.Timeout
+	let debounceTimer: NodeJS.Timeout
 	let rulesDelayTimer: NodeJS.Timeout
 	let usernameRulesVisible = false
 	let emailRulesVisible = false
@@ -49,12 +49,12 @@
 	let password = ''
 
 	$: isUsernameEmpty = username.length === 0
-	$: isUsernameValid = username.length > 2 && usernameRules.test(username)
-	// $: isUsernameTaken = isUsernameValid && !isUsernameAvailable && !loadingUsername
+	$: isUsernameValid = usernameRules.test(username)
+	$: isUsernameTaken = isUsernameValid && !isUsernameAvailable && !loadingUsername
 
 	$: isEmailEmpty = email.length === 0
 	$: isEmailValid = emailRules.test(email)
-	// $: isEmailTaken = isEmailValid && !isEmailAvailable && !loadingEmail
+	$: isEmailTaken = isEmailValid && !isEmailAvailable && !loadingEmail
 
 	$: isPasswordEmpty = password.length === 0
 	$: isPasswordValid = passwordRules.test(password)
@@ -63,93 +63,88 @@
 		email = ''
 		password = ''
 		username = ''
+		signUpResultVisibility = 'hidden'
 	}
 
-	// Due to RLS policy, availability checking can only be done on the server, so this needs to be moved
-	// async function checkUsernameAvailability() {
-	//     isUsernameAvailable = false
-	//     clearTimeout(debounceTimer)
-	//     loadingUsername = true
+	async function checkUsernameAvailability() {
+		isUsernameAvailable = false
+		clearTimeout(debounceTimer)
+		loadingUsername = true
 
-	//     debounceTimer = setTimeout(async () => {
-	//         console.log(username)
-	//         const { data: select, error: selectError } = await supabase
-	//             .from("profiles")
-	//             .select("username")
-	//             // .eq("username", username)
-	//             // .limit(1)
-	//             // .maybeSingle()
+		debounceTimer = setTimeout(async () => {
+			const res = await fetch(`/api/v1/auth/user?username=${username}`)
+			isUsernameAvailable = await res.json()
+			loadingUsername = false
+		}, 500)
+	}
 
-	//         console.log(select)
+	async function checkEmailAvailability() {
+		isEmailAvailable = false
+		clearTimeout(debounceTimer)
+		loadingEmail = true
 
-	//         if (selectError) console.error(`Error when fetching usernames: ${selectError.message}`)
-	//         isUsernameAvailable = (select || selectError) ? false : true
-	//         loadingUsername = false
-	//     }, 500)
-	// }
+		debounceTimer = setTimeout(async () => {
+			const res = await fetch(`/api/v1/auth/email?email=${email}`)
+			isEmailAvailable = await res.json()
+			loadingEmail = false
+		}, 500)
+	}
 
-	// async function checkEmailAvailability() {
-	//     isEmailAvailable = false
-	//     clearTimeout(debounceTimer)
-	//     loadingEmail = true
-
-	//     debounceTimer = setTimeout(async () => {
-	//         const { data: select, error: selectError } = await supabase
-	//             .from("profiles")
-	//             .select("email")
-	//             .eq("email", email)
-	//             .limit(1)
-	//             .maybeSingle()
-
-	//         if (selectError) console.error(`Error when fetching user emails: ${selectError.message}`)
-	//         isEmailAvailable = (select || selectError) ? false : true
-	//         loadingEmail = false
-	//     }, 500)
-	// }
-
-	async function signUpButton() {
-		if (!email || !password || !username) {
+	function checkCredentialValidity() {
+		if (isEmailEmpty || isPasswordEmpty || isUsernameEmpty) {
 			signUpResultMessage = 'Please fill in all the fields.'
 			signUpResultColor = 'error'
 			signUpResultVisibility = ''
-			return
+			return false
 		}
-        if (!isEmailValid || !isPasswordValid || !isUsernameValid) {
-            signUpResultMessage = 'Please make sure all fields are valid.'
+		if (!isEmailValid || !isPasswordValid || !isUsernameValid) {
+			signUpResultMessage = 'Please make sure all fields are valid.'
 			signUpResultColor = 'error'
 			signUpResultVisibility = ''
-			return
-        }
+			return false
+		}
+		if (isEmailTaken) {
+			signUpResultMessage = 'Email already taken. Please use a different email.'
+			signUpResultColor = 'error'
+			signUpResultVisibility = ''
+			return false
+		}
+		if (isUsernameTaken) {
+			signUpResultMessage = 'Username already taken. Please choose a different username.'
+			signUpResultColor = 'error'
+			signUpResultVisibility = ''
+			return false
+		}
+
+		return true
+	}
+
+	async function signUpButton() {
+		const areCredsValid = checkCredentialValidity()
+		if (!areCredsValid) return
+
 		const res = await signUp(supabase, email, password, username)
 		if (res instanceof AuthError) {
+			// console.error(res.name, res.message, res.cause, res.status)
 			signUpResultMessage = `Failed to sign up. ${res.message}`
-			console.error(res.name, res.message, res.cause, res.status)
 			signUpResultColor = 'error'
 			signUpResultVisibility = ''
 		} else {
 			signUpResultMessage = 'Successfully signed up!'
 			signUpResultColor = 'success'
 			signUpResultVisibility = ''
-            window.location.reload()
+			window.location.reload()
 		}
 	}
 
 	async function logInButton() {
-		if (!email || !password) {
-			signUpResultMessage = 'Please fill in all the fields.'
-			signUpResultColor = 'error'
-			signUpResultVisibility = ''
-			return
-		}
-        if (!isEmailValid || !isPasswordValid) {
-            signUpResultMessage = 'Please make sure all fields are valid.'
-			signUpResultColor = 'error'
-			signUpResultVisibility = ''
-			return
-        }
+		const areCredsValid = checkCredentialValidity()
+		if (!areCredsValid) return
+
 		const res = await logIn(supabase, email, password)
 		if (res instanceof AuthError) {
-			signUpResultMessage = `Failed to log in. ${res.message}`
+			// console.error(res.name, res.message, res.cause, res.status)
+			signUpResultMessage = `Failed to log in. ${res.message}.`
 			signUpResultColor = 'error'
 			signUpResultVisibility = ''
 		} else {
@@ -184,47 +179,61 @@
 							<span>Email</span>
 							<input
 								class="input"
-								class:input-error={!isEmailValid && !isEmailEmpty}
+								class:input-error={(!isEmailValid || isEmailTaken) && !isEmailEmpty}
 								type="text"
 								bind:value={email}
-								on:input={() => {
+								on:input={async () => {
 									clearTimeout(rulesDelayTimer)
 									rulesDelayTimer = setTimeout(
 										() => (emailRulesVisible = isEmailValid ? false : true),
 										500
 									)
+									await checkEmailAvailability()
 								}}
 								placeholder="Enter email..."
 							/>
 						</label>
 						{#if !isEmailValid && !isEmailEmpty && emailRulesVisible}
-							<p>Invalid email address</p>
+							<div class="variant-ghost-warning p-2 m-2">
+								<p>Invalid email address.</p>
+							</div>
+						{:else if isEmailTaken}
+							<div class="variant-ghost-warning p-2 m-2">
+								<p>The email is already taken.</p>
+							</div>
 						{/if}
 						<label class="label">
 							<span>Username</span>
 							<input
 								class="input"
-								class:input-error={!isUsernameValid && !isUsernameEmpty}
+								class:input-error={(!isUsernameValid || isUsernameTaken) && !isUsernameEmpty}
 								type="text"
 								bind:value={username}
-								on:input={() => {
+								on:input={async () => {
 									clearTimeout(rulesDelayTimer)
 									rulesDelayTimer = setTimeout(
 										() => (usernameRulesVisible = isUsernameValid ? false : true),
 										500
 									)
+									await checkUsernameAvailability()
 								}}
 								placeholder="Enter username..."
 							/>
 						</label>
 						{#if !isUsernameValid && !isUsernameEmpty && usernameRulesVisible}
-							<p>Username must be:</p>
-							<ol class="list-inside list-decimal">
-								<li>Alphanumeric with dots and underscores</li>
-								<li>At least two characters long</li>
-								<li>Can't have more than one dot in a row (e.g. no 'the..legend')</li>
-								<li>Can't start or end in a dot or underscore</li>
-							</ol>
+							<div class="variant-ghost-warning p-2 m-2">
+								<p>Username must be:</p>
+								<ol class="list-inside list-decimal">
+									<li>Alphanumeric with dots and underscores</li>
+									<li>At least three characters long</li>
+									<li>Can't have more than one dot in a row (e.g. no 'the..legend')</li>
+									<li>Can't start or end in a dot or underscore</li>
+								</ol>
+							</div>
+						{:else if isUsernameTaken}
+							<div class="variant-ghost-warning p-2 m-2">
+								<p>The username is already taken.</p>
+							</div>
 						{/if}
 						<label class="label">
 							<span>Password</span>
@@ -279,19 +288,21 @@
 						<button
 							class="btn variant-filled-primary"
 							disabled={!isEmailValid ||
-								!isUsernameValid ||
-								!isPasswordValid ||
-								isUsernameEmpty ||
+								isEmailTaken ||
 								isEmailEmpty ||
+								!isUsernameValid ||
+								isUsernameTaken ||
+								isUsernameEmpty ||
+								!isPasswordValid ||
 								isPasswordEmpty}
 							on:click={signUpButton}>Sign Up</button
 						>
 					{:else if tabSet === 1}
 						<button
-                            class="btn variant-filled-primary"
-                            disabled={isEmailEmpty || isPasswordEmpty}
-                            on:click={logInButton}
-                        >Log In</button>
+							class="btn variant-filled-primary"
+							disabled={isEmailEmpty || isPasswordEmpty}
+							on:click={logInButton}>Log In</button
+						>
 					{/if}
 					<button class="btn variant-filled-surface" on:click={() => modalStore.close()}
 						>Cancel</button

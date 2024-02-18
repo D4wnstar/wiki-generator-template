@@ -68,6 +68,12 @@ export async function hideUnauthorizedLinks(id: string, refSlugs: string[]) {
 	})
 }
 
+/**
+ * Merges the HTML chunks of the page to make up the content to render based on user permission.
+ * @param chunks The chunks of HTML that make up the page
+ * @param username The currently logged-in user
+ * @returns The HTML of the page as a string
+ */
 export function mergeContent(chunks: ContentChunk[], username: string | undefined) {
 	let content = ''
 	chunks.forEach((chunk) => {
