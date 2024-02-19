@@ -10,6 +10,7 @@
 	import type { Session, SupabaseClient } from '@supabase/supabase-js'
 	import type { Database } from '$lib/database.types'
 	import { goto } from '$app/navigation'
+	import { Settings, User } from 'lucide-svelte'
 
 	export let title: string
 	export let notesTreeView: TreeViewNode[]
@@ -18,24 +19,15 @@
 	export let session: Session | null
 
 	const modalStore = getModalStore()
-	const componentModal: ModalSettings = {
+	const authModal: ModalSettings = {
 		type: 'component',
 		component: 'auth',
 		meta: { supabase: supabase }
 	}
-	const logOutModal: ModalSettings = {
-		type: 'confirm',
-		// Data
-		title: 'Log Out',
-		body: 'Are you sure you want to log out?',
-		// TRUE if confirm pressed, FALSE if cancel pressed
-		response: async (res: boolean) => {
-			if (res) {
-				const { error } = await supabase.auth.signOut()
-				if (error) console.log(error)
-				window.location.assign("/")
-			}
-		}
+	const accountModal: ModalSettings = {
+		type: 'component',
+		component: 'account',
+		meta: { supabase: supabase, session: session }
 	}
 
 	function autocompleteRedirect(e: CustomEvent) {
@@ -46,14 +38,26 @@
 <NavTree {title} {notesTreeView} {notesTitles} on:autocomplete={autocompleteRedirect} />
 <hr />
 {#if session}
-	<button
-		class="btn variant-filled-surface mt-4 mx-6"
-		on:click={() => modalStore.trigger(logOutModal)}>Log Out</button
-	>
+	<div class="flex gap-2">
+		<button
+			class="btn variant-filled-surface mt-4 mx-6 w-full"
+			on:click={() => modalStore.trigger(accountModal)}
+		>
+			<div class="flex gap-2">
+				<Settings />
+				Account
+			</div>
+		</button>
+	</div>
 {:else}
 	<button
-		class="btn variant-filled-surface mt-4 mx-6"
-		on:click={() => modalStore.trigger(componentModal)}>Log In</button
+		class="btn variant-filled-surface mt-4 mx-6 w-full"
+		on:click={() => modalStore.trigger(authModal)}
 	>
+		<div class="flex gap-2">
+			<User />
+			Log In
+		</div>
+	</button>
 {/if}
 <ThemeSwitcher />

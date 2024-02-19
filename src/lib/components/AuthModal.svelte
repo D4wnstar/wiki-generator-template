@@ -90,7 +90,7 @@
 		}, 500)
 	}
 
-	function checkCredentialValidity() {
+	function checkCredentialValiditySignUp() {
 		if (isEmailEmpty || isPasswordEmpty || isUsernameEmpty) {
 			signUpResultMessage = 'Please fill in all the fields.'
 			signUpResultColor = 'error'
@@ -119,8 +119,19 @@
 		return true
 	}
 
+	function checkCredentialValidityLogIn() {
+		if (isEmailEmpty || isPasswordEmpty) {
+			signUpResultMessage = 'Please fill in all the fields.'
+			signUpResultColor = 'error'
+			signUpResultVisibility = ''
+			return false
+		}
+
+		return true
+	}
+
 	async function signUpButton() {
-		const areCredsValid = checkCredentialValidity()
+		const areCredsValid = checkCredentialValiditySignUp()
 		if (!areCredsValid) return
 
 		const res = await signUp(supabase, email, password, username)
@@ -138,7 +149,7 @@
 	}
 
 	async function logInButton() {
-		const areCredsValid = checkCredentialValidity()
+		const areCredsValid = checkCredentialValidityLogIn()
 		if (!areCredsValid) return
 
 		const res = await logIn(supabase, email, password)
@@ -180,7 +191,7 @@
 							<input
 								class="input"
 								class:input-error={(!isEmailValid || isEmailTaken) && !isEmailEmpty}
-								type="text"
+								type="email"
 								bind:value={email}
 								on:input={async () => {
 									clearTimeout(rulesDelayTimer)
@@ -268,7 +279,7 @@
 						</p>
 						<label class="label">
 							<span>Email</span>
-							<input class="input" type="text" bind:value={email} placeholder="Enter email..." />
+							<input class="input" type="email" bind:value={email} placeholder="Enter email..." />
 						</label>
 						<label class="label">
 							<span>Password</span>
@@ -304,7 +315,7 @@
 							on:click={logInButton}>Log In</button
 						>
 					{/if}
-					<button class="btn variant-filled-surface" on:click={() => modalStore.close()}
+					<button class="btn variant-ghost-surface" on:click={() => modalStore.close()}
 						>Cancel</button
 					>
 				</footer>

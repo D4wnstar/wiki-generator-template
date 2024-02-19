@@ -51,8 +51,10 @@
 	import AuthModal from '$lib/components/AuthModal.svelte'
 	import { Menu } from 'lucide-svelte'
 	import NavigationSidebar from '$lib/components/NavigationSidebar.svelte'
+	import AccountModal from '$lib/components/AccountModal.svelte'
 	const modalRegistry: Record<string, ModalComponent> = {
-		auth: { ref: AuthModal }
+		auth: { ref: AuthModal },
+		account: { ref: AccountModal },
 	}
 
 	// Autoscroll to top of page or hashed header on navigation

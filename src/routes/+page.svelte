@@ -29,11 +29,11 @@
 <div class="h-full w-full flex flex-col md:flex-row">
 	<div class="flex flex-col w-full items-center md:pb-8 pt-10 px-8">
 		<h1 id="note-title" class="h1 pb-4 text-center">{data.alt_title ?? data.title}</h1>
-		<div id="note-content" class="flex flex-col md:max-w-3xl w-full space-y-4">
+		<article id="note-content" class="flex flex-col md:max-w-3xl w-full space-y-4">
 			<hr />
 			{@html data.pageContent}
 			<hr />
-		</div>
+		</article>
 	</div>
 
 	{#if data.sidebar_images.length > 0 || data.details.length > 0 || data.backreferences.length > 0}
@@ -62,7 +62,7 @@
 </div>
 
 <div class="card p-4 variant-outline-secondary w-80 max-h-80 overflow-hidden" data-popup="popupHover">
-	<div class="text-center pb-2 text-2xl"><strong>{$popupNote.title}</strong></div>
+	<h1 class="text-center pb-2 text-2xl"><strong>{$popupNote.title}</strong></h1>
 	<hr />
-	<div class="text-sm py-2 space-y-2">{@html $popupNote.content}</div>
+	<article class="text-sm py-2 space-y-2">{@html $popupNote.content}</article>
 </div>
