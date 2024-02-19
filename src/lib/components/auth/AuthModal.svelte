@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { logIn, signUp } from '$lib/auth'
+	import { emailRules, logIn, passwordRules, signUp, usernameRules } from '$lib/auth'
 	import type { Database } from '$lib/database.types'
 	import { Tab, TabGroup, getModalStore } from '@skeletonlabs/skeleton'
 	import { AuthError, type SupabaseClient } from '@supabase/supabase-js'
@@ -7,24 +7,6 @@
 
 	const modalStore = getModalStore()
 	const supabase: SupabaseClient<Database> = $modalStore[0].meta.supabase
-	/**
-	 * Username must be:
-	 * 1. Alphanumeric with dots and underscores
-	 * 2. At least three characters long
-	 * 3. Can't have more than one dot in a row (e.g. no 'the..legend')
-	 * 4. Can't start or end in a dot or underscore
-	 */
-	const usernameRules = /^(?=[a-zA-Z0-9._]{3,}$)(?!.*[.]{2})[^_.].*[^_.]$/
-	/**
-	 * RFC2822 standard email validation. From the .NET helpfiles.
-	 */
-	const emailRules =
-		/[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
-	/**
-	 * Password must be at least six characters long, with at least one
-	 * upper- or lowercase letter. Password rules are intentionally very lenient.
-	 */
-	const passwordRules = /^(?=.*[a-zA-Z]).{6,}$/
 
 	let signUpResultVisibility = 'hidden'
 	let signUpResultMessage = 'Placeholder'
@@ -110,7 +92,7 @@
 			return false
 		}
 		if (isUsernameTaken) {
-			signUpResultMessage = 'Username already taken. Please choose a different username.'
+			signUpResultMessage = 'Username already taken. Please use a different username.'
 			signUpResultColor = 'error'
 			signUpResultVisibility = ''
 			return false

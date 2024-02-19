@@ -48,10 +48,10 @@
 	}
 
 	// Modal initialization
-	import AuthModal from '$lib/components/AuthModal.svelte'
+	import AuthModal from '$lib/components/auth/AuthModal.svelte'
 	import { Menu } from 'lucide-svelte'
 	import NavigationSidebar from '$lib/components/NavigationSidebar.svelte'
-	import AccountModal from '$lib/components/AccountModal.svelte'
+	import AccountModal from '$lib/components/auth/AccountModal.svelte'
 	const modalRegistry: Record<string, ModalComponent> = {
 		auth: { ref: AuthModal },
 		account: { ref: AccountModal },

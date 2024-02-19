@@ -51,7 +51,7 @@
 	</div>
 {:else}
 	<button
-		class="btn variant-filled-surface mt-4 mx-6 w-full"
+		class="btn variant-filled-surface mt-4 mx-6"
 		on:click={() => modalStore.trigger(authModal)}
 	>
 		<div class="flex gap-2">

@@ -4,6 +4,27 @@ import type { ContentChunk } from './shorthand.types'
 import type { Database } from './database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
+/**
+ * Username must be:
+ * 1. Alphanumeric with dots and underscores
+ * 2. At least three characters long
+ * 3. Can't have more than one dot in a row (e.g. no 'the..legend')
+ * 4. Can't start or end in a dot or underscore
+ */
+export const usernameRules = /^(?=[a-zA-Z0-9._]{3,}$)(?!.*[.]{2})[^_.].*[^_.]$/
+
+/**
+ * RFC2822 standard email validation. From the .NET helpfiles.
+ */
+export const emailRules =
+	/[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
+
+/**
+ * Password must be at least six characters long, with at least one
+ * upper- or lowercase letter. Password rules are intentionally very lenient.
+ */
+export const passwordRules = /^(?=.*[a-zA-Z]).{6,}$/
+
 export async function signUp(
 	supabase: SupabaseClient<Database>,
 	email: string,
@@ -20,11 +41,7 @@ export async function signUp(
 		}
 	})
 
-	if (!error) {
-		return data.user
-	} else {
-		return error
-	}
+	return error ? error : data.user
 }
 
 export async function logIn(supabase: SupabaseClient, email: string, password: string) {
@@ -33,15 +50,22 @@ export async function logIn(supabase: SupabaseClient, email: string, password: s
 		password
 	})
 
-	if (!error) {
-		return data.user
-	} else {
-		return error
-	}
+	return error ? error : data.user
+}
+
+export async function updateUserInfo(supabase: SupabaseClient, email: string, username: string) {
+	const { data, error } = await supabase.auth.updateUser({
+		email: email,
+		data: {
+			username: username
+		}
+	})
+
+	return error ? error : data.user
 }
 
 /**
- * Hides and disables all links pointing to pages the currently logged-in user doesn't
+ * Hides and disables all internal links pointing to pages the currently logged-in user doesn't
  * have permission to see. This happens only inside of the element with the given id.
  * This happens onMount and afterNavigate so it will cause flickering.
  * @param id The id of the HTML element to apply this function to
@@ -58,12 +82,12 @@ export async function hideUnauthorizedLinks(id: string, refSlugs: string[]) {
 	}
 
 	onMount(() => {
-		anchors = document.getElementById(id)?.querySelectorAll('a')
+		anchors = document.getElementById(id)?.querySelectorAll('a:not([target="_blank"])')
 		anchors?.forEach((a) => removeLinks(a))
 	})
 
 	afterNavigate(() => {
-		anchors = document.getElementById(id)?.querySelectorAll('a')
+		anchors = document.getElementById(id)?.querySelectorAll('a:not([target="_blank"])')
 		anchors?.forEach((a) => removeLinks(a))
 	})
 }
