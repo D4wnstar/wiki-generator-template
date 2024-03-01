@@ -34,11 +34,7 @@ export const load = async ({ fetch, data, depends }) => {
     // eslint-disable-next-line prefer-const
     let { data: notes, error: dbError } = await supabase
         .from('notes')
-        .select(`
-			title,
-            path,
-			slug
-        `)
+        .select(`*`)
 		.eq('frontpage', false)
 
     if (dbError) {
@@ -47,10 +43,9 @@ export const load = async ({ fetch, data, depends }) => {
     } else if (!notes || notes.length === 0) {
         error(404, `Could not find notes during layout loading.`)
 	}
-
+	
 	notes = notes.sort((a, b) => a.path.localeCompare(b.path))
-	const paths = notes.map((note) => note.path)
-	const notesTreeView = createNotesTree(paths)
+	const notesTreeView = createNotesTree(notes)
 
 	const noteTitles: AutocompleteOption<string>[] = notes.map((note) => {
 		return {
@@ -76,7 +71,7 @@ export const load = async ({ fetch, data, depends }) => {
 	wikiTitle.set(wikiSettings.settings?.title)
 
 	const settings = wikiSettings.settings
-	return { supabase, session, paths, noteTitles, notesTreeView, settings }
+	return { supabase, session, noteTitles, notesTreeView, settings }
 }
 
 // export const prerender = true

@@ -319,7 +319,7 @@ export function initializePopup(
 
 
 export function destroyPopup(triggerNode: HTMLElement) {
-	closeInstantly()
+	if (closeInstantly) closeInstantly()
 	// Trigger Events
 	triggerNode.removeEventListener('click', () => closeInstantly(), true)
 	triggerNode.removeEventListener('mouseover', open, true)

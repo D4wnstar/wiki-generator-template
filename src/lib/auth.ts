@@ -2,7 +2,7 @@ import { afterNavigate } from '$app/navigation'
 import { onMount } from 'svelte'
 import type { ContentChunk } from './shorthand.types'
 import type { Database } from './database.types'
-import type { SupabaseClient } from '@supabase/supabase-js'
+import { AuthError, type SupabaseClient } from '@supabase/supabase-js'
 
 /**
  * Username must be:
@@ -64,6 +64,32 @@ export async function updateUserInfo(supabase: SupabaseClient, email: string, us
 	return error ? error : data.user
 }
 
+export async function updateUserPassword(
+	supabase: SupabaseClient,
+	newPass: string,
+	newPassConfirm: string
+) {
+	if (newPass !== newPassConfirm) return new AuthError("The passwords don't coincide.")
+
+	const { data, error } = await supabase.auth.updateUser({
+		password: newPass
+	})
+
+	return error ? error : data.user
+}
+
+export async function sendPasswordResetEmail(supabase: SupabaseClient, email: string) {
+	let url = window.location.href
+	url = url.charAt(url.length - 1) === '/' ? url : `${url}/`
+	console.log(url)
+
+	const { error } = await supabase.auth.resetPasswordForEmail(email, {
+		redirectTo: url
+	})
+
+	return error ? error : undefined
+}
+
 /**
  * Hides and disables all internal links pointing to pages the currently logged-in user doesn't
  * have permission to see. This happens only inside of the element with the given id.
@@ -102,7 +128,7 @@ export function mergeContent(chunks: ContentChunk[], username: string | undefine
 	let content = ''
 	chunks.forEach((chunk) => {
 		if (
-			(chunk.allowed_users?.length === 0) ||
+			chunk.allowed_users?.length === 0 ||
 			(username && chunk.allowed_users?.includes(username))
 		) {
 			content += chunk.text

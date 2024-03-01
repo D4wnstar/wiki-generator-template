@@ -1,14 +1,20 @@
 <script lang="ts">
 	import { emailRules, logIn, passwordRules, signUp, usernameRules } from '$lib/auth'
 	import type { Database } from '$lib/database.types'
-	import { Tab, TabGroup, getModalStore } from '@skeletonlabs/skeleton'
+	import { Tab, TabGroup, getModalStore, type ModalSettings } from '@skeletonlabs/skeleton'
 	import { AuthError, type SupabaseClient } from '@supabase/supabase-js'
 	import { UserPlus, User } from 'lucide-svelte'
 
 	const modalStore = getModalStore()
 	const supabase: SupabaseClient<Database> = $modalStore[0].meta.supabase
 
-	let signUpResultVisibility = 'hidden'
+	const pwresetModal: ModalSettings = {
+		type: 'component',
+		component: 'pwreset',
+		meta: { supabase: supabase }
+	}
+
+	let signUpResultVisibility = false
 	let signUpResultMessage = 'Placeholder'
 	let signUpResultColor = 'warning'
 	let tabSet: number = 0
@@ -45,7 +51,7 @@
 		email = ''
 		password = ''
 		username = ''
-		signUpResultVisibility = 'hidden'
+		signUpResultVisibility = false
 	}
 
 	async function checkUsernameAvailability() {
@@ -76,25 +82,25 @@
 		if (isEmailEmpty || isPasswordEmpty || isUsernameEmpty) {
 			signUpResultMessage = 'Please fill in all the fields.'
 			signUpResultColor = 'error'
-			signUpResultVisibility = ''
+			signUpResultVisibility = true
 			return false
 		}
 		if (!isEmailValid || !isPasswordValid || !isUsernameValid) {
 			signUpResultMessage = 'Please make sure all fields are valid.'
 			signUpResultColor = 'error'
-			signUpResultVisibility = ''
+			signUpResultVisibility = true
 			return false
 		}
 		if (isEmailTaken) {
 			signUpResultMessage = 'Email already taken. Please use a different email.'
 			signUpResultColor = 'error'
-			signUpResultVisibility = ''
+			signUpResultVisibility = true
 			return false
 		}
 		if (isUsernameTaken) {
 			signUpResultMessage = 'Username already taken. Please use a different username.'
 			signUpResultColor = 'error'
-			signUpResultVisibility = ''
+			signUpResultVisibility = true
 			return false
 		}
 
@@ -105,7 +111,7 @@
 		if (isEmailEmpty || isPasswordEmpty) {
 			signUpResultMessage = 'Please fill in all the fields.'
 			signUpResultColor = 'error'
-			signUpResultVisibility = ''
+			signUpResultVisibility = true
 			return false
 		}
 
@@ -121,11 +127,11 @@
 			// console.error(res.name, res.message, res.cause, res.status)
 			signUpResultMessage = `Failed to sign up. ${res.message}`
 			signUpResultColor = 'error'
-			signUpResultVisibility = ''
+			signUpResultVisibility = true
 		} else {
 			signUpResultMessage = 'Successfully signed up!'
 			signUpResultColor = 'success'
-			signUpResultVisibility = ''
+			signUpResultVisibility = true
 			window.location.reload()
 		}
 	}
@@ -139,35 +145,70 @@
 			// console.error(res.name, res.message, res.cause, res.status)
 			signUpResultMessage = `Failed to log in. ${res.message}.`
 			signUpResultColor = 'error'
-			signUpResultVisibility = ''
+			signUpResultVisibility = true
 		} else {
 			signUpResultMessage = 'Successfully logged in!'
 			signUpResultColor = 'success'
-			signUpResultVisibility = ''
+			signUpResultVisibility = true
 			window.location.reload()
 		}
 	}
 </script>
 
 {#if $modalStore[0]}
-	<div class="card p-4 w-modal shadow-xl space-y-4">
+	<div class="card w-modal space-y-4 p-4 shadow-xl">
 		<TabGroup>
-			<Tab bind:group={tabSet} name="signup" value={0} on:change={clearData}>
-				<svelte:fragment slot="lead"><UserPlus class="inline" /></svelte:fragment>
-				<span>Sign Up</span>
-			</Tab>
-			<Tab bind:group={tabSet} name="login" value={1} on:change={clearData}>
+			<Tab bind:group={tabSet} name="login" value={0} on:change={clearData}>
 				<svelte:fragment slot="lead"><User class="inline" /></svelte:fragment>
 				<span>Log In</span>
 			</Tab>
+			<Tab bind:group={tabSet} name="signup" value={1} on:change={clearData}>
+				<svelte:fragment slot="lead"><UserPlus class="inline" /></svelte:fragment>
+				<span>Sign Up</span>
+			</Tab>
 			<svelte:fragment slot="panel">
 				{#if tabSet === 0}
-					<form class="px-4 space-y-4 rounded-container-token">
-						<p
-							class="{signUpResultVisibility} text-center card variant-filled-{signUpResultColor} py-2"
+					<form class="space-y-4 px-4 rounded-container-token">
+						{#if signUpResultVisibility}
+							<p
+								class="card text-center variant-filled-{signUpResultColor} p-2"
+							>
+								{signUpResultMessage}
+							</p>
+						{/if}
+						<label class="label">
+							<span>Email</span>
+							<input class="input" type="email" bind:value={email} placeholder="Enter email..." />
+						</label>
+						<label class="label">
+							<span>Password</span>
+							<input
+								class="input"
+								type="password"
+								bind:value={password}
+								placeholder="Enter password..."
+							/>
+						</label>
+						<button
+							class="variant-ghost-surface btn btn-sm"
+							on:click={() => {
+								modalStore.clear()
+								modalStore.trigger(pwresetModal)
+							}}
 						>
-							{signUpResultMessage}
-						</p>
+							<small class="small block">Forgot your password?</small>
+						</button>
+						<hr />
+					</form>
+				{:else if tabSet === 1}
+					<form class="space-y-4 px-4 rounded-container-token">
+						{#if signUpResultVisibility}
+							<p
+								class="card text-center variant-filled-{signUpResultColor} py-2"
+							>
+								{signUpResultMessage}
+							</p>
+						{/if}
 						<label class="label">
 							<span>Email</span>
 							<input
@@ -187,11 +228,11 @@
 							/>
 						</label>
 						{#if !isEmailValid && !isEmailEmpty && emailRulesVisible}
-							<div class="variant-ghost-warning p-2 m-2">
+							<div class="variant-ghost-warning m-2 p-2">
 								<p>Invalid email address.</p>
 							</div>
 						{:else if isEmailTaken}
-							<div class="variant-ghost-warning p-2 m-2">
+							<div class="variant-ghost-warning m-2 p-2">
 								<p>The email is already taken.</p>
 							</div>
 						{/if}
@@ -214,7 +255,7 @@
 							/>
 						</label>
 						{#if !isUsernameValid && !isUsernameEmpty && usernameRulesVisible}
-							<div class="variant-ghost-warning p-2 m-2">
+							<div class="variant-ghost-warning m-2 p-2">
 								<p>Username must be:</p>
 								<ol class="list-inside list-decimal">
 									<li>Alphanumeric with dots and underscores</li>
@@ -224,7 +265,7 @@
 								</ol>
 							</div>
 						{:else if isUsernameTaken}
-							<div class="variant-ghost-warning p-2 m-2">
+							<div class="variant-ghost-warning m-2 p-2">
 								<p>The username is already taken.</p>
 							</div>
 						{/if}
@@ -247,39 +288,23 @@
 						</label>
 						{#if !isPasswordValid && !isPasswordEmpty && passwordRulesVisible}
 							<p>
-								Password must be at least six characters long and can contain special characters
+								Password must be at least six characters long and can contain special characters.
 							</p>
 						{/if}
 						<hr />
 					</form>
-				{:else if tabSet === 1}
-					<form class="px-4 space-y-4 rounded-container-token">
-						<p
-							class="{signUpResultVisibility} text-center card variant-filled-{signUpResultColor} py-2"
-						>
-							{signUpResultMessage}
-						</p>
-						<label class="label">
-							<span>Email</span>
-							<input class="input" type="email" bind:value={email} placeholder="Enter email..." />
-						</label>
-						<label class="label">
-							<span>Password</span>
-							<input
-								class="input"
-								type="password"
-								bind:value={password}
-								placeholder="Enter password..."
-							/>
-						</label>
-						<hr />
-					</form>
 				{/if}
 
-				<footer class="w-full flex justify-end gap-2 pt-4">
+				<footer class="flex w-full justify-end gap-2 pt-4">
 					{#if tabSet === 0}
 						<button
-							class="btn variant-filled-primary"
+							class="variant-filled-primary btn"
+							disabled={isEmailEmpty || isPasswordEmpty}
+							on:click={logInButton}>Log In</button
+						>
+					{:else if tabSet === 1}
+						<button
+							class="variant-filled-primary btn"
 							disabled={!isEmailValid ||
 								isEmailTaken ||
 								isEmailEmpty ||
@@ -290,14 +315,8 @@
 								isPasswordEmpty}
 							on:click={signUpButton}>Sign Up</button
 						>
-					{:else if tabSet === 1}
-						<button
-							class="btn variant-filled-primary"
-							disabled={isEmailEmpty || isPasswordEmpty}
-							on:click={logInButton}>Log In</button
-						>
 					{/if}
-					<button class="btn variant-ghost-surface" on:click={() => modalStore.close()}
+					<button class="variant-ghost-surface btn" on:click={() => modalStore.close()}
 						>Cancel</button
 					>
 				</footer>

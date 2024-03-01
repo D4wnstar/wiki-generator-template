@@ -111,7 +111,7 @@
 	<hr />
 	<form class="space-y-4">
 		{#if responseVisibility}
-			<p class="variant-filled-{responseColor} text-center card py-2">
+			<p class="variant-filled-{responseColor} text-center card p-2">
 				{responseMessage}
 			</p>
 		{/if}
@@ -179,6 +179,7 @@
 		>
 		<button
 			class="btn variant-filled-surface"
+            disabled={!isEmailValid || !isUsernameValid}
 			on:click={updateInfo}
 		>
 			Save Changes

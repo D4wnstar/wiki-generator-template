@@ -5,7 +5,9 @@
 		AppShell,
 		Modal,
 		type DrawerSettings,
-		type ModalComponent
+		type ModalComponent,
+		getModalStore,
+		type ModalSettings
 	} from '@skeletonlabs/skeleton'
 	import { currentTheme } from '$lib/stores'
 	import { browser } from '$app/environment'
@@ -28,9 +30,21 @@
 	$: ({ supabase, session } = data)
 
 	onMount(() => {
-		const { data } = supabase.auth.onAuthStateChange((_event, _session) => {
+		const { data } = supabase.auth.onAuthStateChange(async (event, _session) => {
 			if (_session?.expires_at !== session?.expires_at) {
 				invalidate('supabase:auth')
+			}
+
+			if (event == "PASSWORD_RECOVERY") {
+				const pwresetModal: ModalSettings = {
+					type: 'component',
+					component: 'pwresetPost',
+					meta: { supabase: supabase }
+				}
+
+				const modalStore = getModalStore()
+				modalStore.clear()
+				modalStore.trigger(pwresetModal)
 			}
 		})
 
@@ -52,9 +66,13 @@
 	import { Menu } from 'lucide-svelte'
 	import NavigationSidebar from '$lib/components/NavigationSidebar.svelte'
 	import AccountModal from '$lib/components/auth/AccountModal.svelte'
+	import PasswordResetModal from '$lib/components/auth/PasswordResetModal.svelte'
+	import PasswordResetPostModal from '$lib/components/auth/PasswordResetPostModal.svelte'
 	const modalRegistry: Record<string, ModalComponent> = {
 		auth: { ref: AuthModal },
 		account: { ref: AccountModal },
+		pwreset: { ref: PasswordResetModal },
+		pwresetPost: { ref: PasswordResetPostModal },
 	}
 
 	// Autoscroll to top of page or hashed header on navigation
