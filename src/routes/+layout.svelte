@@ -41,24 +41,16 @@
 	import NavigationSidebar from '$lib/components/NavigationSidebar.svelte'
 	import AccountModal from '$lib/components/auth/AccountModal.svelte'
 	import PasswordResetModal from '$lib/components/auth/PasswordResetModal.svelte'
-	import PasswordResetPostModal from '$lib/components/auth/PasswordResetPostModal.svelte'
 	const modalStore = getModalStore()
 	const modalRegistry: Record<string, ModalComponent> = {
 		auth: { ref: AuthModal },
 		account: { ref: AccountModal },
 		pwreset: { ref: PasswordResetModal },
-		pwresetPost: { ref: PasswordResetPostModal },
 	}
 
 	// Supabase authentication client updates
 	let { supabase, session } = data
 	$: ({ supabase, session } = data)
-
-	const pwresetModal: ModalSettings = {
-		type: 'component',
-		component: 'pwresetPost',
-		meta: { supabase }
-	}
 
 	onMount(() => {
 		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
