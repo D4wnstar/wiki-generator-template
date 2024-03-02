@@ -106,9 +106,7 @@
 	}
 </script>
 
-<section class="flex flex-col space-y-4 w-full md:px-4">
-	<h2 class="text-xl hidden md:block"><strong>Information</strong></h2>
-	<hr />
+<section class="flex flex-col space-y-4 w-full">
 	<form class="space-y-4">
 		{#if responseVisibility}
 			<p class="variant-filled-{responseColor} text-center card p-2">

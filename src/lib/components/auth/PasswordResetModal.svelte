@@ -44,7 +44,7 @@
 
 {#if $modalStore[0]}
 	<div class="card w-modal space-y-4 p-4 shadow-xl">
-		<h1 class="text-2xl"><strong>Password Reset</strong></h1>
+		<h1 class="text-3xl"><strong>Password Reset</strong></h1>
 		<hr />
 		<form class="space-y-4 px-4 rounded-container-token">
 			{#if responseVisibility}

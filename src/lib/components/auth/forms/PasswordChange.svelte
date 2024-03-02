@@ -50,7 +50,7 @@
     }
 </script>
 
-<section class="flex flex-col space-y-4 w-full md:px-4">
+<section class="flex flex-col space-y-4 w-full">
     <form class="space-y-4">
         {#if responseVisibility}
 			<p class="variant-filled-{responseColor} text-center card p-2">
