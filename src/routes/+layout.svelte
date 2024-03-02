@@ -25,32 +25,6 @@
 	import { storePopup } from '@skeletonlabs/skeleton'
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow })
 
-	// Supabase authentication client updates
-	let { supabase, session } = data
-	$: ({ supabase, session } = data)
-
-	onMount(() => {
-		const { data } = supabase.auth.onAuthStateChange(async (event, _session) => {
-			if (_session?.expires_at !== session?.expires_at) {
-				invalidate('supabase:auth')
-			}
-
-			if (event == "PASSWORD_RECOVERY") {
-				const pwresetModal: ModalSettings = {
-					type: 'component',
-					component: 'pwresetPost',
-					meta: { supabase: supabase }
-				}
-
-				const modalStore = getModalStore()
-				modalStore.clear()
-				modalStore.trigger(pwresetModal)
-			}
-		})
-
-		return () => data.subscription.unsubscribe()
-	})
-
 	// Drawer initialization
 	import { initializeStores, Drawer, getDrawerStore } from '@skeletonlabs/skeleton'
 	import type { AfterNavigate } from '@sveltejs/kit'
@@ -68,12 +42,39 @@
 	import AccountModal from '$lib/components/auth/AccountModal.svelte'
 	import PasswordResetModal from '$lib/components/auth/PasswordResetModal.svelte'
 	import PasswordResetPostModal from '$lib/components/auth/PasswordResetPostModal.svelte'
+	const modalStore = getModalStore()
 	const modalRegistry: Record<string, ModalComponent> = {
 		auth: { ref: AuthModal },
 		account: { ref: AccountModal },
 		pwreset: { ref: PasswordResetModal },
 		pwresetPost: { ref: PasswordResetPostModal },
 	}
+
+	// Supabase authentication client updates
+	let { supabase, session } = data
+	$: ({ supabase, session } = data)
+
+	const pwresetModal: ModalSettings = {
+		type: 'component',
+		component: 'pwresetPost',
+		meta: { supabase }
+	}
+
+	onMount(() => {
+		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
+			if (_session?.expires_at !== session?.expires_at) {
+				invalidate('supabase:auth')
+			}
+
+			if (event === "PASSWORD_RECOVERY") {
+				console.log(_session)
+				modalStore.clear()
+				modalStore.trigger(pwresetModal)
+			}
+		})
+
+		return () => data.subscription.unsubscribe()
+	})
 
 	// Autoscroll to top of page or hashed header on navigation
 	afterNavigate((params: AfterNavigate) => {

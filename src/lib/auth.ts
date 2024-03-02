@@ -3,6 +3,7 @@ import { onMount } from 'svelte'
 import type { ContentChunk } from './shorthand.types'
 import type { Database } from './database.types'
 import { AuthError, type SupabaseClient } from '@supabase/supabase-js'
+import { PUBLIC_PASSWORD_REDIRECT_URL } from '$env/static/public'
 
 /**
  * Username must be:
@@ -79,13 +80,17 @@ export async function updateUserPassword(
 }
 
 export async function sendPasswordResetEmail(supabase: SupabaseClient, email: string) {
-	let url = window.location.href
+	let url = PUBLIC_PASSWORD_REDIRECT_URL
+	// Make sure to include `https://` when not localhost.
+	url = url.includes('http') ? url : `https://${url}`
+	// Make sure to include a trailing `/`.
 	url = url.charAt(url.length - 1) === '/' ? url : `${url}/`
+	
 	console.log(url)
-
-	const { error } = await supabase.auth.resetPasswordForEmail(email, {
-		redirectTo: url
-	})
+	const { error } = await supabase.auth.resetPasswordForEmail(
+		email,
+		{ redirectTo: url },
+	)
 
 	return error ? error : undefined
 }

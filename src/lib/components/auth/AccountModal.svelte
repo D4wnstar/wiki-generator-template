@@ -45,7 +45,7 @@
 			<div class="flex w-full flex-col space-y-4 overflow-auto">
 				<InfoChange {session} {supabase} />
 				<hr />
-				<PasswordChange {supabase} />
+				<PasswordChange {supabase} on:success={() => window.location.reload()} />
 			</div>
 		</div>
 		<hr />

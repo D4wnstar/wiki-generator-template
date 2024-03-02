@@ -2,8 +2,11 @@
 	import { passwordRules, updateUserPassword } from "$lib/auth"
 	import type { Database } from "$lib/database.types"
 	import { AuthError, type SupabaseClient } from "@supabase/supabase-js"
+	import { createEventDispatcher } from "svelte"
 
 	export let supabase: SupabaseClient<Database>
+
+    const dispatch = createEventDispatcher()
 
     let newPass = ""
     let newPassConfirm = ""
@@ -42,7 +45,7 @@
             responseMessage = 'Successfully updated password.'
 			responseColor = 'success'
 			responseVisibility = true
-			window.location.reload()
+            dispatch('success')
         }
     }
 </script>
