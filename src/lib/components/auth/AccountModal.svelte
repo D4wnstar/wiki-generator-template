@@ -2,7 +2,7 @@
 	import type { Database } from '$lib/database.types'
 	import { getModalStore, ListBox, ListBoxItem, type ModalSettings } from '@skeletonlabs/skeleton'
 	import type { Session, SupabaseClient } from '@supabase/supabase-js'
-	import { Info, Lock } from 'lucide-svelte'
+	import { EyeOff, Info } from 'lucide-svelte'
 	import InfoChange from './forms/InfoChange.svelte'
 	import PasswordChange from './forms/PasswordChange.svelte'
 	import { onMount } from 'svelte'
@@ -28,7 +28,7 @@
 		}
 	}
 
-	let currTab: string = 'private'
+	let currTab: string = 'info'
 	let privateNotes: Note[] = []
 
 	onMount(async () => {
@@ -58,9 +58,9 @@
 					<svelte:fragment slot="lead"><Info /></svelte:fragment>
 					Info
 				</ListBoxItem>
-				<ListBoxItem bind:group={currTab} name="private" value="private">
-					<svelte:fragment slot="lead"><Lock /></svelte:fragment>
-					Private
+				<ListBoxItem bind:group={currTab} name="secrets" value="secrets">
+					<svelte:fragment slot="lead"><EyeOff /></svelte:fragment>
+					Secrets
 				</ListBoxItem>
 			</ListBox>
 			<div class="border-surface-300-600-token hidden border-r md:block" />
@@ -70,20 +70,20 @@
 					<hr />
 					<PasswordChange {supabase} on:success={() => window.location.reload()} />
 				</ModalTab>
-			{:else if currTab === 'private'}
-				<ModalTab tabTitle="Private">
+			{:else if currTab === 'secrets'}
+				<ModalTab tabTitle="Secrets">
 					<div>
-						<h3 class="text-xl">Secret Pages</h3>
+						<!-- <h3 class="text-xl">Secret Pages</h3> -->
 						<div class="text-surface-600-300-token">
-							These are all the private pages you have access to.
+							These are all the secret pages you have access to.
 						</div>
-						<ul class="ul card variant-soft-secondary p-2 my-2">
+						<ul class="ul card variant-soft-secondary my-2 p-2">
 							{#if privateNotes.length === 0}
 								<div>There's nothing here...</div>
 							{:else}
 								{#each privateNotes as note}
 									<li class="list-inside list-disc pl-4">
-										<a href={`/${note.slug}`} class="anchor">{note.path}</a>
+										<a href={`/${note.slug}`} class="underline">{note.path}</a>
 									</li>
 								{/each}
 							{/if}

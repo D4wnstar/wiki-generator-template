@@ -3,8 +3,8 @@
 	import { setupPopups } from '$lib/popups'
 	import type { PopupSettings } from '@skeletonlabs/skeleton'
 	import Extras from '$lib/components/Extras.svelte'
-	import { hideUnauthorizedLinks, mergeContent } from '$lib/auth.js'
-
+	import { hideUnauthorizedLinks } from '$lib/auth.js'
+	
 	export let data
 
 	const popupSettings: PopupSettings = {
@@ -14,7 +14,10 @@
 		middleware: { autoPlacement: { allowedPlacements: ['top', 'bottom'] } }
 	}
 
-	hideUnauthorizedLinks('note-content', data.refNotes.map((r) => r.slug))
+	hideUnauthorizedLinks(
+		'note-content',
+		data.refNotes.map((r) => r.slug)
+	)
 	setupPopups('note-content', popupSettings, data.supabase)
 	$: pageTitle = `${data.alt_title ?? data.title} - ${$wikiTitle}`
 </script>
@@ -23,10 +26,10 @@
 	<title>{pageTitle}</title>
 </svelte:head>
 
-<div class="h-full w-full flex flex-col md:flex-row">
-	<div class="flex flex-col w-full items-center md:pb-8 pt-10 px-8">
-		<h1 id="note-title" class="h1 pb-4 text-center">{data.alt_title ?? data.title}</h1>
-		<article id="note-content" class="flex flex-col md:max-w-3xl w-full space-y-4">
+<div class="flex h-full w-full flex-col md:flex-row">
+	<div class="flex w-full flex-col items-center px-8 md:pb-8">
+		<h1 id="note-title" class="h1 pb-4 pt-4 text-center">{data.alt_title ?? data.title}</h1>
+		<article id="note-content" class="flex w-full flex-col space-y-4 md:max-w-3xl">
 			<hr />
 			{@html data.pageContent}
 			<hr />
@@ -36,7 +39,7 @@
 	{#if data.sidebar_images.length > 0 || data.details.length > 0 || data.backreferences.length > 0}
 		<div
 			id="extras-sidebar"
-			class="hidden md:flex md:flex-col md:w-[24em] lg:w-[36em] p-4 space-y-2 rounded-none variant-glass-surface border-l-[1px] border-surface-300-600-token"
+			class="variant-glass-surface border-surface-300-600-token hidden space-y-2 rounded-none border-l-[1px] p-4 md:flex md:w-[24em] md:flex-col lg:w-[36em]"
 		>
 			<Extras
 				sidebar_images={data.sidebar_images}
@@ -46,7 +49,7 @@
 				supabase={data.supabase}
 			/>
 		</div>
-		<div class="md:hidden px-8 pt-4 pb-8 space-y-4">
+		<div class="space-y-4 px-8 pb-8 pt-4 md:hidden">
 			<Extras
 				sidebar_images={data.sidebar_images}
 				details={data.details}
@@ -58,8 +61,11 @@
 	{/if}
 </div>
 
-<div class="card p-4 variant-outline-secondary w-80 max-h-80 overflow-hidden" data-popup="popupHover">
-	<h1 class="text-center pb-2 text-2xl"><strong>{$popupNote.title}</strong></h1>
+<div
+	class="card variant-outline-secondary max-h-80 w-80 overflow-hidden p-4"
+	data-popup="popupHover"
+>
+	<h1 class="pb-2 text-center text-2xl"><strong>{$popupNote.title}</strong></h1>
 	<hr />
-	<article class="text-sm py-2 space-y-2">{@html $popupNote.content}</article>
+	<article class="space-y-2 py-2 text-sm">{@html $popupNote.content}</article>
 </div>

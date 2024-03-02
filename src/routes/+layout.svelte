@@ -5,10 +5,7 @@
 		AppShell,
 		Modal,
 		type DrawerSettings,
-		type ModalComponent,
-		getModalStore,
-		type ModalSettings
-	} from '@skeletonlabs/skeleton'
+		type ModalComponent	} from '@skeletonlabs/skeleton'
 	import { currentTheme } from '$lib/stores'
 	import { browser } from '$app/environment'
 	import { onMount } from 'svelte'
@@ -41,7 +38,6 @@
 	import NavigationSidebar from '$lib/components/NavigationSidebar.svelte'
 	import AccountModal from '$lib/components/auth/AccountModal.svelte'
 	import PasswordResetModal from '$lib/components/auth/PasswordResetModal.svelte'
-	const modalStore = getModalStore()
 	const modalRegistry: Record<string, ModalComponent> = {
 		auth: { ref: AuthModal },
 		account: { ref: AccountModal },
@@ -53,15 +49,9 @@
 	$: ({ supabase, session } = data)
 
 	onMount(() => {
-		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
+		const { data } = supabase.auth.onAuthStateChange((_event, _session) => {
 			if (_session?.expires_at !== session?.expires_at) {
 				invalidate('supabase:auth')
-			}
-
-			if (event === "PASSWORD_RECOVERY") {
-				console.log(_session)
-				modalStore.clear()
-				modalStore.trigger(pwresetModal)
 			}
 		})
 

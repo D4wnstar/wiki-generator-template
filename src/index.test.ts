@@ -1,11 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { slugifyPath, getPathCombinations } from '$lib/notes';
-
-describe('sum test', () => {
-	it('adds 1 + 2 to equal 3', () => {
-		expect(1 + 2).toBe(3);
-	});
-});
+import { slugifyPath, getPathCombinations, deletePathAndDescendants } from '$lib/notes';
 
 describe('slugifyPath function', () => {
 	it('should return a slug for a single word', () => {
@@ -37,18 +31,81 @@ describe('slugifyPath function', () => {
 
 describe('getPathCombinations function', () => {
 	it('should return all combinations for a given path', () => {
-	  expect(getPathCombinations('path/to/folder')).toEqual(['path', 'path/to', 'path/to/folder']);
+	  expect(getPathCombinations('path/to/folder')).toEqual(new Set(['path', 'path/to', 'path/to/folder']));
 	});
   
 	it('should return the path itself when there are no slashes', () => {
-	  expect(getPathCombinations('path')).toEqual(['path']);
+	  expect(getPathCombinations('path')).toEqual(new Set(['path']));
 	});
   
 	it('should handle paths with multiple consecutive slashes', () => {
-	  expect(getPathCombinations('path//to/folder')).toEqual(['path', 'path/to', 'path/to/folder']);
+	  expect(getPathCombinations('path//to/folder')).toEqual(new Set(['path', 'path/to', 'path/to/folder']));
 	});
   
 	it('should return an empty array for an empty path', () => {
-	  expect(getPathCombinations('')).toEqual([]);
+	  expect(getPathCombinations('')).toEqual(new Set());
 	});
   });
+
+
+  describe('deletePathAndDescendants function', () => {
+	it('deletes a path and its children', () => {
+		const paths = new Set([
+			'path/to',
+			'path/to/a',
+			'path/to/b',
+			'path/to/c',
+			'path/other',
+			'path/other/d'
+		]);
+
+		deletePathAndDescendants(paths, 'path/to');
+
+		expect(paths.has('path/to')).toBe(false);
+		expect(paths.has('path/to/a')).toBe(false);
+		expect(paths.has('path/to/b')).toBe(false);
+		expect(paths.has('path/to/c')).toBe(false);
+		expect(paths.has('path/other')).toBe(true);
+		expect(paths.has('path/other/d')).toBe(true);
+	});
+
+	it('does not delete unrelated paths', () => {
+		const paths = new Set([
+			'path/to',
+			'path/to/a',
+			'path/other',
+			'path/other/d'
+		]);
+
+		deletePathAndDescendants(paths, 'path/to');
+
+		expect(paths.has('path/to')).toBe(false);
+		expect(paths.has('path/to/a')).toBe(false);
+		expect(paths.has('path/other')).toBe(true);
+		expect(paths.has('path/other/d')).toBe(true);
+	});
+
+	it('handles empty sets', () => {
+		const paths = new Set<string>();
+
+		deletePathAndDescendants(paths, 'path/to');
+
+		expect(paths.size).toBe(0);
+	});
+
+	it('handles paths not in the set', () => {
+		const paths = new Set([
+			'path/to',
+			'path/to/a',
+			'path/other',
+			'path/other/d'
+		]);
+
+		deletePathAndDescendants(paths, 'path/nonexistent');
+
+		expect(paths.has('path/to')).toBe(true);
+		expect(paths.has('path/to/a')).toBe(true);
+		expect(paths.has('path/other')).toBe(true);
+		expect(paths.has('path/other/d')).toBe(true);
+	});
+});

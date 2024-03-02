@@ -15,7 +15,7 @@ export function slugifyPath(path: string): string {
 export function getPathCombinations(path: string): string[] {
 	const pathParts = path.split('/').filter((part) => part !== '')
 	let currentPath = ''
-	const combinations = []
+	const combinations: string[] = []
 
 	for (const part of pathParts) {
 		currentPath = currentPath ? `${currentPath}/${part}` : part
@@ -23,6 +23,12 @@ export function getPathCombinations(path: string): string[] {
 	}
 
 	return combinations
+}
+
+export function deletePathAndDescendants(set: Set<string>, path: string) {
+	const paths = Array.from(set)
+	const pathsToDelete = paths.filter((p) => p.startsWith(path))
+	pathsToDelete.forEach((p) => set.delete(p))
 }
 
 export function createNotesTree(notes: Note[]): TreeViewNode[] {
