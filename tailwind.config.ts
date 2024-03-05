@@ -101,10 +101,13 @@ export default {
 		'callout-error',
 		'callout-surface',
 		'popup',
+		'task-checkbox',
 
 		'text-center',
 		'not-italic',
+		'line-through',
 		'text-surface-700-200-token',
+		'bg-tertiary-50-900-token',
 
 		'stroke-primary-400',
 		'stroke-secondary-400',
@@ -114,6 +117,5 @@ export default {
 		'stroke-error-400',
 		'stroke-surface-400',
 		'variant-outline-surface',
-
 	]
 } satisfies Config
