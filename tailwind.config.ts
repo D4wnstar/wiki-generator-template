@@ -108,6 +108,7 @@ export default {
 		'line-through',
 		'text-surface-700-200-token',
 		'bg-tertiary-50-900-token',
+		'text-slate-500',
 
 		'stroke-primary-400',
 		'stroke-secondary-400',
