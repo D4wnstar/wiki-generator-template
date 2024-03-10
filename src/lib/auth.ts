@@ -113,12 +113,12 @@ export async function hideUnauthorizedLinks(id: string, refSlugs: string[]) {
 	}
 
 	onMount(() => {
-		anchors = document.getElementById(id)?.querySelectorAll('a:not([target="_blank"])')
+		anchors = document.getElementById(id)?.querySelectorAll('a[href^="/"]')
 		anchors?.forEach((a) => removeLinks(a))
 	})
 
 	afterNavigate(() => {
-		anchors = document.getElementById(id)?.querySelectorAll('a:not([target="_blank"])')
+		anchors = document.getElementById(id)?.querySelectorAll('a[href^="/"]')
 		anchors?.forEach((a) => removeLinks(a))
 	})
 }
