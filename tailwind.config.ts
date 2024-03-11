@@ -109,6 +109,9 @@ export default {
 		'text-surface-700-200-token',
 		'bg-tertiary-50-900-token',
 		'text-slate-500',
+		'border',
+		'border-collapse',
+		'border-surface-400-500-token',
 
 		'stroke-primary-400',
 		'stroke-secondary-400',

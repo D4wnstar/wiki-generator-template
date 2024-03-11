@@ -45,6 +45,8 @@
 	}
 
 	// Supabase authentication client updates
+	import mermaid from 'mermaid'
+
 	let { supabase, session } = data
 	$: ({ supabase, session } = data)
 
@@ -55,10 +57,15 @@
 			}
 		})
 
+		// Mermaid initialization
+		mermaid.initialize({ startOnLoad: true, darkMode: true, theme: "dark" })
+		mermaid.run()
+
 		return () => data.subscription.unsubscribe()
 	})
 
 	// Autoscroll to top of page or hashed header on navigation
+	// and regenerate Mermaid diagrams and LaTeX equations
 	afterNavigate((params: AfterNavigate) => {
 		if (params.from?.url.pathname === params.to?.url.pathname) return
 
@@ -70,6 +77,10 @@
 			const elemPage = document.querySelector('#page')
 			if (elemPage) elemPage.scrollTop = 0
 		}
+
+		//@ts-ignore
+		if (window && window.MathJax) window.MathJax.typeset()
+		mermaid.run()
 	})
 </script>
 
