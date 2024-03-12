@@ -46,9 +46,12 @@
 		searchQuery = ''
 	}
 
-	$: if ($drawerStore.open && $page.params.slug) {
-		getPathCombinations($page.params.slug).forEach((path) => expandedNodes.push(path))
-	}
+	
+	drawerStore.subscribe((drawer) => {
+		if (drawer.open && $page.params.slug) {
+			getPathCombinations($page.params.slug).forEach((path) => expandedNodes.push(path))
+		}
+	})
 </script>
 
 <nav class="w-full grow overflow-auto rounded-none">

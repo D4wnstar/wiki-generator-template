@@ -38,6 +38,7 @@
 	import NavigationSidebar from '$lib/components/NavigationSidebar.svelte'
 	import AccountModal from '$lib/components/auth/AccountModal.svelte'
 	import PasswordResetModal from '$lib/components/auth/PasswordResetModal.svelte'
+	import mermaid from 'mermaid'
 	const modalRegistry: Record<string, ModalComponent> = {
 		auth: { ref: AuthModal },
 		account: { ref: AccountModal },
@@ -45,8 +46,6 @@
 	}
 
 	// Supabase authentication client updates
-	import mermaid from 'mermaid'
-
 	let { supabase, session } = data
 	$: ({ supabase, session } = data)
 
@@ -56,10 +55,6 @@
 				invalidate('supabase:auth')
 			}
 		})
-
-		// Mermaid initialization
-		mermaid.initialize({ startOnLoad: true, darkMode: true, theme: "dark" })
-		mermaid.run()
 
 		return () => data.subscription.unsubscribe()
 	})
@@ -78,9 +73,12 @@
 			if (elemPage) elemPage.scrollTop = 0
 		}
 
+		// Rerun MathJax typesetting and Mermaid graph rendering on navigation
+		// (normally these are only run on on a full reload)
 		//@ts-ignore
 		if (window && window.MathJax) window.MathJax.typeset()
-		mermaid.run()
+		//@ts-ignore
+		if (window && window.mermaid) window.mermaid.run()
 	})
 </script>
 
