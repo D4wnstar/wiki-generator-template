@@ -3,7 +3,7 @@ import type { Config } from 'tailwindcss'
 import typography from '@tailwindcss/typography'
 import forms from '@tailwindcss/forms'
 import { skeleton } from '@skeletonlabs/tw-plugin'
-import { starry } from './themes/starry-theme'
+import { cosmos } from './themes/cosmos'
 
 export default {
 	darkMode: 'class',
@@ -19,7 +19,7 @@ export default {
 		typography,
 		skeleton({
 			themes: {
-				custom: [starry],
+				custom: [cosmos],
 				preset: [
 					{
 						name: 'skeleton',

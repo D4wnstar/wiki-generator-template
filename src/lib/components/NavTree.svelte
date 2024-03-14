@@ -42,7 +42,6 @@
         
         const pathsToAdd = Array.from(getPathCombinations(slug))
         expandedNodes = expandedNodes.concat(pathsToAdd.slice(0, pathsToAdd.length - 1))
-        console.log(expandedNodes)
 		searchQuery = ''
 	}
 

@@ -36,6 +36,8 @@
 	let username = ''
 	let password = ''
 
+	let logInButtonRef
+
 	$: isUsernameEmpty = username.length === 0
 	$: isUsernameValid = usernameRules.test(username)
 	$: isUsernameTaken = isUsernameValid && !isUsernameAvailable && !loadingUsername
@@ -189,17 +191,17 @@
 								placeholder="Enter password..."
 							/>
 						</label>
-						<button
-							class="variant-ghost-surface btn btn-sm"
+						<hr />
+					</form>
+					<button
+							class="variant-ghost-surface btn btn-sm mx-4 mt-4"
 							on:click={() => {
 								modalStore.clear()
 								modalStore.trigger(pwresetModal)
 							}}
 						>
 							<small class="small block">Forgot your password?</small>
-						</button>
-						<hr />
-					</form>
+					</button>
 				{:else if tabSet === 1}
 					<form class="space-y-4 px-4 rounded-container-token">
 						{#if signUpResultVisibility}
@@ -300,8 +302,11 @@
 						<button
 							class="variant-filled-primary btn"
 							disabled={isEmailEmpty || isPasswordEmpty}
-							on:click={logInButton}>Log In</button
+							on:click={logInButton}
+							bind:this={logInButtonRef}
 						>
+							Log In
+						</button>
 					{:else if tabSet === 1}
 						<button
 							class="variant-filled-primary btn"

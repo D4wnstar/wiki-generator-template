@@ -9,7 +9,7 @@
         class="select w-2/3"
         bind:value={$currentTheme}
     >
-        <option value="starry">✨ Starry</option>
+        <option value="cosmos">✨ Cosmos</option>
         <option value="skeleton">💀 Skeleton</option>
         <option value="wintry">❄️ Wintry</option>
         <option value="modern">🤖 Modern</option>
