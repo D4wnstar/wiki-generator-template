@@ -1,5 +1,50 @@
 @tailwind base;
 @tailwind components;
+
+.callout-primary {
+	@apply card w-full px-6 py-4 variant-soft-primary
+}
+
+.callout-secondary {
+	@apply card w-full px-6 py-4 variant-soft-secondary
+}
+
+.callout-tertiary {
+	@apply card w-full px-6 py-4 variant-soft-tertiary text-tertiary-900-50-token
+}
+
+.callout-success {
+	@apply card w-full px-6 py-4 variant-soft-success text-success-800-100-token
+}
+
+.callout-warning {
+	@apply card w-full px-6 py-4 variant-soft-warning
+}
+
+.callout-error {
+	@apply card w-full px-6 py-4 variant-soft-error
+}
+
+.callout-surface {
+	@apply card w-full px-6 py-4 variant-soft-surface
+}
+
+.codeblock-base {
+	@apply codeblock w-full overflow-hidden shadow text-sm text-white rounded-container-token bg-gray-900
+}
+
+.codeblock-header {
+	@apply text-xs text-white/50 uppercase flex justify-between items-center p-2 pl-4
+}
+
+.codeblock-pre {
+	@apply whitespace-pre-wrap break-all p-4 pt-1
+}
+
+.task-checkbox {
+	@apply rounded text-primary-500 bg-transparent mr-2
+}
+
 @tailwind utilities;
 @tailwind variants;
 
@@ -87,6 +132,14 @@ body[data-theme="cosmos"] {
 	@apply pl-5
 }
 
+pre.mermaid > svg {
+	@apply bg-surface-900 rounded-2xl mx-auto
+}
+
+.dark pre.mermaid > svg {
+	@apply bg-transparent
+}
+
 a[href^="http"]::after,
 a[href^="https://"]::after {
 	/* @apply w-4;
@@ -103,55 +156,3 @@ a[href^="https://"]::after {
 .dark a[href^="https://"]::after {
 	background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWV4dGVybmFsLWxpbmsiPjxwYXRoIGQ9Ik0xOCAxM3Y2YTIgMiAwIDAgMS0yIDJINWEyIDIgMCAwIDEtMi0yVjhhMiAyIDAgMCAxIDItMmg2Ii8+PHBvbHlsaW5lIHBvaW50cz0iMTUgMyAyMSAzIDIxIDkiLz48bGluZSB4MT0iMTAiIHgyPSIyMSIgeTE9IjE0IiB5Mj0iMyIvPjwvc3ZnPg==");
 } */
-
-.callout-primary {
-	@apply card w-full px-6 py-4 variant-soft-primary
-}
-
-.callout-secondary {
-	@apply card w-full px-6 py-4 variant-soft-secondary
-}
-
-.callout-tertiary {
-	@apply card w-full px-6 py-4 variant-soft-tertiary text-tertiary-900-50-token
-}
-
-.callout-success {
-	@apply card w-full px-6 py-4 variant-soft-success text-success-800-100-token
-}
-
-.callout-warning {
-	@apply card w-full px-6 py-4 variant-soft-warning
-}
-
-.callout-error {
-	@apply card w-full px-6 py-4 variant-soft-error
-}
-
-.callout-surface {
-	@apply card w-full px-6 py-4 variant-soft-surface
-}
-
-.codeblock-base {
-	@apply codeblock w-full overflow-hidden shadow text-sm text-white rounded-container-token bg-gray-900
-}
-
-.codeblock-header {
-	@apply text-xs text-white/50 uppercase flex justify-between items-center p-2 pl-4
-}
-
-.codeblock-pre {
-	@apply whitespace-pre-wrap break-all p-4 pt-1
-}
-
-.task-checkbox {
-	@apply rounded text-primary-500 bg-transparent mr-2
-}
-
-pre.mermaid > svg {
-	@apply bg-surface-900 rounded-2xl mx-auto
-}
-
-.dark pre.mermaid > svg {
-	@apply bg-transparent
-}

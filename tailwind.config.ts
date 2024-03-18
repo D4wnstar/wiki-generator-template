@@ -67,20 +67,13 @@ export default {
 	],
 	safelist: [
 		'w-px',
-		{
-			pattern: /w-\d+(\.\d+)?/,
-		},
-		'max-w-px',
-		{
-			pattern: /max-w-\d+(\.\d+)?/,
-		},
+		{ pattern: /w-\d+(\.\d+)?/ },
 		'mx-auto',
 		'pl-5',
 		'py-2',
 		'px-4',
 		'pb-2',
 		'space-y-2',
-		'indent-cascade',
 		'flex',
 
 		'anchor',
@@ -90,18 +83,7 @@ export default {
 		'list-decimal',
 		'list-inside',
 		'code',
-		'codeblock-base',
-		'codeblock-header',
-		'codeblock-pre',
-		'callout-primary',
-		'callout-secondary',
-		'callout-tertiary',
-		'callout-success',
-		'callout-warning',
-		'callout-error',
-		'callout-surface',
 		'popup',
-		'task-checkbox',
 
 		'text-center',
 		'not-italic',
@@ -113,13 +95,8 @@ export default {
 		'border-collapse',
 		'border-surface-400-500-token',
 
-		'stroke-primary-400',
-		'stroke-secondary-400',
-		'stroke-tertiary-400',
-		'stroke-success-400',
-		'stroke-warning-400',
-		'stroke-error-400',
-		'stroke-surface-400',
-		'variant-outline-surface',
+		{ pattern: /stroke-(primary|secondary|tertiary|success|warning|error|surface)-400/ },
+		{ pattern: /variant-soft-.+/ },
+		'variant-outline-surface'
 	]
 } satisfies Config

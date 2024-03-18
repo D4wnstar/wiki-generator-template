@@ -38,7 +38,6 @@
 	import NavigationSidebar from '$lib/components/NavigationSidebar.svelte'
 	import AccountModal from '$lib/components/auth/AccountModal.svelte'
 	import PasswordResetModal from '$lib/components/auth/PasswordResetModal.svelte'
-	import mermaid from 'mermaid'
 	const modalRegistry: Record<string, ModalComponent> = {
 		auth: { ref: AuthModal },
 		account: { ref: AccountModal },
