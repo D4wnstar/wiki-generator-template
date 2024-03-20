@@ -161,10 +161,10 @@
 			<div class="variant-ghost-warning p-2 w-3/4">
 				<p>Username must be:</p>
 				<ol class="list-inside list-decimal">
-					<li>Alphanumeric with dots and underscores</li>
-					<li>At least three characters long</li>
+					<li>Alphanumeric with dots, dashes and underscores</li>
+					<li>Between 3 and 20 characters long</li>
 					<li>Can't have more than one dot in a row (e.g. no 'the..legend')</li>
-					<li>Can't start or end in a dot or underscore</li>
+					<li>Can't start or end in a dot, dash or underscore</li>
 				</ol>
 			</div>
 		{:else if isUsernameTaken}

@@ -7,12 +7,12 @@ import { PUBLIC_PASSWORD_REDIRECT_URL } from '$env/static/public'
 
 /**
  * Username must be:
- * 1. Alphanumeric with dots and underscores
- * 2. At least three characters long
+ * 1. Alphanumeric with dots, dashes and underscores
+ * 2. Between 3 and 20 characters long
  * 3. Can't have more than one dot in a row (e.g. no 'the..legend')
- * 4. Can't start or end in a dot or underscore
+ * 4. Can't start or end in a dot, dash or underscore
  */
-export const usernameRules = /^(?=[a-zA-Z0-9._]{3,}$)(?!.*[.]{2})[^_.].*[^_.]$/
+export const usernameRules = /^(?=[a-zA-Z0-9._-]{3,20}$)(?!.*[.]{2})[^_.-].*[^_.-]$/
 
 /**
  * RFC2822 standard email validation. From the .NET helpfiles.
@@ -24,7 +24,7 @@ export const emailRules =
  * Password must be at least six characters long, with at least one
  * upper- or lowercase letter. Password rules are intentionally very lenient.
  */
-export const passwordRules = /^(?=.*[a-zA-Z]).{6,}$/
+export const passwordRules = /^(?=.*[a-zA-Z]).{6,100}$/
 
 export async function signUp(
 	supabase: SupabaseClient<Database>,
