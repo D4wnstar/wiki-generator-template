@@ -15,7 +15,7 @@
     {#each sidebarImages as image}
         <figure class="text-center">
             <img src={image.url} alt={image.caption} class="max-h-80 mx-auto" />
-            <figcaption class="text-surface-700-200-token py-2 px-4 card variant-outline-surface">
+            <figcaption class="text-surface-700-200-token mt-2 py-2 px-4 card variant-outline-surface">
                 {image.caption}
             </figcaption>
         </figure>
