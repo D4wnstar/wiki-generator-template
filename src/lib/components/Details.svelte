@@ -18,8 +18,8 @@
             {#each details as detail}
                 {#if detail.detail_content !== ""}
                     <tr>
-                        <td class="align-text-top">{@html detail.detail_name}</td>
-                        <td>{@html detail.detail_content.replace(/; */, "<br />")}</td>
+                        <td class="align-text-top px-1 lg:min-w-[6em]">{@html detail.detail_name}</td>
+                        <td class="px-1">{@html detail.detail_content.replaceAll(/; */g, "<br />")}</td>
                     </tr>
                 {:else}
                     <tr>
