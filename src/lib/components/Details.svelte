@@ -13,7 +13,20 @@
 
 <div id="details" class="space-y-2">
     <h3 class="h3"><Library class="inline" /> Details</h3>
-    {#each details as detail}
-        <p><strong>{detail.detail_name}</strong>: {@html detail.detail_content}</p>
-    {/each}
+    <table class="w-full">
+        <tbody>
+            {#each details as detail}
+                {#if detail.detail_content !== ""}
+                    <tr>
+                        <td class="align-text-top">{@html detail.detail_name}</td>
+                        <td>{@html detail.detail_content.replace(/; */, "<br />")}</td>
+                    </tr>
+                {:else}
+                    <tr>
+                        <td colspan="2" class="text-center">{@html detail.detail_name}</td>
+                    </tr>
+                {/if}
+            {/each}
+        </tbody>
+    </table>
 </div>

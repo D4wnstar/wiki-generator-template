@@ -85,12 +85,9 @@ export async function sendPasswordResetEmail(supabase: SupabaseClient, email: st
 	url = url.includes('http') ? url : `https://${url}`
 	// Make sure to include a trailing `/`.
 	url = url.charAt(url.length - 1) === '/' ? url : `${url}/`
-	
+
 	console.log(url)
-	const { error } = await supabase.auth.resetPasswordForEmail(
-		email,
-		{ redirectTo: url },
-	)
+	const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: url })
 
 	return error ? error : undefined
 }
@@ -103,23 +100,16 @@ export async function sendPasswordResetEmail(supabase: SupabaseClient, email: st
  * @param refSlugs The slugs of the pages that are authorized. Links to pages with any other slugs will be hidden
  */
 export async function hideUnauthorizedLinks(id: string, refSlugs: string[]) {
-	let anchors: NodeListOf<HTMLAnchorElement> | undefined
-	const removeLinks = (a: HTMLAnchorElement) => {
+	const anchors: NodeListOf<HTMLAnchorElement> | undefined = document
+		.getElementById(id)
+		?.querySelectorAll('a[href^="/"]')
+		
+	anchors?.forEach((a) => {
 		if (!refSlugs.includes(a.pathname.slice(1))) {
 			a.addEventListener('click', (e) => e.preventDefault())
 			a.classList.add('pointer-events-none')
 			a.classList.remove('anchor')
 		}
-	}
-
-	onMount(() => {
-		anchors = document.getElementById(id)?.querySelectorAll('a[href^="/"]')
-		anchors?.forEach((a) => removeLinks(a))
-	})
-
-	afterNavigate(() => {
-		anchors = document.getElementById(id)?.querySelectorAll('a[href^="/"]')
-		anchors?.forEach((a) => removeLinks(a))
 	})
 }
 

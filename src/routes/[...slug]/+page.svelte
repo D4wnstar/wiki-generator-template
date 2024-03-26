@@ -4,6 +4,8 @@
 	import type { PopupSettings } from '@skeletonlabs/skeleton'
 	import Extras from '$lib/components/Extras.svelte'
 	import { hideUnauthorizedLinks } from '$lib/auth.js'
+	import { onMount } from 'svelte'
+	import { afterNavigate } from '$app/navigation'
 	
 	export let data
 
@@ -14,11 +16,21 @@
 		middleware: { autoPlacement: { allowedPlacements: ['top', 'bottom'] } }
 	}
 
-	hideUnauthorizedLinks(
-		'note-content',
-		data.refNotes.map((r) => r.slug)
-	)
+	// Setup can only run once on a full reload as the supabase client does not change on navigation
 	setupPopups('note-content', popupSettings, data.supabase)
+	// Hiding needs to be done on every navigation as the refNotes changes on every page
+	onMount(() => {
+		hideUnauthorizedLinks(
+			'note-content',
+			data.refNotes.map((ref) => ref.slug)
+		)
+	})
+	afterNavigate(() => {
+		hideUnauthorizedLinks(
+			'note-content',
+			data.refNotes.map((ref) => ref.slug)
+		)
+	})
 	$: pageTitle = `${data.alt_title ?? data.title} - ${$wikiTitle}`
 </script>
 
@@ -28,7 +40,7 @@
 
 <div class="flex h-full w-full flex-col md:flex-row">
 	<div class="flex w-full flex-col items-center px-8 md:pb-8">
-		<h1 id="note-title" class="h1 pb-4 pt-4 text-center">{data.alt_title ?? data.title}</h1>
+		<h1 id="note-title" class="h1 pb-4 pt-4 text-center md:max-w-3xl">{data.alt_title ?? data.title}</h1>
 		<article id="note-content" class="flex w-full flex-col space-y-4 md:max-w-3xl">
 			<hr />
 			{@html data.pageContent}
