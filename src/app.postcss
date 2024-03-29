@@ -129,7 +129,7 @@ body[data-theme="cosmos"] {
 }
 
 .indent-cascade .indent-cascade {
-	@apply pl-5
+	@apply pl-4
 }
 
 pre.mermaid > svg {
@@ -139,6 +139,36 @@ pre.mermaid > svg {
 .dark pre.mermaid > svg {
 	@apply bg-transparent
 }
+
+blockquote {
+	@apply blockquote break-all
+}
+
+ul,
+ol {
+	@apply pl-6 marker:text-surface-500-400-token list-outside indent-cascade space-y-1
+}
+
+ul {
+	@apply list-disc
+}
+
+ol {
+	@apply list-decimal
+}
+
+code {
+	@apply code
+}
+
+/* table {
+	@apply border-collapse
+}
+
+th,
+td {
+	@apply border border-surface-400-500-token py-1 px-2
+} */
 
 a[href^="http"]::after,
 a[href^="https://"]::after {

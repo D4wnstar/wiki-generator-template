@@ -38,10 +38,12 @@
 	import NavigationSidebar from '$lib/components/NavigationSidebar.svelte'
 	import AccountModal from '$lib/components/auth/AccountModal.svelte'
 	import PasswordResetModal from '$lib/components/auth/PasswordResetModal.svelte'
+	import ImageModal from '$lib/components/ImageModal.svelte'
 	const modalRegistry: Record<string, ModalComponent> = {
 		auth: { ref: AuthModal },
 		account: { ref: AccountModal },
 		pwreset: { ref: PasswordResetModal },
+		image: { ref: ImageModal },
 	}
 
 	// Supabase authentication client updates
@@ -87,6 +89,7 @@
 			notesTreeView={data.notesTreeView}
 			notesTitles={data.noteTitles}
 			title={data.settings?.title}
+			allowLogins={data.settings?.allowLogins}
 			{supabase}
 			{session}
 		/>
@@ -116,6 +119,7 @@
 			notesTreeView={data.notesTreeView}
 			notesTitles={data.noteTitles}
 			title={data.settings?.title}
+			allowLogins={data.settings?.allowLogins}
 			{supabase}
 			{session}
 		/>

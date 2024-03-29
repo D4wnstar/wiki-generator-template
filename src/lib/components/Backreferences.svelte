@@ -22,9 +22,9 @@
 
 <div id="backreferences" class="space-y-2">
 	<h3 class="h3"><Link class="inline" /> Backreferences</h3>
-	<ul class="list-inside list-disc">
+	<ul class="space-y-0">
 		{#each backRefs as ref}
-			<li class="pl-2">
+			<li>
 				<a href="/{ref.slug}" class="anchor" use:popupAction>{ref.display_name}</a>
 			</li>
 		{/each}

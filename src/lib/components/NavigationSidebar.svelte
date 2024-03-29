@@ -17,6 +17,7 @@
 	export let notesTitles: AutocompleteOption<string>[]
 	export let supabase: SupabaseClient<Database>
 	export let session: Session | null
+	export let allowLogins: boolean
 
 	const modalStore = getModalStore()
 	const authModal: ModalSettings = {
@@ -37,27 +38,29 @@
 
 <NavTree {title} {notesTreeView} {notesTitles} on:autocomplete={autocompleteRedirect} />
 <hr />
-{#if session}
-	<div class="flex gap-2">
+{#if allowLogins}
+	{#if session}
+		<div class="flex gap-2">
+			<button
+				class="btn variant-filled-surface mt-4 mx-6 w-full"
+				on:click={() => modalStore.trigger(accountModal)}
+			>
+				<div class="flex gap-2">
+					<Settings />
+					Account
+				</div>
+			</button>
+		</div>
+	{:else}
 		<button
-			class="btn variant-filled-surface mt-4 mx-6 w-full"
-			on:click={() => modalStore.trigger(accountModal)}
+			class="btn variant-filled-surface mt-4 mx-6"
+			on:click={() => modalStore.trigger(authModal)}
 		>
 			<div class="flex gap-2">
-				<Settings />
-				Account
+				<User />
+				Log In
 			</div>
 		</button>
-	</div>
-{:else}
-	<button
-		class="btn variant-filled-surface mt-4 mx-6"
-		on:click={() => modalStore.trigger(authModal)}
-	>
-		<div class="flex gap-2">
-			<User />
-			Log In
-		</div>
-	</button>
+	{/if}
 {/if}
 <ThemeSwitcher />

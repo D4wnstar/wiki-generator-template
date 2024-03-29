@@ -1,23 +1,34 @@
 <script lang="ts">
-	import { setupPopups } from "$lib/popups"
-	import type { SidebarImageObject } from "$lib/shorthand.types"
-	import type { PopupSettings } from "@skeletonlabs/skeleton"
-	import type { SupabaseClient } from "@supabase/supabase-js"
+	import { setupPopups } from '$lib/popups'
+	import type { SidebarImageObject } from '$lib/shorthand.types'
+	import { getModalStore, type ModalSettings, type PopupSettings } from '@skeletonlabs/skeleton'
+	import type { SupabaseClient } from '@supabase/supabase-js'
 
-    export let sidebarImages: SidebarImageObject[]
-    export let popupSettings: PopupSettings
-    export let supabase: SupabaseClient
+	const modalStore = getModalStore()
 
-    setupPopups('sidebar-images', popupSettings, supabase)
+	export let sidebarImages: SidebarImageObject[]
+	export let popupSettings: PopupSettings
+	export let supabase: SupabaseClient
+
+	setupPopups('sidebar-images', popupSettings, supabase)
 </script>
 
-<div id="sidebar-images" class="space-y-2">
-    {#each sidebarImages as image}
-        <figure class="text-center">
-            <img src={image.url} alt={image.caption} class="max-h-80 mx-auto" />
-            <figcaption class="text-surface-700-200-token mt-2 py-2 px-4 card variant-outline-surface">
-                {@html image.caption}
-            </figcaption>
-        </figure>
-    {/each}
+<div id="sidebar-images" class="space-y-6">
+	{#each sidebarImages as image}
+		<figure class="text-center">
+			<button
+				on:click={() =>
+					modalStore.trigger({
+                        type: "component",
+                        component: "image",
+						meta: { imageUrl: image.url, imageCaption: image.caption },
+					})}
+			>
+				<img src={image.url} alt={image.caption} class="mx-auto max-h-80" />
+			</button>
+			<figcaption class="card variant-outline-surface text-surface-700-200-token mt-4 px-4 py-2">
+				{@html image.caption}
+			</figcaption>
+		</figure>
+	{/each}
 </div>
