@@ -6,7 +6,7 @@
 	import { hideUnauthorizedLinks } from '$lib/auth.js'
 	import { onMount } from 'svelte'
 	import { afterNavigate } from '$app/navigation'
-	
+
 	export let data
 
 	const popupSettings: PopupSettings = {
@@ -39,8 +39,10 @@
 </svelte:head>
 
 <div class="flex h-full w-full flex-col md:flex-row">
-	<div class="flex w-full flex-col items-center px-8 md:pb-8">
-		<h1 id="note-title" class="h1 pb-4 pt-4 text-center md:max-w-3xl">{data.alt_title ?? data.title}</h1>
+	<div class="flex w-full flex-col items-center px-16 md:pb-8">
+		<h1 id="note-title" class="h1 pb-4 pt-4 text-center md:max-w-3xl">
+			{data.alt_title ?? data.title}
+		</h1>
 		<article id="note-content" class="flex w-full flex-col space-y-4 md:max-w-3xl">
 			<hr />
 			{@html data.pageContent}

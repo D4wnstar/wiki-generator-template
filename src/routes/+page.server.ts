@@ -45,6 +45,12 @@ export const load = (async ({ locals: { supabase, getSession } }) => {
 		)
 	}
 
+	// Sort details by the given order
+    note.details.sort((detail1, detail2) => detail1.order > detail2.order ? 1 : -1)
+
+	// and also sidebar images
+    note.sidebar_images.sort((img1, img2) => img1.order > img2.order ? 1 : -1)
+
 	// Since only authorized notes will be returned, we can used the returned slugs to filter out
 	// all the backreferences that don't get anything back
 	note.backreferences = note.backreferences.filter((backref) =>
