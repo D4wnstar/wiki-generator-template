@@ -3,6 +3,7 @@
 	import {
 		AppBar,
 		AppShell,
+		autoModeWatcher,
 		Modal,
 		type DrawerSettings,
 		type ModalComponent	} from '@skeletonlabs/skeleton'
@@ -82,6 +83,10 @@
 		if (window && window.mermaid) window.mermaid.run()
 	})
 </script>
+
+<svelte:head>
+	{@html '<script>(' + autoModeWatcher.toString() + ')();</script>'}
+</svelte:head>
 
 <Drawer>
 	<div class="flex flex-col h-full">

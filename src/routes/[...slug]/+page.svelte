@@ -19,12 +19,6 @@
 	// Setup can only run once on a full reload as the supabase client does not change on navigation
 	setupPopups('note-content', popupSettings, data.supabase)
 	// Hiding needs to be done on every navigation as the refNotes changes on every page
-	onMount(() => {
-		hideUnauthorizedLinks(
-			'note-content',
-			data.refNotes.map((ref) => ref.slug)
-		)
-	})
 	afterNavigate(() => {
 		hideUnauthorizedLinks(
 			'note-content',

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { beforeNavigate } from '$app/navigation'
+	import { afterNavigate, beforeNavigate } from '$app/navigation'
 	import { page } from '$app/stores'
 	import { getPathCombinations } from '$lib/notes'
 	import {
@@ -18,7 +18,7 @@
 	export let notesTitles: AutocompleteOption<string>[]
         
     const drawerStore = getDrawerStore()
-        
+    
     let expandedNodes: string[] = []
 
 	beforeNavigate(() => {
@@ -38,17 +38,20 @@
 	function onAutocompleteSelection(event: CustomEvent<AutocompleteOption<string>>): void {
 		// @ts-expect-error
 		const slug = event.detail.meta.slug
-		dispatch('autocomplete', { slug })
-        
-        const pathsToAdd = Array.from(getPathCombinations(slug))
-        expandedNodes = expandedNodes.concat(pathsToAdd.slice(0, pathsToAdd.length - 1))
+		dispatch('autocomplete', { slug })        
 		searchQuery = ''
 	}
-
 	
 	drawerStore.subscribe((drawer) => {
 		if (drawer.open && $page.params.slug) {
 			getPathCombinations($page.params.slug).forEach((path) => expandedNodes.push(path))
+		}
+	})
+
+	afterNavigate(() => {
+		if ($page.params.slug) {
+			const nodes = Array.from(getPathCombinations($page.params.slug))
+			expandedNodes = expandedNodes.concat(nodes)
 		}
 	})
 </script>
@@ -79,7 +82,7 @@
 	/>
 </nav>
 
-<div class="card max-h-48 w-[15em] overflow-y-auto" tabindex="-1" data-popup="popupAutocomplete">
+<div class="card max-h-60 w-[15em] overflow-y-auto" tabindex="-1" data-popup="popupAutocomplete">
 	<Autocomplete
 		regionButton="text-left w-full"
 		bind:input={searchQuery}

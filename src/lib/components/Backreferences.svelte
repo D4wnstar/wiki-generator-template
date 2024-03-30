@@ -22,7 +22,7 @@
 
 <div id="backreferences" class="space-y-2">
 	<h3 class="h3"><Link class="inline" /> Backreferences</h3>
-	<ul class="space-y-0">
+	<ul>
 		{#each backRefs as ref}
 			<li>
 				<a href="/{ref.slug}" class="anchor" use:popupAction>{ref.display_name}</a>
