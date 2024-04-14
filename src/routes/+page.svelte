@@ -33,7 +33,7 @@
 </svelte:head>
 
 <div class="flex h-full w-full flex-col md:flex-row">
-	<div class="flex w-full flex-col items-center px-16 md:pb-8">
+	<div class="flex max-h-[93vh] lg:max-h-screen overflow-auto w-full flex-col items-center px-16 md:pb-8">
 		<h1 id="note-title" class="h1 pb-4 pt-4 text-center md:max-w-3xl">
 			{data.alt_title ?? data.title}
 		</h1>
@@ -47,7 +47,7 @@
 	{#if data.sidebar_images.length > 0 || data.details.length > 0 || data.backreferences.length > 0}
 		<div
 			id="extras-sidebar"
-			class="variant-glass-surface border-surface-300-600-token hidden space-y-2 rounded-none border-l-[1px] p-4 md:flex md:w-[24em] md:flex-col lg:w-[36em]"
+			class="variant-glass-surface border-surface-300-600-token hidden space-y-2 rounded-none border-l-[1px] p-4 md:flex md:w-[24em] md:flex-col lg:w-[36em] max-h-[93vh] lg:max-h-screen overflow-auto"
 		>
 			<Extras
 				sidebar_images={data.sidebar_images}

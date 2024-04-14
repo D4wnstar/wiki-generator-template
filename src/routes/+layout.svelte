@@ -6,7 +6,8 @@
 		autoModeWatcher,
 		Modal,
 		type DrawerSettings,
-		type ModalComponent	} from '@skeletonlabs/skeleton'
+		type ModalComponent
+	} from '@skeletonlabs/skeleton'
 	import { currentTheme } from '$lib/stores'
 	import { browser } from '$app/environment'
 	import { onMount } from 'svelte'
@@ -44,7 +45,7 @@
 		auth: { ref: AuthModal },
 		account: { ref: AccountModal },
 		pwreset: { ref: PasswordResetModal },
-		image: { ref: ImageModal },
+		image: { ref: ImageModal }
 	}
 
 	// Supabase authentication client updates
@@ -89,7 +90,7 @@
 </svelte:head>
 
 <Drawer>
-	<div class="flex flex-col h-full">
+	<div class="flex h-full flex-col">
 		<NavigationSidebar
 			notesTreeView={data.notesTreeView}
 			notesTitles={data.noteTitles}
@@ -104,10 +105,10 @@
 <Modal components={modalRegistry} />
 
 <AppShell
-	slotSidebarLeft="hidden lg:flex lg:flex-col lg:w-[16em] h-screen variant-glass-surface border-r-[1px] border-surface-300-600-token"
+	slotSidebarLeft="hidden lg:flex lg:flex-col lg:w-[16em] variant-glass-surface border-r-[1px] border-surface-300-600-token"
 >
 	<svelte:fragment slot="header">
-		<AppBar class="lg:hidden border-b-[1px] border-surface-300-600-token">
+		<AppBar class="border-surface-300-600-token h-[7vh] border-b-[1px] lg:hidden">
 			<svelte:fragment slot="lead">
 				<div class="flex items-center">
 					<button class="btn btn-sm mr-4" on:click={() => drawerStore.open(drawerSettings)}>
