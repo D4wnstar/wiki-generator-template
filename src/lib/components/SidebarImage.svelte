@@ -19,16 +19,18 @@
 			<button
 				on:click={() =>
 					modalStore.trigger({
-                        type: "component",
-                        component: "image",
-						meta: { imageUrl: image.url, imageCaption: image.caption },
+						type: 'component',
+						component: 'image',
+						meta: { imageUrl: image.url, imageCaption: image.caption }
 					})}
 			>
 				<img src={image.url} alt={image.caption} class="mx-auto max-h-80" />
 			</button>
-			<figcaption class="card variant-outline-surface text-surface-700-200-token mt-4 px-4 py-2">
-				{@html image.caption}
-			</figcaption>
+			{#if image.caption}
+				<figcaption class="card variant-outline-surface text-surface-700-200-token mt-4 px-4 py-2">
+					{@html image.caption}
+				</figcaption>
+			{/if}
 		</figure>
 	{/each}
 </div>
