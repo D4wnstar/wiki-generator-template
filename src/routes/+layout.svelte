@@ -48,22 +48,7 @@
 		image: { ref: ImageModal }
 	}
 
-	// Supabase authentication client updates
-	let { supabase, session } = data
-	$: ({ supabase, session } = data)
-
-	onMount(() => {
-		const { data } = supabase.auth.onAuthStateChange((_event, _session) => {
-			if (_session?.expires_at !== session?.expires_at) {
-				invalidate('supabase:auth')
-			}
-		})
-
-		return () => data.subscription.unsubscribe()
-	})
-
 	// Autoscroll to top of page or hashed header on navigation
-	// and regenerate Mermaid diagrams and LaTeX equations
 	afterNavigate((params: AfterNavigate) => {
 		if (params.from?.url.pathname === params.to?.url.pathname) return
 
@@ -75,13 +60,6 @@
 			const elemPage = document.querySelector('#page')
 			if (elemPage) elemPage.scrollTop = 0
 		}
-
-		// Rerun MathJax typesetting and Mermaid graph rendering on navigation
-		// (normally these are only run on on a full reload)
-		//@ts-ignore
-		if (window && window.MathJax) window.MathJax.typeset()
-		//@ts-ignore
-		if (window && window.mermaid) window.mermaid.run()
 	})
 </script>
 
@@ -95,9 +73,7 @@
 			notesTreeView={data.notesTreeView}
 			notesTitles={data.noteTitles}
 			title={data.settings?.title}
-			allowLogins={data.settings?.allowLogins}
-			{supabase}
-			{session}
+			allowLogins={data.settings.allow_logins}
 		/>
 	</div>
 </Drawer>
@@ -125,9 +101,7 @@
 			notesTreeView={data.notesTreeView}
 			notesTitles={data.noteTitles}
 			title={data.settings?.title}
-			allowLogins={data.settings?.allowLogins}
-			{supabase}
-			{session}
+			allowLogins={data.settings.allow_logins}
 		/>
 	</svelte:fragment>
 

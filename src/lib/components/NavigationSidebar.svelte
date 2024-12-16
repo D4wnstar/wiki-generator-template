@@ -15,21 +15,21 @@
 	export let title: string
 	export let notesTreeView: TreeViewNode[]
 	export let notesTitles: AutocompleteOption<string>[]
-	export let supabase: SupabaseClient<Database>
-	export let session: Session | null
+	// export let supabase: SupabaseClient<Database>
+	// export let session: Session | null
 	export let allowLogins: boolean
 
-	const modalStore = getModalStore()
-	const authModal: ModalSettings = {
-		type: 'component',
-		component: 'auth',
-		meta: { supabase: supabase }
-	}
-	const accountModal: ModalSettings = {
-		type: 'component',
-		component: 'account',
-		meta: { supabase: supabase, session: session }
-	}
+	// const modalStore = getModalStore()
+	// const authModal: ModalSettings = {
+	// 	type: 'component',
+	// 	component: 'auth',
+	// 	meta: { supabase: supabase }
+	// }
+	// const accountModal: ModalSettings = {
+	// 	type: 'component',
+	// 	component: 'account',
+	// 	meta: { supabase: supabase, session: session }
+	// }
 
 	function autocompleteRedirect(e: CustomEvent) {
 		goto(`/${e.detail.slug}`)
@@ -38,11 +38,11 @@
 
 <NavTree {title} {notesTreeView} {notesTitles} on:autocomplete={autocompleteRedirect} />
 <hr />
-{#if allowLogins}
+<!-- {#if allowLogins}
 	{#if session}
 		<div class="flex gap-2">
 			<button
-				class="btn variant-filled-surface mt-4 mx-6 w-full"
+				class="variant-filled-surface btn mx-6 mt-4 w-full"
 				on:click={() => modalStore.trigger(accountModal)}
 			>
 				<div class="flex gap-2">
@@ -53,7 +53,7 @@
 		</div>
 	{:else}
 		<button
-			class="btn variant-filled-surface mt-4 mx-6"
+			class="variant-filled-surface btn mx-6 mt-4"
 			on:click={() => modalStore.trigger(authModal)}
 		>
 			<div class="flex gap-2">
@@ -62,5 +62,5 @@
 			</div>
 		</button>
 	{/if}
-{/if}
+{/if} -->
 <ThemeSwitcher />

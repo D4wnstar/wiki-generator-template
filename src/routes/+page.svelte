@@ -4,7 +4,6 @@
 	import type { PopupSettings } from '@skeletonlabs/skeleton'
 	import Extras from '$lib/components/Extras.svelte'
 	import { hideUnauthorizedLinks } from '$lib/auth.js'
-	import { onMount } from 'svelte'
 	import { afterNavigate } from '$app/navigation'
 
 	export let data
@@ -17,15 +16,15 @@
 	}
 
 	// Setup can only run once on a full reload as the supabase client does not change on navigation
-	setupPopups('note-content', popupSettings, data.supabase)
+	// setupPopups('note-content', popupSettings, data.supabase)
 	// Hiding needs to be done on every navigation as the refNotes changes on every page
-	afterNavigate(() => {
-		hideUnauthorizedLinks(
-			'note-content',
-			data.refNotes.map((ref) => ref.slug)
-		)
-	})
-	$: pageTitle = `${data.alt_title ?? data.title} - ${$wikiTitle}`
+	// afterNavigate(() => {
+	// 	hideUnauthorizedLinks(
+	// 		'note-content',
+	// 		data.refNotes.map((ref) => ref.slug)
+	// 	)
+	// })
+	$: pageTitle = `${data.note.alt_title ?? data.note.title} - ${$wikiTitle}`
 </script>
 
 <svelte:head>
@@ -33,9 +32,11 @@
 </svelte:head>
 
 <div class="flex h-full w-full flex-col md:flex-row">
-	<div class="flex max-h-[93vh] lg:max-h-screen overflow-auto w-full flex-col items-center px-16 md:pb-8">
+	<div
+		class="flex max-h-[93vh] w-full flex-col items-center overflow-auto px-16 md:pb-8 lg:max-h-screen"
+	>
 		<h1 id="note-title" class="h1 pb-4 pt-4 text-center md:max-w-3xl">
-			{data.alt_title ?? data.title}
+			{data.note.alt_title ?? data.note.title}
 		</h1>
 		<article id="note-content" class="flex w-full flex-col space-y-4 md:max-w-3xl">
 			<hr />
@@ -44,27 +45,15 @@
 		</article>
 	</div>
 
-	{#if data.sidebar_images.length > 0 || data.details.length > 0 || data.backreferences.length > 0}
+	{#if data.sidebarImages.length > 0 || data.details.length > 0}
 		<div
 			id="extras-sidebar"
-			class="variant-glass-surface border-surface-300-600-token hidden space-y-2 rounded-none border-l-[1px] p-4 md:flex md:w-[24em] md:flex-col lg:w-[36em] max-h-[93vh] lg:max-h-screen overflow-auto"
+			class="variant-glass-surface border-surface-300-600-token hidden max-h-[93vh] space-y-2 overflow-auto rounded-none border-l-[1px] p-4 md:flex md:w-[24em] md:flex-col lg:max-h-screen lg:w-[36em]"
 		>
-			<Extras
-				sidebar_images={data.sidebar_images}
-				details={data.details}
-				backreferences={data.backreferences}
-				{popupSettings}
-				supabase={data.supabase}
-			/>
+			<Extras sidebarImages={data.sidebarImages} details={data.details} />
 		</div>
 		<div class="space-y-4 px-8 pb-8 pt-4 md:hidden">
-			<Extras
-				sidebar_images={data.sidebar_images}
-				details={data.details}
-				backreferences={data.backreferences}
-				{popupSettings}
-				supabase={data.supabase}
-			/>
+			<Extras sidebarImages={data.sidebarImages} details={data.details} />
 		</div>
 	{/if}
 </div>

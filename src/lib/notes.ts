@@ -1,6 +1,6 @@
 import type { TreeViewNode } from '@skeletonlabs/skeleton'
 import slugify from 'slugify'
-import type { Note } from './shorthand.types'
+import type { NoteRow } from '$lib/schema'
 
 export function slugifyPath(path: string): string {
 	const elems = path.split('/').filter((elem) => elem !== '')
@@ -31,7 +31,7 @@ export function deletePathAndDescendants(set: Set<string>, path: string) {
 	pathsToDelete.forEach((p) => set.delete(p))
 }
 
-export function createNotesTree(notes: Note[]): TreeViewNode[] {
+export function createNotesTree(notes: NoteRow[]): TreeViewNode[] {
 	const tree: TreeViewNode[] = []
 	const paths = notes.map((note) => note.path)
 

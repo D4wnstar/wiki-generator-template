@@ -2,19 +2,17 @@
 // for information about these interfaces
 // and what to do when importing types
 
-import { SupabaseClient, Session } from '@supabase/supabase-js'
-import { Database } from './lib/database.types'
+import type { LibSQLDatabase } from 'drizzle-orm/libsql'
 
 declare global {
-  namespace App {
-    interface Locals {
-      supabase: SupabaseClient<Database>
-      getSession(): Promise<Session | null>
-    }
-    interface PageData {
-      session: Session | null
-    }
-    // interface Error {}
-    // interface Platform {}
-  }
+	namespace App {
+		interface Locals {
+			db: LibSQLDatabase
+		}
+		interface PageData {
+			session: Session | null
+		}
+		// interface Error {}
+		// interface Platform {}
+	}
 }

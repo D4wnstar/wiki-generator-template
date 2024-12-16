@@ -5,10 +5,9 @@
 	import { Library } from 'lucide-svelte'
 
 	export let details: DetailsObject[]
-	export let popupSettings: PopupSettings
-	export let supabase
+	// export let popupSettings: PopupSettings
 
-	setupPopups('details', popupSettings, supabase)
+	// setupPopups('details', popupSettings, supabase)
 </script>
 
 <div id="details" class="space-y-2">
