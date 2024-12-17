@@ -13,3 +13,4 @@ src/lib/html
 .vercel
 src/routes/testing
 wiki-generator-template.code-workspace
+*.pem

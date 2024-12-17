@@ -2,9 +2,7 @@
 	import { popupNote, wikiTitle } from '$lib/stores'
 	import { setupPopups } from '$lib/popups'
 	import type { PopupSettings } from '@skeletonlabs/skeleton'
-	import Extras from '$lib/components/Extras.svelte'
-	import { hideUnauthorizedLinks } from '$lib/auth.js'
-	import { afterNavigate } from '$app/navigation'
+	import Extras from '$lib/components/content/Extras.svelte'
 
 	export let data
 
@@ -16,14 +14,8 @@
 	}
 
 	// Setup can only run once on a full reload as the supabase client does not change on navigation
-	// setupPopups('note-content', popupSettings, data.supabase)
-	// Hiding needs to be done on every navigation as the refNotes changes on every page
-	// afterNavigate(() => {
-	// 	hideUnauthorizedLinks(
-	// 		'note-content',
-	// 		data.refNotes.map((ref) => ref.slug)
-	// 	)
-	// })
+	// setupPopups('note-content', popupSettings)
+
 	$: pageTitle = `${data.note.alt_title ?? data.note.title} - ${$wikiTitle}`
 </script>
 

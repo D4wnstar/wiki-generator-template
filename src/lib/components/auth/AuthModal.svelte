@@ -1,18 +1,9 @@
 <script lang="ts">
-	import { emailRules, logIn, passwordRules, signUp, usernameRules } from '$lib/auth'
-	import type { Database } from '$lib/database.types'
-	import { Tab, TabGroup, getModalStore, type ModalSettings } from '@skeletonlabs/skeleton'
-	import { AuthError, type SupabaseClient } from '@supabase/supabase-js'
+	import { passwordRules, usernameRules } from '$lib/auth'
+	import { Tab, TabGroup, getModalStore } from '@skeletonlabs/skeleton'
 	import { UserPlus, User } from 'lucide-svelte'
 
 	const modalStore = getModalStore()
-	const supabase: SupabaseClient<Database> = $modalStore[0].meta.supabase
-
-	const pwresetModal: ModalSettings = {
-		type: 'component',
-		component: 'pwreset',
-		meta: { supabase: supabase }
-	}
 
 	let signUpResultVisibility = false
 	let signUpResultMessage = 'Placeholder'
@@ -20,19 +11,15 @@
 	let tabSet: number = 0
 
 	let loadingUsername = false
-	let loadingEmail = false
 
 	let isUsernameAvailable = false
-	let isEmailAvailable = false
 
 	let debounceTimer: NodeJS.Timeout
 	let rulesDelayTimer: NodeJS.Timeout
 	let usernameRulesVisible = false
-	let emailRulesVisible = false
 	let passwordRulesVisible = false
 
 	// Auth Data
-	let email = ''
 	let username = ''
 	let password = ''
 
@@ -42,15 +29,10 @@
 	$: isUsernameValid = usernameRules.test(username)
 	$: isUsernameTaken = isUsernameValid && !isUsernameAvailable && !loadingUsername
 
-	$: isEmailEmpty = email.length === 0
-	$: isEmailValid = emailRules.test(email)
-	$: isEmailTaken = isEmailValid && !isEmailAvailable && !loadingEmail
-
 	$: isPasswordEmpty = password.length === 0
 	$: isPasswordValid = passwordRules.test(password)
 
 	function clearData() {
-		email = ''
 		password = ''
 		username = ''
 		signUpResultVisibility = false
@@ -68,33 +50,15 @@
 		}, 500)
 	}
 
-	async function checkEmailAvailability() {
-		isEmailAvailable = false
-		clearTimeout(debounceTimer)
-		loadingEmail = true
-
-		debounceTimer = setTimeout(async () => {
-			const res = await fetch(`/api/v1/auth/email?email=${email}`)
-			isEmailAvailable = await res.json()
-			loadingEmail = false
-		}, 500)
-	}
-
 	function checkCredentialValiditySignUp() {
-		if (isEmailEmpty || isPasswordEmpty || isUsernameEmpty) {
+		if (isPasswordEmpty || isUsernameEmpty) {
 			signUpResultMessage = 'Please fill in all the fields.'
 			signUpResultColor = 'error'
 			signUpResultVisibility = true
 			return false
 		}
-		if (!isEmailValid || !isPasswordValid || !isUsernameValid) {
+		if (!isPasswordValid || !isUsernameValid) {
 			signUpResultMessage = 'Please make sure all fields are valid.'
-			signUpResultColor = 'error'
-			signUpResultVisibility = true
-			return false
-		}
-		if (isEmailTaken) {
-			signUpResultMessage = 'Email already taken. Please use a different email.'
 			signUpResultColor = 'error'
 			signUpResultVisibility = true
 			return false
@@ -110,7 +74,7 @@
 	}
 
 	function checkCredentialValidityLogIn() {
-		if (isEmailEmpty || isPasswordEmpty) {
+		if (isUsernameEmpty || isPasswordEmpty) {
 			signUpResultMessage = 'Please fill in all the fields.'
 			signUpResultColor = 'error'
 			signUpResultVisibility = true
@@ -124,28 +88,52 @@
 		const areCredsValid = checkCredentialValiditySignUp()
 		if (!areCredsValid) return
 
-		const res = await signUp(supabase, email, password, username)
-		if (res instanceof AuthError) {
+		const res = await fetch('/api/v1/auth/register', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ username, password })
+		})
+		if (!res.ok) {
 			// console.error(res.name, res.message, res.cause, res.status)
-			signUpResultMessage = `Failed to sign up. ${res.message}`
+			const data = await res.json()
+			signUpResultMessage = `Failed to sign up. ${data.message}`
 			signUpResultColor = 'error'
 			signUpResultVisibility = true
 		} else {
-			signUpResultMessage = 'A confirmation email has been sent! Please check your email inbox.'
+			signUpResultMessage = 'Sign up successful'
 			signUpResultColor = 'success'
 			signUpResultVisibility = true
 			// window.location.reload()
 		}
+
+		// Login immediately after registering
+		await fetch('/api/v1/auth/login', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ username, password })
+		})
+		window.location.reload()
 	}
 
 	async function logInButton() {
 		const areCredsValid = checkCredentialValidityLogIn()
 		if (!areCredsValid) return
 
-		const res = await logIn(supabase, email, password)
-		if (res instanceof AuthError) {
+		const res = await fetch('/api/v1/auth/login', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ username, password })
+		})
+		if (!res.ok) {
 			// console.error(res.name, res.message, res.cause, res.status)
-			signUpResultMessage = `Failed to log in. ${res.message}.`
+			const data = await res.json()
+			signUpResultMessage = `Failed to log in. ${data.message}.`
 			signUpResultColor = 'error'
 			signUpResultVisibility = true
 		} else {
@@ -172,15 +160,13 @@
 				{#if tabSet === 0}
 					<form class="space-y-4 px-4 rounded-container-token">
 						{#if signUpResultVisibility}
-							<p
-								class="card text-center variant-filled-{signUpResultColor} p-2"
-							>
+							<p class="card text-center variant-filled-{signUpResultColor} p-2">
 								{signUpResultMessage}
 							</p>
 						{/if}
 						<label class="label">
-							<span>Email</span>
-							<input class="input" type="email" bind:value={email} placeholder="Enter email..." />
+							<span>Username</span>
+							<input class="input" bind:value={username} placeholder="Enter username..." />
 						</label>
 						<label class="label">
 							<span>Password</span>
@@ -193,50 +179,12 @@
 						</label>
 						<hr />
 					</form>
-					<button
-							class="variant-ghost-surface btn btn-sm mx-4 mt-4"
-							on:click={() => {
-								modalStore.clear()
-								modalStore.trigger(pwresetModal)
-							}}
-						>
-							<small class="small block">Forgot your password?</small>
-					</button>
 				{:else if tabSet === 1}
 					<form class="space-y-4 px-4 rounded-container-token">
 						{#if signUpResultVisibility}
-							<p
-								class="card text-center variant-filled-{signUpResultColor} py-2"
-							>
+							<p class="card text-center variant-filled-{signUpResultColor} py-2">
 								{signUpResultMessage}
 							</p>
-						{/if}
-						<label class="label">
-							<span>Email</span>
-							<input
-								class="input"
-								class:input-error={(!isEmailValid || isEmailTaken) && !isEmailEmpty}
-								type="email"
-								bind:value={email}
-								on:input={async () => {
-									clearTimeout(rulesDelayTimer)
-									rulesDelayTimer = setTimeout(
-										() => (emailRulesVisible = isEmailValid ? false : true),
-										500
-									)
-									await checkEmailAvailability()
-								}}
-								placeholder="Enter email..."
-							/>
-						</label>
-						{#if !isEmailValid && !isEmailEmpty && emailRulesVisible}
-							<div class="variant-ghost-warning m-2 p-2">
-								<p>Invalid email address.</p>
-							</div>
-						{:else if isEmailTaken}
-							<div class="variant-ghost-warning m-2 p-2">
-								<p>The email is already taken.</p>
-							</div>
 						{/if}
 						<label class="label">
 							<span>Username</span>
@@ -293,6 +241,7 @@
 								Password must be at least six characters long and can contain special characters.
 							</p>
 						{/if}
+						<small class="small block pl-1">Passwords cannot be reset!</small>
 						<hr />
 					</form>
 				{/if}
@@ -301,7 +250,7 @@
 					{#if tabSet === 0}
 						<button
 							class="variant-filled-primary btn"
-							disabled={isEmailEmpty || isPasswordEmpty}
+							disabled={isUsernameEmpty || isPasswordEmpty}
 							on:click={logInButton}
 							bind:this={logInButtonRef}
 						>
@@ -310,10 +259,7 @@
 					{:else if tabSet === 1}
 						<button
 							class="variant-filled-primary btn"
-							disabled={!isEmailValid ||
-								isEmailTaken ||
-								isEmailEmpty ||
-								!isUsernameValid ||
+							disabled={!isUsernameValid ||
 								isUsernameTaken ||
 								isUsernameEmpty ||
 								!isPasswordValid ||

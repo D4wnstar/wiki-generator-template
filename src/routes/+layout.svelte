@@ -1,5 +1,10 @@
 <script lang="ts">
 	import '../app.postcss'
+	import '../prism-night-owl.css'
+	// import '../prism-line-numbers.css'
+	import '../rehype-callouts.css'
+	import '../katex.css'
+
 	import {
 		AppBar,
 		AppShell,
@@ -10,9 +15,7 @@
 	} from '@skeletonlabs/skeleton'
 	import { currentTheme } from '$lib/stores'
 	import { browser } from '$app/environment'
-	import { onMount } from 'svelte'
-	import { afterNavigate, invalidate } from '$app/navigation'
-	import 'highlight.js/styles/github-dark.css'
+	import { afterNavigate } from '$app/navigation'
 
 	export let data
 
@@ -37,14 +40,12 @@
 	// Modal initialization
 	import AuthModal from '$lib/components/auth/AuthModal.svelte'
 	import { Menu } from 'lucide-svelte'
-	import NavigationSidebar from '$lib/components/NavigationSidebar.svelte'
+	import NavigationSidebar from '$lib/components/utils/NavigationSidebar.svelte'
 	import AccountModal from '$lib/components/auth/AccountModal.svelte'
-	import PasswordResetModal from '$lib/components/auth/PasswordResetModal.svelte'
-	import ImageModal from '$lib/components/ImageModal.svelte'
+	import ImageModal from '$lib/components/utils/ImageModal.svelte'
 	const modalRegistry: Record<string, ModalComponent> = {
 		auth: { ref: AuthModal },
 		account: { ref: AccountModal },
-		pwreset: { ref: PasswordResetModal },
 		image: { ref: ImageModal }
 	}
 
@@ -74,6 +75,7 @@
 			notesTitles={data.noteTitles}
 			title={data.settings?.title}
 			allowLogins={data.settings.allow_logins}
+			user={data.user}
 		/>
 	</div>
 </Drawer>
@@ -102,6 +104,7 @@
 			notesTitles={data.noteTitles}
 			title={data.settings?.title}
 			allowLogins={data.settings.allow_logins}
+			user={data.user}
 		/>
 	</svelte:fragment>
 

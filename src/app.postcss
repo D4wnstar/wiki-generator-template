@@ -29,7 +29,7 @@
 	@apply card variant-soft-surface w-full px-6 py-4;
 }
 
-.codeblock-base {
+/* .codeblock-base {
 	@apply codeblock w-full overflow-hidden bg-gray-900 text-sm text-white shadow rounded-container-token;
 }
 
@@ -39,7 +39,7 @@
 
 .codeblock-pre {
 	@apply break-all p-4 pt-1;
-}
+} */
 
 .task-checkbox {
 	@apply mr-2 rounded bg-transparent text-primary-500;
@@ -80,6 +80,10 @@ body[data-theme='cosmos'] {
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: cover;
+}
+
+:root {
+	color-scheme: 'dark';
 }
 
 [data-theme='cosmos'] h1,
@@ -151,13 +155,13 @@ body[data-theme='cosmos'] {
 	@apply pl-4;
 }
 
-pre.mermaid > svg {
+/* pre.mermaid > svg {
 	@apply mx-auto rounded-2xl bg-surface-900;
 }
 
 .dark pre.mermaid > svg {
 	@apply bg-transparent;
-}
+} */
 
 blockquote {
 	@apply blockquote break-all;
@@ -195,10 +199,6 @@ blockquote {
 
 #note-content .task-list ul {
 	@apply mt-1 list-none;
-}
-
-code {
-	@apply code;
 }
 
 /* table {

@@ -1,12 +1,160 @@
 import type { TreeViewNode } from '@skeletonlabs/skeleton'
-import slugify from 'slugify'
-import type { NoteRow } from '$lib/schema'
+import { slug } from 'github-slugger'
+import {
+	details,
+	noteContents,
+	notes,
+	sidebarImages,
+	type DetailsRow,
+	type NoteContentsRow,
+	type NoteRow,
+	type SidebarImageRow
+} from '$lib/schema'
+import type { LibSQLDatabase } from 'drizzle-orm/libsql'
+import { eq, and, or, isNull } from 'drizzle-orm'
+import rehypeParse from 'rehype-parse'
+import rehypeStringify from 'rehype-stringify'
+import { unified } from 'unified'
+import rehypeAuthorizeLinks from './rehype/rehype-authorize-links'
+import type { LoggedUser } from './types'
+import { getAllowedUsersFilter } from './utils'
+import { error } from '@sveltejs/kit'
 
-export function slugifyPath(path: string): string {
+/**
+ * Common handling function for both the front page and slug-navigated pages.
+ * Meant to be used in the page.server.ts load function.
+ * @param db A Drizzle LibSQLDatabase instance
+ * @param user The currently logged-in user, if any
+ * @param slug The slug of the page to handle. Leave undefined for the front page
+ * @returns The page data and its content
+ */
+export async function handlePageSlug(
+	db: LibSQLDatabase,
+	user: LoggedUser | null,
+	slug: string | undefined = undefined
+) {
+	const isUserAllowed = user ? getAllowedUsersFilter(user.username, 'notes') : undefined
+	const isUserAllowedChunks = user
+		? getAllowedUsersFilter(user.username, 'noteContents')
+		: undefined
+
+	// Current page must match the URL slug or be the frontpage, depending on how the function is called
+	const pageCondition = slug ? eq(notes.slug, slug) : eq(notes.frontpage, true)
+
+	const rows = await db
+		.select()
+		.from(notes)
+		.leftJoin(noteContents, eq(notes.id, noteContents.note_id))
+		.leftJoin(details, eq(notes.id, details.note_id))
+		.leftJoin(sidebarImages, eq(notes.id, sidebarImages.note_id))
+		.where(
+			and(
+				pageCondition,
+				// The user must either need no permission or be allowed in the page
+				or(isNull(notes.allowed_users), isUserAllowed),
+				// and in each individual chunk
+				or(isNull(noteContents.allowed_users), isUserAllowedChunks)
+			)
+		)
+
+	if (rows.length === 0) {
+		error(404, 'Could not find page or you are not authorized to see it.')
+	}
+
+	// Reduce rows to a more manageable data structure
+	// Uniqueness of each element is guaranteed with hashmaps
+	const pageMap = rows.reduce<{
+		note: NoteRow
+		contents: Map<number, NoteContentsRow>
+		details: Map<number, DetailsRow>
+		sidebarImages: Map<number, SidebarImageRow>
+	}>(
+		(acc, row) => {
+			if (row.note_contents) {
+				acc.contents.set(row.note_contents.chunk_id, row.note_contents)
+			}
+
+			if (row.details) {
+				acc.details.set(row.details.order, row.details)
+			}
+
+			if (row.sidebar_images) {
+				acc.sidebarImages.set(row.sidebar_images.order, row.sidebar_images)
+			}
+
+			return acc
+		},
+		{
+			note: rows[0].notes,
+			contents: new Map<number, NoteContentsRow>(), // Adjust the type as needed
+			details: new Map<number, DetailsRow>(), // Adjust the type as needed
+			sidebarImages: new Map<number, SidebarImageRow>() // Adjust the type as needed
+		}
+	)
+
+	const page = {
+		note: pageMap.note,
+		contents: [...pageMap.contents.values()],
+		details: [...pageMap.details.values()],
+		sidebarImages: [...pageMap.sidebarImages.values()]
+	}
+
+	// Sort details by the given order
+	page.details.sort((detail1, detail2) => (detail1.order > detail2.order ? 1 : -1))
+
+	// and also sidebar images
+	page.sidebarImages.sort((img1, img2) => (img1.order > img2.order ? 1 : -1))
+
+	let pageContent = page.contents.reduce((acc, c) => acc + c.text, '')
+
+	// Initialize the data needed to remove links that the current user shouldn't see
+	const pathToAllowedUsers = (
+		await db
+			.select({
+				path: notes.slug,
+				allowedUsers: notes.allowed_users
+			})
+			.from(notes)
+	).reduce((acc, row) => {
+		const allowedUsers = row.allowedUsers?.split(';')
+		if (allowedUsers) {
+			acc.set(row.path, allowedUsers)
+		}
+
+		return acc
+	}, new Map<string, string[]>())
+
+	// Initialize the rehype processor to modify the anchor tags
+	const processor = unified()
+		.use(rehypeParse, { fragment: true })
+		.use(rehypeAuthorizeLinks, user?.username, pathToAllowedUsers)
+		.use(rehypeStringify)
+
+	const stripLinks = async (text: string) => (await processor.process(text)).toString()
+
+	// Run the processor on the main page, the details and the sidebar captions
+	pageContent = await stripLinks(pageContent)
+	page.details = await Promise.all(
+		page.details.map(async (d) => {
+			d.detail_content = await stripLinks(d.detail_content)
+			return d
+		})
+	)
+	page.sidebarImages = await Promise.all(
+		page.sidebarImages.map(async (si) => {
+			if (si.caption) si.caption = await stripLinks(si.caption)
+			return si
+		})
+	)
+
+	return { page, pageContent }
+}
+
+export function slugPath(path: string): string {
 	const elems = path.split('/').filter((elem) => elem !== '')
 	const slugged = []
 	for (const elem of elems) {
-		slugged.push(slugify(elem, { lower: true, remove: /[^\w\d\s]/g }))
+		slugged.push(slug(elem))
 	}
 
 	return slugged.join('/')
@@ -46,21 +194,21 @@ export function createNotesTree(notes: NoteRow[]): TreeViewNode[] {
 		// not just the base name
 		for (const piece of pathPieces) {
 			currPath += '/' + piece
-			const slugPath = slugifyPath(currPath)
+			const sluggedPath = slugPath(currPath)
 			let content: string
 
 			// If the current path is among the note paths, that means it's a note and should have a link to it
 			if (paths.includes(currPath.slice(1))) {
 				// Also check if the note in question has an alt name before making the link
 				const linkText = note.alt_title ?? piece
-				content = `<a href="/${slugPath}"><button class="h-full w-full text-left py-1">${linkText}</button></a>`
+				content = `<a href="/${sluggedPath}"><button class="h-full w-full text-left py-1">${linkText}</button></a>`
 			} else {
 				// otherwise it should just be a text box containing the intermediate path
 				content = `<p class="py-1">${piece}</p>`
 			}
 
 			const newNode: TreeViewNode = {
-				id: slugPath,
+				id: sluggedPath,
 				content: content
 			}
 

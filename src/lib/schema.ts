@@ -95,6 +95,20 @@ CREATE TABLE IF NOT EXISTS wiki_settings (
 );
 */
 
+export const users = sqliteTable('users', {
+	id: int().primaryKey(),
+	username: text().notNull().unique(),
+	password: text().notNull()
+})
+
+/*
+CREATE TABLE IF NOT EXISTS users (
+	id integer primary key,
+	username text not null unique,
+	password text not null
+);
+*/
+
 /* TYPES */
 export type NoteRow = typeof notes.$inferInsert
 export type NoteContentsRow = typeof noteContents.$inferSelect

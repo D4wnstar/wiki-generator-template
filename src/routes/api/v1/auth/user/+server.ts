@@ -1,18 +1,19 @@
 import { json } from '@sveltejs/kit'
 import type { RequestHandler } from './$types'
+import { users } from '$lib/schema'
+import { eq } from 'drizzle-orm'
 
+/**
+ * Determine if a username is already taken
+ */
 export const GET: RequestHandler = async ({ locals, url }) => {
 	const username = url.searchParams.get('username')
-	if (!username) return json(false)
+	if (!username) {
+		return json({ message: 'Missing or invalid URL paramter' }, { status: 500 })
+	}
 
-	const { data: select, error: selectError } = await locals.supabase
-		.from('profiles')
-		.select('username')
-		.eq('username', username)
-		.limit(1)
-		.maybeSingle()
-        
-	if (selectError) console.error(`Error when fetching usernames: ${selectError.message}`)
-	const isUsernameAvailable = select || selectError ? false : true
+	const maybe_user = await locals.db.select().from(users).where(eq(users.username, username)).get()
+
+	const isUsernameAvailable = maybe_user ? false : true
 	return json(isUsernameAvailable)
 }

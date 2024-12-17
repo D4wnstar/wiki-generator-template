@@ -50,11 +50,7 @@ async function fetchContent(e: MouseEvent, supabase: SupabaseClient) {
 	return true
 }
 
-export function initializePopup(
-	triggerNode: HTMLElement,
-	args: PopupSettings,
-	supabase: SupabaseClient
-) {
+export function initializePopup(triggerNode: HTMLElement, args: PopupSettings) {
 	// Floating UI Modules
 	const {
 		computePosition,
@@ -143,7 +139,7 @@ export function initializePopup(
 				// Implement optional middleware
 				...optionalMiddleware
 			]
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		}).then(({ x, y, placement, middlewareData }: any) => {
 			Object.assign(elemPopup.style, {
 				left: `${x}px`,
@@ -317,7 +313,6 @@ export function initializePopup(
 	render()
 }
 
-
 export function destroyPopup(triggerNode: HTMLElement) {
 	if (closeInstantly) closeInstantly()
 	// Trigger Events
@@ -332,12 +327,12 @@ export function destroyPopup(triggerNode: HTMLElement) {
 	window.removeEventListener('keydown', onWindowKeyDown, true)
 }
 
-export function setupPopups(id: string, settings: PopupSettings, supabase: SupabaseClient): void {
+export function setupPopups(id: string, settings: PopupSettings): void {
 	let anchors: NodeListOf<HTMLAnchorElement> | undefined
 
 	onMount(() => {
 		anchors?.forEach((anchor) => {
-			initializePopup(anchor, settings, supabase)
+			initializePopup(anchor, settings)
 		})
 	})
 
@@ -348,7 +343,7 @@ export function setupPopups(id: string, settings: PopupSettings, supabase: Supab
 		})
 
 		anchors?.forEach((anchor) => {
-			initializePopup(anchor, settings, supabase)
+			initializePopup(anchor, settings)
 		})
 	})
 

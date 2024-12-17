@@ -1,13 +1,10 @@
 <script lang="ts">
-	import { usernameRules, emailRules, updateUserInfo } from "$lib/auth"
-	import type { Database } from "$lib/database.types"
-	import { AuthError, type Session, type SupabaseClient } from "@supabase/supabase-js"
+	import { usernameRules } from '$lib/auth'
+	import type { LoggedUser } from '$lib/types'
 
-	export let supabase: SupabaseClient<Database>
-    export let session: Session
+	export let user: LoggedUser
 
-	let username = session.user.user_metadata.username
-	let email = session.user.email ?? ""
+	let username = user.username
 
 	let debounceTimer: NodeJS.Timeout
 	let rulesDelayTimer: NodeJS.Timeout
@@ -16,19 +13,11 @@
 	let responseColor = 'warning'
 
 	let loadingUsername = false
-	let loadingEmail = false
-
 	let isUsernameAvailable = true
-	let isEmailAvailable = true
-
 	let usernameRulesVisible = false
-	let emailRulesVisible = false
 
 	$: isUsernameValid = usernameRules.test(username)
 	$: isUsernameTaken = isUsernameValid && !isUsernameAvailable && !loadingUsername
-
-	$: isEmailValid = emailRules.test(email)
-	$: isEmailTaken = isEmailValid && !isEmailAvailable && !loadingEmail
 
 	async function checkUsernameAvailability() {
 		isUsernameAvailable = false
@@ -36,7 +25,7 @@
 		loadingUsername = true
 
 		debounceTimer = setTimeout(async () => {
-			if (username === session.user.user_metadata.username) {
+			if (username === user.username) {
 				isUsernameAvailable = true
 				return
 			}
@@ -47,32 +36,9 @@
 		}, 500)
 	}
 
-	async function checkEmailAvailability() {
-		isEmailAvailable = false
-		clearTimeout(debounceTimer)
-		loadingEmail = true
-
-		debounceTimer = setTimeout(async () => {
-			if (email === session.user.email) {
-				isEmailAvailable = true
-				return
-			}
-
-			const res = await fetch(`/api/v1/auth/email?email=${email}`)
-			isEmailAvailable = await res.json()
-			loadingEmail = false
-		}, 500)
-	}
-
 	function checkCredentialValidity() {
-		if (!isEmailValid || !isUsernameValid) {
+		if (!isUsernameValid) {
 			responseMessage = 'Please make sure all fields are valid.'
-			responseColor = 'error'
-			responseVisibility = true
-			return false
-		}
-		if (isEmailTaken) {
-			responseMessage = 'Email already taken. Please use a different email.'
 			responseColor = 'error'
 			responseVisibility = true
 			return false
@@ -91,14 +57,21 @@
 		const areCredsValid = checkCredentialValidity()
 		if (!areCredsValid) return
 
-		const res = await updateUserInfo(supabase, email, username)
-		if (res instanceof AuthError) {
+		const res = await fetch('/api/v1/auth/update-username', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ username })
+		})
+		if (!res.ok) {
 			// console.error(res.name, res.message, res.cause, res.status)
-			responseMessage = `Failed to update credentials. ${res.message}`
+			const data = await res.json()
+			responseMessage = `Failed to update username. ${data.message}`
 			responseColor = 'error'
 			responseVisibility = true
 		} else {
-			responseMessage = 'Successfully updated credentials.'
+			responseMessage = 'Successfully updated username.'
 			responseColor = 'success'
 			responseVisibility = true
 			window.location.reload()
@@ -106,37 +79,12 @@
 	}
 </script>
 
-<section class="flex flex-col space-y-4 w-full">
+<section class="flex w-full flex-col space-y-4">
 	<form class="space-y-4">
 		{#if responseVisibility}
-			<p class="variant-filled-{responseColor} text-center card p-2">
+			<p class="variant-filled-{responseColor} card p-2 text-center">
 				{responseMessage}
 			</p>
-		{/if}
-		<label class="label">
-			<div>Email</div>
-			<input
-				class="input w-3/4"
-				class:input-error={!isEmailValid || isEmailTaken}
-				type="email"
-				name="email"
-				placeholder="Email"
-				bind:value={email}
-				on:input={async () => {
-					clearTimeout(rulesDelayTimer)
-					rulesDelayTimer = setTimeout(() => (emailRulesVisible = isEmailValid ? false : true), 500)
-					await checkEmailAvailability()
-				}}
-			/>
-		</label>
-		{#if !isEmailValid && emailRulesVisible}
-			<div class="variant-ghost-warning p-2 w-3/4">
-				<p>Invalid email address.</p>
-			</div>
-		{:else if isEmailTaken}
-			<div class="variant-ghost-warning p-2 w-3/4">
-				<p>The email is already taken.</p>
-			</div>
 		{/if}
 		<label class="label">
 			<div>Username</div>
@@ -158,7 +106,7 @@
 			/>
 		</label>
 		{#if !isUsernameValid && usernameRulesVisible}
-			<div class="variant-ghost-warning p-2 w-3/4">
+			<div class="variant-ghost-warning w-3/4 p-2">
 				<p>Username must be:</p>
 				<ol class="list-inside list-decimal">
 					<li>Alphanumeric with dots, dashes and underscores</li>
@@ -168,18 +116,14 @@
 				</ol>
 			</div>
 		{:else if isUsernameTaken}
-			<div class="variant-ghost-warning p-2 w-3/4">
+			<div class="variant-ghost-warning w-3/4 p-2">
 				<p>The username is already taken.</p>
 			</div>
 		{/if}
-		<small class="block text-sm text-surface-600-300-token pl-1 w-3/4"
+		<small class="text-surface-600-300-token block w-3/4 pl-1 text-sm"
 			>Changing username will cause all of your permissions to be revoked!</small
 		>
-		<button
-			class="btn variant-filled-surface"
-            disabled={!isEmailValid || !isUsernameValid}
-			on:click={updateInfo}
-		>
+		<button class="variant-filled-surface btn" disabled={!isUsernameValid} on:click={updateInfo}>
 			Save Changes
 		</button>
 	</form>
