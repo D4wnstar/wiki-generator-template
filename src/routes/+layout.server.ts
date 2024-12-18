@@ -2,10 +2,9 @@ import { notes, wikiSettings } from '$lib/schema'
 import { error } from '@sveltejs/kit'
 import type { LayoutServerLoad } from './$types'
 import { and, eq, isNull, or } from 'drizzle-orm'
-import { createNotesTree } from '$lib/notes'
-import type { AutocompleteOption } from '@skeletonlabs/skeleton'
 import { wikiTitle } from '$lib/stores'
 import { getAllowedUsersFilter } from '$lib/utils'
+import { getNotesTree, sortFiles } from '$lib/notes'
 
 export const load = (async ({ locals: { db, user } }) => {
 	// Select allowed pages
@@ -20,15 +19,13 @@ export const load = (async ({ locals: { db, user } }) => {
 	}
 
 	// Sort them and add them to the navigation tree and in the search bar
-	const pages = rows.sort((a, b) => a.path.localeCompare(b.path))
-	const notesTreeView = createNotesTree(pages)
-	const noteTitles: AutocompleteOption<string>[] = pages.map((page) => {
-		return {
-			label: page.alt_title ?? page.title,
-			value: page.alt_title?.toLocaleLowerCase() ?? page.title.toLocaleLowerCase(),
-			meta: { slug: page.slug }
-		}
-	})
+	const pages = rows
+		.sort((a, b) => a.path.localeCompare(b.path))
+		.map((p) => {
+			const depth = p.slug.split('/').length
+			return { ...p, depth }
+		})
+	const topLevelContent = getNotesTree(rows).children.sort(sortFiles)
 
 	// Select the setting and pass them on to the store/layout
 	const settings = await db.select().from(wikiSettings).get()
@@ -38,5 +35,5 @@ export const load = (async ({ locals: { db, user } }) => {
 
 	wikiTitle.set(settings.title)
 
-	return { noteTitles, notesTreeView, settings, user }
+	return { /* noteTitles, */ pages, settings, user, topLevelContent }
 }) satisfies LayoutServerLoad

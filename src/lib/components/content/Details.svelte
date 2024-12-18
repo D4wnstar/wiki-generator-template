@@ -1,13 +1,12 @@
 <script lang="ts">
-	import { setupPopups } from '$lib/popups'
-	import type { DetailsObject } from '$lib/shorthand.types'
-	import type { PopupSettings } from '@skeletonlabs/skeleton'
-	import { Library } from 'lucide-svelte'
+	import type { DetailsRow } from "$lib/schema"
+	import { Library } from "lucide-svelte"
 
-	export let details: DetailsObject[]
-	// export let popupSettings: PopupSettings
+	interface Props {
+		details: DetailsRow[]
+	}
 
-	// setupPopups('details', popupSettings, supabase)
+	let { details }: Props = $props();
 </script>
 
 <div id="details" class="space-y-2">

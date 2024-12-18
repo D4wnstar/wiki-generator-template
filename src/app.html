@@ -6,13 +6,7 @@
 		<meta name="viewport" content="width=device-width" />
 		%sveltekit.head%
 	</head>
-	<body data-sveltekit-preload-data="hover">
-		<script>
-			document.body.setAttribute(
-				'data-theme',
-				localStorage.getItem('current-theme')?.replaceAll('"', '') ?? 'cosmos'
-			)
-		</script>
+	<body data-sveltekit-preload-data="hover" data-theme="cosmos">
 		<div style="display: contents" class="h-full overflow-hidden">%sveltekit.body%</div>
 	</body>
 </html>

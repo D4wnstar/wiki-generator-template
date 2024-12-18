@@ -1,60 +1,26 @@
 <script lang="ts">
 	import { popupNote, wikiTitle } from '$lib/stores'
-	import { setupPopups } from '$lib/popups'
-	import type { PopupSettings } from '@skeletonlabs/skeleton'
 	import Extras from '$lib/components/content/Extras.svelte'
 
-	export let data
-
-	const popupSettings: PopupSettings = {
-		event: 'hover',
-		target: 'popupHover',
-		placement: 'top',
-		middleware: { autoPlacement: { allowedPlacements: ['top', 'bottom'] } }
-	}
-
-	// Setup can only run once on a full reload as the supabase client does not change on navigation
-	// setupPopups('note-content', popupSettings, data.supabase)
-
-	$: pageTitle = `${data.note.alt_title ?? data.note.title} - ${$wikiTitle}`
+	let { data } = $props()
 </script>
 
-<svelte:head>
+<!-- <svelte:head>
 	<title>{pageTitle}</title>
-</svelte:head>
+</svelte:head> -->
 
-<div class="flex h-full w-full flex-col md:flex-row">
-	<div
-		class="flex max-h-[93vh] w-full flex-col items-center overflow-auto px-16 md:pb-8 lg:max-h-screen"
-	>
-		<h1 id="note-title" class="h1 pb-4 pt-4 text-center md:max-w-3xl">
-			{data.note.alt_title ?? data.note.title}
-		</h1>
-		<article id="note-content" class="flex w-full flex-col space-y-4 md:max-w-3xl">
-			<hr />
-			{@html data.pageContent}
-			<hr />
-		</article>
-	</div>
+<main id="note-content" class="mx-auto max-w-[800px] space-y-4 lg:grow">
+	<h1 class="h1 text-center">{data.note.alt_title ?? data.note.title}</h1>
+	<hr />
+	{@html data.pageContent}
+	<hr />
+</main>
 
-	{#if data.sidebarImages.length > 0 || data.details.length > 0}
-		<div
-			id="extras-sidebar"
-			class="variant-glass-surface border-surface-300-600-token hidden max-h-[93vh] space-y-2 overflow-auto rounded-none border-l-[1px] p-4 md:flex md:w-[24em] md:flex-col lg:max-h-screen lg:w-[36em]"
-		>
-			<Extras sidebarImages={data.sidebarImages} details={data.details} />
-		</div>
-		<div class="space-y-4 px-8 pb-8 pt-4 md:hidden">
-			<Extras sidebarImages={data.sidebarImages} details={data.details} />
-		</div>
-	{/if}
-</div>
-
-<div
-	class="card variant-outline-secondary max-h-80 w-80 overflow-hidden p-4"
+<!-- <div
+	class="variant-outline-secondary card max-h-80 w-80 overflow-hidden p-4"
 	data-popup="popupHover"
 >
 	<h1 class="pb-2 text-center text-2xl"><strong>{$popupNote.title}</strong></h1>
 	<hr />
 	<article class="space-y-2 py-2 text-sm">{@html $popupNote.content}</article>
-</div>
+</div> -->

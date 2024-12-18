@@ -160,6 +160,74 @@ export function slugPath(path: string): string {
 	return slugged.join('/')
 }
 
+export type Folder = {
+	type: 'folder'
+	title: string
+	children: (File | Folder)[]
+}
+
+export type File = {
+	type: 'file'
+	title: string
+	path: string
+	slug: string
+}
+
+export function getNotesTree(pages: NoteRow[]) {
+	const files: File[] = pages.map((p) => {
+		return { ...p, type: 'file' }
+	})
+	const root: Folder = {
+		type: 'folder',
+		title: 'Root',
+		children: []
+	}
+
+	// Go through each file
+	for (const file of files) {
+		const parts = file.path.split('/')
+		let currentFolder = root
+
+		// Go through each part of the path
+		for (const [index, part] of parts.entries()) {
+			if (index === parts.length - 1) {
+				// The last part of the path is the parent folder, so add the
+				// the current file to it
+				currentFolder.children.push(file)
+			} else {
+				// If it's not the last part, check if the folder exists
+				let childFolder = currentFolder.children.find((child) => {
+					return child.type === 'folder' && child.title === part
+				}) as Folder | undefined
+
+				// If it doesn't, create it and add it to the tree
+				if (!childFolder) {
+					childFolder = {
+						type: 'folder',
+						title: part,
+						children: []
+					}
+					currentFolder.children.push(childFolder)
+				}
+
+				currentFolder = childFolder
+			}
+		}
+	}
+
+	return root
+}
+
+export function sortFiles(a: File | Folder, b: File | Folder) {
+	if (a.type === 'folder' && b.type === 'file') {
+		return -1
+	} else if (a.type === 'file' && b.type === 'folder') {
+		return 1
+	} else {
+		return a.title.localeCompare(b.title)
+	}
+}
+
 export function getPathCombinations(path: string): string[] {
 	const pathParts = path.split('/').filter((part) => part !== '')
 	let currentPath = ''

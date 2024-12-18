@@ -5,32 +5,32 @@
 
 	const modalStore = getModalStore()
 
-	let signUpResultVisibility = false
-	let signUpResultMessage = 'Placeholder'
-	let signUpResultColor = 'warning'
-	let tabSet: number = 0
+	let signUpResultVisibility = $state(false)
+	let signUpResultMessage = $state('Placeholder')
+	let signUpResultColor = $state('warning')
+	let tabSet: number = $state(0)
 
-	let loadingUsername = false
+	let loadingUsername = $state(false)
 
-	let isUsernameAvailable = false
+	let isUsernameAvailable = $state(false)
 
 	let debounceTimer: NodeJS.Timeout
-	let rulesDelayTimer: NodeJS.Timeout
-	let usernameRulesVisible = false
-	let passwordRulesVisible = false
+	let rulesDelayTimer: NodeJS.Timeout = $state()
+	let usernameRulesVisible = $state(false)
+	let passwordRulesVisible = $state(false)
 
 	// Auth Data
-	let username = ''
-	let password = ''
+	let username = $state('')
+	let password = $state('')
 
-	let logInButtonRef
+	let logInButtonRef = $state()
 
-	$: isUsernameEmpty = username.length === 0
-	$: isUsernameValid = usernameRules.test(username)
-	$: isUsernameTaken = isUsernameValid && !isUsernameAvailable && !loadingUsername
+	let isUsernameEmpty = $derived(username.length === 0)
+	let isUsernameValid = $derived(usernameRules.test(username))
+	let isUsernameTaken = $derived(isUsernameValid && !isUsernameAvailable && !loadingUsername)
 
-	$: isPasswordEmpty = password.length === 0
-	$: isPasswordValid = passwordRules.test(password)
+	let isPasswordEmpty = $derived(password.length === 0)
+	let isPasswordValid = $derived(passwordRules.test(password))
 
 	function clearData() {
 		password = ''
@@ -149,51 +149,56 @@
 	<div class="card w-modal space-y-4 p-4 shadow-xl">
 		<TabGroup>
 			<Tab bind:group={tabSet} name="login" value={0} on:change={clearData}>
-				<svelte:fragment slot="lead"><User class="inline" /></svelte:fragment>
+				{#snippet lead()}
+								<User class="inline" />
+							{/snippet}
 				<span>Log In</span>
 			</Tab>
 			<Tab bind:group={tabSet} name="signup" value={1} on:change={clearData}>
-				<svelte:fragment slot="lead"><UserPlus class="inline" /></svelte:fragment>
+				{#snippet lead()}
+								<UserPlus class="inline" />
+							{/snippet}
 				<span>Sign Up</span>
 			</Tab>
-			<svelte:fragment slot="panel">
-				{#if tabSet === 0}
-					<form class="space-y-4 px-4 rounded-container-token">
-						{#if signUpResultVisibility}
-							<p class="card text-center variant-filled-{signUpResultColor} p-2">
-								{signUpResultMessage}
-							</p>
-						{/if}
-						<label class="label">
-							<span>Username</span>
-							<input class="input" bind:value={username} placeholder="Enter username..." />
-						</label>
-						<label class="label">
-							<span>Password</span>
-							<input
-								class="input"
-								type="password"
-								bind:value={password}
-								placeholder="Enter password..."
-							/>
-						</label>
-						<hr />
-					</form>
-				{:else if tabSet === 1}
-					<form class="space-y-4 px-4 rounded-container-token">
-						{#if signUpResultVisibility}
-							<p class="card text-center variant-filled-{signUpResultColor} py-2">
-								{signUpResultMessage}
-							</p>
-						{/if}
-						<label class="label">
-							<span>Username</span>
-							<input
-								class="input"
-								class:input-error={(!isUsernameValid || isUsernameTaken) && !isUsernameEmpty}
-								type="text"
-								bind:value={username}
-								on:input={async () => {
+			{#snippet panel()}
+					
+					{#if tabSet === 0}
+						<form class="space-y-4 px-4 rounded-container-token">
+							{#if signUpResultVisibility}
+								<p class="card text-center variant-filled-{signUpResultColor} p-2">
+									{signUpResultMessage}
+								</p>
+							{/if}
+							<label class="label">
+								<span>Username</span>
+								<input class="input" bind:value={username} placeholder="Enter username..." />
+							</label>
+							<label class="label">
+								<span>Password</span>
+								<input
+									class="input"
+									type="password"
+									bind:value={password}
+									placeholder="Enter password..."
+								/>
+							</label>
+							<hr />
+						</form>
+					{:else if tabSet === 1}
+						<form class="space-y-4 px-4 rounded-container-token">
+							{#if signUpResultVisibility}
+								<p class="card text-center variant-filled-{signUpResultColor} py-2">
+									{signUpResultMessage}
+								</p>
+							{/if}
+							<label class="label">
+								<span>Username</span>
+								<input
+									class="input"
+									class:input-error={(!isUsernameValid || isUsernameTaken) && !isUsernameEmpty}
+									type="text"
+									bind:value={username}
+									oninput={async () => {
 									clearTimeout(rulesDelayTimer)
 									rulesDelayTimer = setTimeout(
 										() => (usernameRulesVisible = isUsernameValid ? false : true),
@@ -201,77 +206,78 @@
 									)
 									await checkUsernameAvailability()
 								}}
-								placeholder="Enter username..."
-							/>
-						</label>
-						{#if !isUsernameValid && !isUsernameEmpty && usernameRulesVisible}
-							<div class="variant-ghost-warning m-2 p-2">
-								<p>Username must be:</p>
-								<ol class="list-inside list-decimal">
-									<li>Alphanumeric with dots, dashes and underscores</li>
-									<li>Between 3 and 20 characters long</li>
-									<li>Can't have more than one dot in a row (e.g. no 'the..legend')</li>
-									<li>Can't start or end in a dot, dash or underscore</li>
-								</ol>
-							</div>
-						{:else if isUsernameTaken}
-							<div class="variant-ghost-warning m-2 p-2">
-								<p>The username is already taken.</p>
-							</div>
-						{/if}
-						<label class="label">
-							<span>Password</span>
-							<input
-								class="input"
-								class:input-error={!isPasswordValid && !isPasswordEmpty}
-								type="password"
-								bind:value={password}
-								on:input={() => {
+									placeholder="Enter username..."
+								/>
+							</label>
+							{#if !isUsernameValid && !isUsernameEmpty && usernameRulesVisible}
+								<div class="variant-ghost-warning m-2 p-2">
+									<p>Username must be:</p>
+									<ol class="list-inside list-decimal">
+										<li>Alphanumeric with dots, dashes and underscores</li>
+										<li>Between 3 and 20 characters long</li>
+										<li>Can't have more than one dot in a row (e.g. no 'the..legend')</li>
+										<li>Can't start or end in a dot, dash or underscore</li>
+									</ol>
+								</div>
+							{:else if isUsernameTaken}
+								<div class="variant-ghost-warning m-2 p-2">
+									<p>The username is already taken.</p>
+								</div>
+							{/if}
+							<label class="label">
+								<span>Password</span>
+								<input
+									class="input"
+									class:input-error={!isPasswordValid && !isPasswordEmpty}
+									type="password"
+									bind:value={password}
+									oninput={() => {
 									clearTimeout(rulesDelayTimer)
 									rulesDelayTimer = setTimeout(
 										() => (passwordRulesVisible = isPasswordValid ? false : true),
 										500
 									)
 								}}
-								placeholder="Enter password..."
-							/>
-						</label>
-						{#if !isPasswordValid && !isPasswordEmpty && passwordRulesVisible}
-							<p>
-								Password must be at least six characters long and can contain special characters.
-							</p>
-						{/if}
-						<small class="small block pl-1">Passwords cannot be reset!</small>
-						<hr />
-					</form>
-				{/if}
-
-				<footer class="flex w-full justify-end gap-2 pt-4">
-					{#if tabSet === 0}
-						<button
-							class="variant-filled-primary btn"
-							disabled={isUsernameEmpty || isPasswordEmpty}
-							on:click={logInButton}
-							bind:this={logInButtonRef}
-						>
-							Log In
-						</button>
-					{:else if tabSet === 1}
-						<button
-							class="variant-filled-primary btn"
-							disabled={!isUsernameValid ||
-								isUsernameTaken ||
-								isUsernameEmpty ||
-								!isPasswordValid ||
-								isPasswordEmpty}
-							on:click={signUpButton}>Sign Up</button
-						>
+									placeholder="Enter password..."
+								/>
+							</label>
+							{#if !isPasswordValid && !isPasswordEmpty && passwordRulesVisible}
+								<p>
+									Password must be at least six characters long and can contain special characters.
+								</p>
+							{/if}
+							<small class="small block pl-1">Passwords cannot be reset!</small>
+							<hr />
+						</form>
 					{/if}
-					<button class="variant-ghost-surface btn" on:click={() => modalStore.close()}
-						>Cancel</button
-					>
-				</footer>
-			</svelte:fragment>
+
+					<footer class="flex w-full justify-end gap-2 pt-4">
+						{#if tabSet === 0}
+							<button
+								class="variant-filled-primary btn"
+								disabled={isUsernameEmpty || isPasswordEmpty}
+								onclick={logInButton}
+								bind:this={logInButtonRef}
+							>
+								Log In
+							</button>
+						{:else if tabSet === 1}
+							<button
+								class="variant-filled-primary btn"
+								disabled={!isUsernameValid ||
+									isUsernameTaken ||
+									isUsernameEmpty ||
+									!isPasswordValid ||
+									isPasswordEmpty}
+								onclick={signUpButton}>Sign Up</button
+							>
+						{/if}
+						<button class="variant-ghost-surface btn" onclick={() => modalStore.close()}
+							>Cancel</button
+						>
+					</footer>
+				
+					{/snippet}
 		</TabGroup>
 	</div>
 {/if}

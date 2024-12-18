@@ -13,13 +13,17 @@
 	} from '@skeletonlabs/skeleton'
 	import { createEventDispatcher } from 'svelte'
 
-	export let title: string
-	export let notesTreeView: TreeViewNode[]
-	export let notesTitles: AutocompleteOption<string>[]
+	interface Props {
+		title: string;
+		notesTreeView: TreeViewNode[];
+		notesTitles: AutocompleteOption<string>[];
+	}
+
+	let { title, notesTreeView, notesTitles }: Props = $props();
         
     const drawerStore = getDrawerStore()
     
-    let expandedNodes: string[] = []
+    let expandedNodes: string[] = $state([])
 
 	beforeNavigate(() => {
 		drawerStore.close()
@@ -33,7 +37,7 @@
 
 	// Search bar
 	const dispatch = createEventDispatcher()
-	let searchQuery = ''
+	let searchQuery = $state('')
 
 	function onAutocompleteSelection(event: CustomEvent<AutocompleteOption<string>>): void {
 		// @ts-expect-error

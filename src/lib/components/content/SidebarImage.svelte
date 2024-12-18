@@ -1,21 +1,20 @@
 <script lang="ts">
-	import { setupPopups } from '$lib/popups'
 	import type { SidebarImageRow } from '$lib/schema'
-	import { getModalStore, type ModalSettings, type PopupSettings } from '@skeletonlabs/skeleton'
 
 	const modalStore = getModalStore()
 
-	export let sidebarImages: SidebarImageRow[]
-	// export let popupSettings: PopupSettings
+	interface Props {
+		sidebarImages: SidebarImageRow[]
+	}
 
-	// setupPopups('sidebar-images', popupSettings, supabase)
+	let { sidebarImages }: Props = $props();
 </script>
 
 <div id="sidebar-images" class="space-y-6">
 	{#each sidebarImages as image}
 		<figure class="text-center">
 			<button
-				on:click={() =>
+				onclick={() =>
 					modalStore.trigger({
 						type: 'component',
 						component: 'image',

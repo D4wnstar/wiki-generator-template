@@ -1,100 +1,50 @@
-import { join } from 'path'
 import type { Config } from 'tailwindcss'
 import typography from '@tailwindcss/typography'
 import forms from '@tailwindcss/forms'
-import { skeleton } from '@skeletonlabs/tw-plugin'
-import { cosmos } from './themes/cosmos'
+import { contentPath, skeleton } from '@skeletonlabs/skeleton/plugin'
+import cosmos from './static/themes/cosmos'
 
 export default {
-	content: [
-		'./src/**/*.{html,js,svelte,ts}',
-		join(require.resolve('@skeletonlabs/skeleton'), '../**/*.{html,js,svelte,ts}')
-	],
+	content: ['./src/**/*.{html,js,svelte,ts}', contentPath(import.meta.url, 'svelte')],
 	theme: {
 		extend: {}
 	},
+	darkMode: 'selector',
 	plugins: [
 		forms,
 		typography,
 		skeleton({
-			themes: {
-				custom: [cosmos],
-				preset: [
-					{
-						name: 'skeleton',
-						enhancements: true
-					},
-					{
-						name: 'wintry',
-						enhancements: true
-					},
-					{
-						name: 'modern',
-						enhancements: true
-					},
-					{
-						name: 'rocket',
-						enhancements: true
-					},
-					{
-						name: 'seafoam',
-						enhancements: true
-					},
-					{
-						name: 'vintage',
-						enhancements: true
-					},
-					{
-						name: 'sahara',
-						enhancements: true
-					},
-					{
-						name: 'hamlindigo',
-						enhancements: true
-					},
-					{
-						name: 'gold-nouveau',
-						enhancements: true
-					},
-					{
-						name: 'crimson',
-						enhancements: true
-					}
-				]
-			}
+			themes: [cosmos]
 		})
 	],
+
 	safelist: [
-		'w-px',
-		{ pattern: /w-\d+(\.\d+)?/ },
-		'mx-auto',
-		'pl-5',
-		'py-2',
-		'px-4',
-		'pb-2',
-		'space-y-2',
-		'flex',
-
-		'anchor',
-		'card',
-		'blockquote',
-		'list-disc',
-		'list-decimal',
-		'code',
-		'popup',
-
-		'text-center',
-		'not-italic',
-		'line-through',
-		'text-surface-700-200-token',
-		'bg-tertiary-50-900-token',
-		'text-slate-500',
-		'border',
-		'border-collapse',
-		'border-surface-400-500-token',
-
-		{ pattern: /stroke-(primary|secondary|tertiary|success|warning|error|surface)-400/ },
-		{ pattern: /variant-soft-.+/ },
-		'variant-outline-surface'
+		{
+			pattern: /h[1-6]/
+		},
+		{
+			pattern: /preset-filled-(primary|secondary|tertiary)-600-400/
+		},
+		{
+			pattern: /preset-filled-(primary|secondary|tertiary)-400-600/
+		},
+		{
+			pattern: /preset-filled-(primary|secondary|tertiary)-200-800/
+		},
+		'code-highlight',
+		'code-line',
+		'inserted',
+		'deleted',
+		'highlight-line',
+		'line-number',
+		'callout',
+		'callout-title',
+		'callout-title-inner',
+		'callout-icon',
+		'callout-collapsible',
+		'break-words',
+		{
+			pattern: /pl-(3|6|9|12|15|18)/
+		}
 	]
 } satisfies Config

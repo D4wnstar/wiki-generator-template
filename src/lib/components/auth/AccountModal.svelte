@@ -33,9 +33,9 @@
 		}
 	}
 
-	let currTab: string = 'info'
-	let privateNotes: NoteRow[] = []
-	let privateChunks: { note_contents: NoteContentsRow | null; notes: NoteRow }[] = []
+	let currTab: string = $state('info')
+	let privateNotes: NoteRow[] = $state([])
+	let privateChunks: { note_contents: NoteContentsRow | null; notes: NoteRow }[] = $state([])
 
 	onMount(async () => {
 		const res = await fetch('/api/v1/auth/fetch-secrets')
@@ -54,15 +54,19 @@
 		<div class="flex h-0 grow flex-col items-center gap-2 md:flex-row md:items-stretch">
 			<ListBox class="w-32" active="variant-soft-primary">
 				<ListBoxItem bind:group={currTab} name="info" value="info">
-					<svelte:fragment slot="lead"><Info /></svelte:fragment>
+					{#snippet lead()}
+										<Info />
+									{/snippet}
 					Info
 				</ListBoxItem>
 				<ListBoxItem bind:group={currTab} name="secrets" value="secrets">
-					<svelte:fragment slot="lead"><EyeOff /></svelte:fragment>
+					{#snippet lead()}
+										<EyeOff />
+									{/snippet}
 					Secrets
 				</ListBoxItem>
 			</ListBox>
-			<div class="border-surface-300-600-token hidden border-r md:block" />
+			<div class="border-surface-300-600-token hidden border-r md:block"></div>
 			{#if currTab === 'info'}
 				<ModalTab tabTitle="Information">
 					<InfoChange {user} />
@@ -109,7 +113,7 @@
 		<footer class="flex w-full justify-end gap-2">
 			<button
 				class="variant-ghost-surface btn"
-				on:click={() => {
+				onclick={() => {
 					modalStore.close()
 				}}
 			>
@@ -117,7 +121,7 @@
 			</button>
 			<button
 				class="variant-filled-error btn"
-				on:click={() => {
+				onclick={() => {
 					modalStore.close()
 					modalStore.trigger(logOutModal)
 				}}

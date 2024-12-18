@@ -2,22 +2,26 @@
 	import { usernameRules } from '$lib/auth'
 	import type { LoggedUser } from '$lib/types'
 
-	export let user: LoggedUser
+	interface Props {
+		user: LoggedUser;
+	}
 
-	let username = user.username
+	let { user }: Props = $props();
+
+	let username = $state(user.username)
 
 	let debounceTimer: NodeJS.Timeout
-	let rulesDelayTimer: NodeJS.Timeout
-	let responseVisibility = false
-	let responseMessage = 'Placeholder'
-	let responseColor = 'warning'
+	let rulesDelayTimer: NodeJS.Timeout = $state()
+	let responseVisibility = $state(false)
+	let responseMessage = $state('Placeholder')
+	let responseColor = $state('warning')
 
-	let loadingUsername = false
-	let isUsernameAvailable = true
-	let usernameRulesVisible = false
+	let loadingUsername = $state(false)
+	let isUsernameAvailable = $state(true)
+	let usernameRulesVisible = $state(false)
 
-	$: isUsernameValid = usernameRules.test(username)
-	$: isUsernameTaken = isUsernameValid && !isUsernameAvailable && !loadingUsername
+	let isUsernameValid = $derived(usernameRules.test(username))
+	let isUsernameTaken = $derived(isUsernameValid && !isUsernameAvailable && !loadingUsername)
 
 	async function checkUsernameAvailability() {
 		isUsernameAvailable = false
@@ -95,7 +99,7 @@
 				name="username"
 				placeholder="Username"
 				bind:value={username}
-				on:input={async () => {
+				oninput={async () => {
 					clearTimeout(rulesDelayTimer)
 					rulesDelayTimer = setTimeout(
 						() => (usernameRulesVisible = isUsernameValid ? false : true),
@@ -123,7 +127,7 @@
 		<small class="text-surface-600-300-token block w-3/4 pl-1 text-sm"
 			>Changing username will cause all of your permissions to be revoked!</small
 		>
-		<button class="variant-filled-surface btn" disabled={!isUsernameValid} on:click={updateInfo}>
+		<button class="variant-filled-surface btn" disabled={!isUsernameValid} onclick={updateInfo}>
 			Save Changes
 		</button>
 	</form>

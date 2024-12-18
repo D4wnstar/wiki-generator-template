@@ -1,7 +1,12 @@
-@tailwind base;
-@tailwind components;
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
-.callout-primary {
+.h-screen-no-header {
+	height: calc(100vh - 58px);
+}
+
+/* .callout-primary {
 	@apply card variant-soft-primary w-full px-6 py-4;
 }
 
@@ -27,18 +32,6 @@
 
 .callout-surface {
 	@apply card variant-soft-surface w-full px-6 py-4;
-}
-
-/* .codeblock-base {
-	@apply codeblock w-full overflow-hidden bg-gray-900 text-sm text-white shadow rounded-container-token;
-}
-
-.codeblock-header {
-	@apply flex items-center justify-between p-2 pl-4 text-xs uppercase text-white/50;
-}
-
-.codeblock-pre {
-	@apply break-all p-4 pt-1;
 } */
 
 .task-checkbox {
@@ -58,24 +51,21 @@
 }
 
 .table-cell {
-	@apply border-surface-400-500-token border px-2 py-1;
+	@apply border-surface-400-600 border px-2 py-1;
 }
-
-@tailwind utilities;
-@tailwind variants;
 
 html,
 body {
-	@apply h-full overflow-hidden;
+	@apply h-full;
 }
 
 body[data-theme='cosmos'] {
 	background-image: radial-gradient(
-			at 0% 20%,
-			rgba(var(--color-primary-500) / 0.33) 0px,
-			transparent 60%
+			at 0% 0%,
+			rgba(var(--color-primary-800) / 0.2) 0px,
+			transparent 50%
 		),
-		radial-gradient(at 100% 70%, rgba(var(--color-tertiary-500) / 0.25) 0px, transparent 60%);
+		radial-gradient(at 100% 100%, rgba(var(--color-tertiary-800) / 0.1) 0px, transparent 50%);
 	background-attachment: fixed;
 	background-position: center;
 	background-repeat: no-repeat;
@@ -107,52 +97,8 @@ body[data-theme='cosmos'] {
 	@apply h-full;
 }
 
-.w-100 {
-	width: 400px;
-}
-
-.w-110 {
-	width: 440px;
-}
-
-.w-120 {
-	width: 480px;
-}
-
-.w-130 {
-	width: 520px;
-}
-
-.w-140 {
-	width: 560px;
-}
-
-.w-150 {
-	width: 600px;
-}
-
-.w-160 {
-	width: 640px;
-}
-
-.w-170 {
-	width: 680px;
-}
-
-.w-180 {
-	width: 720px;
-}
-
-.w-190 {
-	width: 760px;
-}
-
-.w-200 {
-	width: 800px;
-}
-
 .indent-cascade .indent-cascade {
-	@apply pl-4;
+	@apply pl-2;
 }
 
 /* pre.mermaid > svg {
@@ -168,15 +114,15 @@ blockquote {
 }
 
 #page-content em {
-	@apply text-secondary-500-400-token;
+	@apply text-secondary-600-400;
 }
 
 #page-content strong {
-	@apply text-primary-500-400-token;
+	@apply text-primary-600-400;
 }
 
 #page-content a {
-	@apply text-tertiary-600-300-token underline-offset-4;
+	@apply text-tertiary-600-400 underline-offset-4;
 }
 
 /* [data-theme='crimson'] #page-content a {
@@ -186,7 +132,7 @@ blockquote {
 /* .list-nav is for the search bar autocomplete list */
 #note-content ul:not(.task-list),
 #note-content ol {
-	@apply indent-cascade list-outside space-y-1 pl-6 marker:text-surface-500-400-token;
+	@apply indent-cascade marker:text-surface-600-400 list-outside space-y-1 pl-6;
 }
 
 #note-content ul:not(.task-list) {

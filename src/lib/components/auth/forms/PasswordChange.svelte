@@ -1,19 +1,21 @@
 <script lang="ts">
+	import { preventDefault } from 'svelte/legacy';
+
 	import { passwordRules } from '$lib/auth'
 
-	let newPass = ''
-	let newPassConfirm = ''
+	let newPass = $state('')
+	let newPassConfirm = $state('')
 
-	let rulesDelayTimer: NodeJS.Timeout
-	let rulesConfirmDelayTimer: NodeJS.Timeout
-	let responseVisibility = false
-	let responseMessage = 'Placeholder'
-	let responseColor = 'warning'
-	let passwordRulesVisible = false
-	let passwordConfirmRulesVisible = false
+	let rulesDelayTimer: NodeJS.Timeout = $state()
+	let rulesConfirmDelayTimer: NodeJS.Timeout = $state()
+	let responseVisibility = $state(false)
+	let responseMessage = $state('Placeholder')
+	let responseColor = $state('warning')
+	let passwordRulesVisible = $state(false)
+	let passwordConfirmRulesVisible = $state(false)
 
-	$: isNewPassValid = passwordRules.test(newPass)
-	$: isNewPassConfirmValid = newPassConfirm === newPass
+	let isNewPassValid = $derived(passwordRules.test(newPass))
+	let isNewPassConfirmValid = $derived(newPassConfirm === newPass)
 
 	function checkCredentialValidity() {
 		if (!isNewPassValid || !isNewPassConfirmValid) {
@@ -66,7 +68,7 @@
 				name="new-password"
 				placeholder="Enter new password"
 				bind:value={newPass}
-				on:input={() => {
+				oninput={() => {
 					clearTimeout(rulesDelayTimer)
 					rulesDelayTimer = setTimeout(
 						() => (passwordRulesVisible = isNewPassValid ? false : true),
@@ -89,7 +91,7 @@
 				name="new-password-confirm"
 				placeholder="Confirm new password"
 				bind:value={newPassConfirm}
-				on:input={() => {
+				oninput={() => {
 					clearTimeout(rulesConfirmDelayTimer)
 					rulesConfirmDelayTimer = setTimeout(
 						() => (passwordConfirmRulesVisible = isNewPassConfirmValid ? false : true),
@@ -106,7 +108,7 @@
 		<button
 			class="variant-filled-surface btn"
 			disabled={!isNewPassValid || !isNewPassConfirmValid}
-			on:click|preventDefault={updatePassword}>Save Changes</button
+			onclick={preventDefault(updatePassword)}>Save Changes</button
 		>
 	</form>
 </section>

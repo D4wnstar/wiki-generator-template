@@ -3,9 +3,13 @@
 	import type { DetailsRow, SidebarImageRow } from '$lib/schema'
 	import SidebarImage from './SidebarImage.svelte'
 
-	export let sidebarImages: SidebarImageRow[]
-	export let details: DetailsRow[]
-	// export let popupSettings: PopupSettings
+	interface Props {
+		sidebarImages: SidebarImageRow[];
+		details: DetailsRow[];
+	}
+
+	let { sidebarImages, details }: Props = $props();
+	
 </script>
 
 {#if sidebarImages.length > 0}

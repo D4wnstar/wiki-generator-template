@@ -11,11 +11,21 @@
 	import { Settings, User } from 'lucide-svelte'
 	import type { LoggedUser } from '$lib/types'
 
-	export let title: string
-	export let notesTreeView: TreeViewNode[]
-	export let notesTitles: AutocompleteOption<string>[]
-	export let allowLogins: boolean
-	export let user: LoggedUser | null
+	interface Props {
+		title: string;
+		notesTreeView: TreeViewNode[];
+		notesTitles: AutocompleteOption<string>[];
+		allowLogins: boolean;
+		user: LoggedUser | null;
+	}
+
+	let {
+		title,
+		notesTreeView,
+		notesTitles,
+		allowLogins,
+		user
+	}: Props = $props();
 
 	const modalStore = getModalStore()
 	const authModal: ModalSettings = {
@@ -40,7 +50,7 @@
 		<div class="flex gap-2">
 			<button
 				class="variant-filled-surface btn mx-6 mt-4 w-full"
-				on:click={() => modalStore.trigger(accountModal)}
+				onclick={() => modalStore.trigger(accountModal)}
 			>
 				<div class="flex gap-2">
 					<Settings />
@@ -51,7 +61,7 @@
 	{:else}
 		<button
 			class="variant-filled-surface btn mx-6 mt-4"
-			on:click={() => modalStore.trigger(authModal)}
+			onclick={() => modalStore.trigger(authModal)}
 		>
 			<div class="flex gap-2">
 				<User />

@@ -1,5 +1,9 @@
 <script lang="ts">
-    export let breadcrumbs: string[]
+    interface Props {
+        breadcrumbs: string[];
+    }
+
+    let { breadcrumbs }: Props = $props();
 </script>
 
 <div class="flex card variant-ghost-surface p-3 my-2 items-center">
