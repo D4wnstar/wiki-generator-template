@@ -2,7 +2,6 @@ import { notes, wikiSettings } from '$lib/schema'
 import { error } from '@sveltejs/kit'
 import type { LayoutServerLoad } from './$types'
 import { and, eq, isNull, or } from 'drizzle-orm'
-import { wikiTitle } from '$lib/stores'
 import { getAllowedUsersFilter } from '$lib/utils'
 import { getNotesTree, sortFiles } from '$lib/notes'
 
@@ -32,8 +31,6 @@ export const load = (async ({ locals: { db, user } }) => {
 	if (!settings) {
 		error(500, 'Failed to fetch wiki settings')
 	}
-
-	wikiTitle.set(settings.title)
 
 	return { /* noteTitles, */ pages, settings, user, topLevelContent }
 }) satisfies LayoutServerLoad

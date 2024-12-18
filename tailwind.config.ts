@@ -23,13 +23,7 @@ export default {
 			pattern: /h[1-6]/
 		},
 		{
-			pattern: /preset-filled-(primary|secondary|tertiary)-600-400/
-		},
-		{
-			pattern: /preset-filled-(primary|secondary|tertiary)-400-600/
-		},
-		{
-			pattern: /preset-filled-(primary|secondary|tertiary)-200-800/
+			pattern: /preset-filled-\w+-\d+-\d+/
 		},
 		'code-highlight',
 		'code-line',
@@ -43,8 +37,15 @@ export default {
 		'callout-icon',
 		'callout-collapsible',
 		'break-words',
-		{
-			pattern: /pl-(3|6|9|12|15|18)/
-		}
+		'blockquote',
+		'table-cell',
+		// For lists
+		'list-outside',
+		'list-disc',
+		'list-decimal',
+		'pl-4',
+		'space-y-1',
+		'text-surface-600-400',
+		'checkbox'
 	]
 } satisfies Config

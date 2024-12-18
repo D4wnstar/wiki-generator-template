@@ -23,7 +23,7 @@ export const POST: RequestHandler = async ({ cookies, request, locals }) => {
 
 	const isPasswordCorrect = await bcrypt.compare(password, user.password)
 	if (!isPasswordCorrect) {
-		return json({ message: 'Invalid password' }, { status: 401 })
+		return json({ message: 'Wrong password' }, { status: 401 })
 	}
 
 	const loggedUser = { id: user.id, username: user.username }

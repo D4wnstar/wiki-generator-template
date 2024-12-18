@@ -20,7 +20,7 @@ const Cosmos = {
 		'--base-font-color': 'var(--color-surface-950)',
 		'--base-font-color-dark': 'var(--color-surface-50)',
 		'--base-font-family': 'sans',
-		'--base-font-size': '1rem',
+		'--base-font-size': 'calc(1rem - 1px)',
 		'--base-line-height': 'inherit',
 		'--base-font-weight': 'normal',
 		'--base-font-style': 'normal',

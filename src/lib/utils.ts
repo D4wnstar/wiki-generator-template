@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm'
 import { noteContents, notes } from './schema'
+import { SQLiteSyncDialect } from 'drizzle-orm/sqlite-core'
 
 /**
  * Create a Drizzle SQL object to filter by the `notes.allowed_users` columns
@@ -15,5 +16,6 @@ export function getAllowedUsersFilter(username: string, table: 'notes' | 'noteCo
 	// or if the only allowed user is the current user
 	username = username.toLowerCase()
 	const noteTable = table === 'notes' ? notes : noteContents
-	return sql`'; ' || LOWER(${noteTable.allowed_users}) || ';' LIKE '%; ${username};%' OR LOWER(${noteTable.allowed_users}) = ${username}`
+	// Query does not appear to work without using sql.raw on the username. Not sure why but needs to be fixed
+	return sql`'; ' || LOWER(${noteTable.allowed_users}) || ';' LIKE '%; ${sql.raw(username)};%' OR LOWER(${noteTable.allowed_users}) = '${sql.raw(username)}'`
 }

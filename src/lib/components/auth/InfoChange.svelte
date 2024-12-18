@@ -3,10 +3,10 @@
 	import type { LoggedUser } from '$lib/types'
 
 	interface Props {
-		user: LoggedUser;
+		user: LoggedUser
 	}
 
-	let { user }: Props = $props();
+	let { user }: Props = $props()
 
 	let username = $state(user.username)
 
@@ -22,6 +22,8 @@
 
 	let isUsernameValid = $derived(usernameRules.test(username))
 	let isUsernameTaken = $derived(isUsernameValid && !isUsernameAvailable && !loadingUsername)
+
+	const warningMsgClasses = 'm-2 p-2 preset-outlined-warning-500'
 
 	async function checkUsernameAvailability() {
 		isUsernameAvailable = false
@@ -86,14 +88,14 @@
 <section class="flex w-full flex-col space-y-4">
 	<form class="space-y-4">
 		{#if responseVisibility}
-			<p class="variant-filled-{responseColor} card p-2 text-center">
+			<p class="preset-filled-{responseColor}-200-800 p-2 text-center">
 				{responseMessage}
 			</p>
 		{/if}
 		<label class="label">
 			<div>Username</div>
 			<input
-				class="input w-3/4"
+				class="input"
 				class:input-error={!isUsernameValid || isUsernameTaken}
 				type="text"
 				name="username"
@@ -110,7 +112,7 @@
 			/>
 		</label>
 		{#if !isUsernameValid && usernameRulesVisible}
-			<div class="variant-ghost-warning w-3/4 p-2">
+			<div class={warningMsgClasses}>
 				<p>Username must be:</p>
 				<ol class="list-inside list-decimal">
 					<li>Alphanumeric with dots, dashes and underscores</li>
@@ -120,14 +122,18 @@
 				</ol>
 			</div>
 		{:else if isUsernameTaken}
-			<div class="variant-ghost-warning w-3/4 p-2">
+			<div class={warningMsgClasses}>
 				<p>The username is already taken.</p>
 			</div>
 		{/if}
-		<small class="text-surface-600-300-token block w-3/4 pl-1 text-sm"
+		<small class="text-surface-600-300-token block pl-1 text-sm"
 			>Changing username will cause all of your permissions to be revoked!</small
 		>
-		<button class="variant-filled-surface btn" disabled={!isUsernameValid} onclick={updateInfo}>
+		<button
+			class="btn preset-filled-surface-200-800"
+			disabled={!isUsernameValid}
+			onclick={updateInfo}
+		>
 			Save Changes
 		</button>
 	</form>

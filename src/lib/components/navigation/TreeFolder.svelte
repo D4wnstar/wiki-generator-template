@@ -18,18 +18,18 @@
 </script>
 
 <button class="flex flex-row items-center gap-2 {expanded ? 'mb-3' : ''}" onclick={toggle}>
-	<ChevronDown class="w-8" />
-	<span class="text-left">{title}</span>
+	<ChevronDown class="min-w-8" />
+	<span class="grow text-left">{title}</span>
 </button>
 
 {#if expanded}
 	<ul transition:slide={{ duration: 300 }} class="space-y-3 pl-1">
-		{#each children.sort(sortFiles) as child, i}
+		{#each children.sort(sortFiles) as child}
 			<li class="pl-1">
 				{#if child.type === 'folder'}
 					<TreeFolder {...child} expanded={false} />
 				{:else}
-					<TreeFile {...child} />
+					<TreeFile title={child.alt_title ?? child.title} slug={child.slug} />
 				{/if}
 			</li>
 		{/each}

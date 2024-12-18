@@ -15,7 +15,9 @@ export const GET: RequestHandler = async ({ locals: { db, user } }) => {
 	const conditionPages = getAllowedUsersFilter(user.username, 'notes')
 	const conditionChunks = getAllowedUsersFilter(user.username, 'noteContents')
 
-	const pages = await db.select().from(notes).where(conditionPages)
+	const query = db.select().from(notes).where(conditionPages)
+	const pages = await query
+
 	const chunks = await db
 		.select()
 		.from(noteContents)

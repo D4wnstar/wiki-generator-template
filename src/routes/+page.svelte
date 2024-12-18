@@ -1,26 +1,23 @@
 <script lang="ts">
-	import { popupNote, wikiTitle } from '$lib/stores'
 	import Extras from '$lib/components/content/Extras.svelte'
 
 	let { data } = $props()
+	const pageTitle = $derived(data.note.alt_title ?? data.note.title)
+	const headTitle = $derived(`${pageTitle} — ${data.settings.title}`)
 </script>
 
-<!-- <svelte:head>
-	<title>{pageTitle}</title>
-</svelte:head> -->
+<svelte:head>
+	<title>{headTitle}</title>
+</svelte:head>
 
-<main id="note-content" class="mx-auto max-w-[800px] space-y-4 lg:grow">
-	<h1 class="h1 text-center">{data.note.alt_title ?? data.note.title}</h1>
-	<hr />
+<main id="note-content" class="mx-auto max-w-[800px] space-y-4 lg:grow lg:px-8">
+	<h1 class="h1 text-center">{pageTitle}</h1>
+	<hr class="hr" />
 	{@html data.pageContent}
-	<hr />
+	<hr class="hr" />
 </main>
-
-<!-- <div
-	class="variant-outline-secondary card max-h-80 w-80 overflow-hidden p-4"
-	data-popup="popupHover"
->
-	<h1 class="pb-2 text-center text-2xl"><strong>{$popupNote.title}</strong></h1>
-	<hr />
-	<article class="space-y-2 py-2 text-sm">{@html $popupNote.content}</article>
-</div> -->
+<div class="hidden w-[360px] [@media(min-width:1400px)]:block">
+	{#if data.sidebarImages.length > 0 || data.details.length > 0}
+		<Extras sidebarImages={data.sidebarImages} details={data.details} />
+	{/if}
+</div>

@@ -5,9 +5,7 @@ import jwt from 'jsonwebtoken'
 import { JWT_SECRET } from '$env/static/private'
 
 export const handle: Handle = async ({ event, resolve }) => {
-	const glob = import.meta.glob('/static/data.db', { query: 'url', import: 'default', eager: true })
-	const path = Object.values(glob)[0] as string
-	event.locals.db = drizzle(`file:${path.substring(1)}`)
+	event.locals.db = drizzle(`file:static/data.db`)
 
 	// Check if a user is logged in by seeing if there is a JWT in the tokens
 	const cookies = cookie.parse(event.request.headers.get('cookie') ?? '')

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { preventDefault } from 'svelte/legacy';
+	import { preventDefault } from 'svelte/legacy'
 
 	import { passwordRules } from '$lib/auth'
 
@@ -16,6 +16,8 @@
 
 	let isNewPassValid = $derived(passwordRules.test(newPass))
 	let isNewPassConfirmValid = $derived(newPassConfirm === newPass)
+
+	const warningMsgClasses = 'm-2 p-2 preset-outlined-warning-500'
 
 	function checkCredentialValidity() {
 		if (!isNewPassValid || !isNewPassConfirmValid) {
@@ -55,14 +57,14 @@
 <section class="flex w-full flex-col space-y-4">
 	<form class="space-y-4">
 		{#if responseVisibility}
-			<p class="variant-filled-{responseColor} card p-2 text-center">
+			<p class="preset-filled-{responseColor}-200-800 p-2 text-center">
 				{responseMessage}
 			</p>
 		{/if}
 		<label class="label">
 			<div>New Password</div>
 			<input
-				class="input w-3/4"
+				class="input"
 				class:input-error={!isNewPassValid && newPass.length > 0}
 				type="password"
 				name="new-password"
@@ -78,14 +80,14 @@
 			/>
 		</label>
 		{#if !isNewPassValid && passwordRulesVisible}
-			<div class="variant-ghost-warning w-3/4 p-2">
+			<div class={warningMsgClasses}>
 				<p>Password must be at least six characters long and can contain special characters.</p>
 			</div>
 		{/if}
 		<label class="label">
 			<div>Confirm New Password</div>
 			<input
-				class="input w-3/4"
+				class="input"
 				class:input-error={!isNewPassConfirmValid && newPassConfirm.length > 0}
 				type="password"
 				name="new-password-confirm"
@@ -101,12 +103,12 @@
 			/>
 		</label>
 		{#if !isNewPassConfirmValid && newPassConfirm.length > 0 && passwordConfirmRulesVisible}
-			<div class="variant-ghost-warning w-3/4 p-2">
+			<div class={warningMsgClasses}>
 				<p>Passwords don't match.</p>
 			</div>
 		{/if}
 		<button
-			class="variant-filled-surface btn"
+			class="btn preset-filled-surface-200-800"
 			disabled={!isNewPassValid || !isNewPassConfirmValid}
 			onclick={preventDefault(updatePassword)}>Save Changes</button
 		>

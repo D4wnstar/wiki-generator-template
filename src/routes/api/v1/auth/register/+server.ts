@@ -18,7 +18,7 @@ export const POST: RequestHandler = async ({ request, locals, cookies }) => {
 		const user = await locals.db
 			.insert(users)
 			.values({
-				username,
+				username: username.toLowerCase(),
 				password: hashedPassword
 			})
 			.returning()

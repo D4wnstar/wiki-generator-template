@@ -12,7 +12,12 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		return json({ message: 'Missing or invalid URL paramter' }, { status: 500 })
 	}
 
-	const maybe_user = await locals.db.select().from(users).where(eq(users.username, username)).get()
+	const maybe_user = await locals.db
+		.select()
+		.from(users)
+		// Usernames should be case insensitive
+		.where(eq(users.username, username.toLowerCase()))
+		.get()
 
 	const isUsernameAvailable = maybe_user ? false : true
 	return json(isUsernameAvailable)

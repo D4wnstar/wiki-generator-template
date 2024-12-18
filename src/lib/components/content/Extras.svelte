@@ -4,19 +4,23 @@
 	import SidebarImage from './SidebarImage.svelte'
 
 	interface Props {
-		sidebarImages: SidebarImageRow[];
-		details: DetailsRow[];
+		sidebarImages: SidebarImageRow[]
+		details: DetailsRow[]
 	}
 
-	let { sidebarImages, details }: Props = $props();
-	
+	let { sidebarImages, details }: Props = $props()
 </script>
 
 {#if sidebarImages.length > 0}
-	<SidebarImage {sidebarImages} />
-	<hr />
+	<div id="sidebar-images" class="space-y-6">
+		{#each sidebarImages as sidebarImage}
+			<SidebarImage {sidebarImage} />
+		{/each}
+	</div>
+
+	<hr class="mb-4 mt-6 border-surface-700-300" />
 {/if}
 {#if details.length > 0}
 	<Details {details} />
-	<hr />
+	<hr class="mt-4 border-surface-700-300" />
 {/if}

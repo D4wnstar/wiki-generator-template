@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { DetailsRow } from "$lib/schema"
-	import { Library } from "lucide-svelte"
+	import type { DetailsRow } from '$lib/schema'
+	import { Library } from 'lucide-svelte'
 
 	interface Props {
 		details: DetailsRow[]
 	}
 
-	let { details }: Props = $props();
+	let { details }: Props = $props()
 </script>
 
 <div id="details" class="space-y-2">
@@ -23,7 +23,7 @@
 					{:else}
 						<td colspan="2" class="pt-2 text-center">
 							<h3 class="text-lg">{@html detail.detail_name}</h3>
-							<hr class="pb-2" />
+							<hr class="pb-2 border-surface-700-300" />
 						</td>
 					{/if}
 				</tr>

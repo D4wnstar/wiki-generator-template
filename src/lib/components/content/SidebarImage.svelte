@@ -1,37 +1,45 @@
 <script lang="ts">
 	import type { SidebarImageRow } from '$lib/schema'
-
-	const modalStore = getModalStore()
+	import { Modal } from '@skeletonlabs/skeleton-svelte'
 
 	interface Props {
-		sidebarImages: SidebarImageRow[]
+		sidebarImage: SidebarImageRow
 	}
 
-	let { sidebarImages }: Props = $props();
+	let { sidebarImage }: Props = $props()
+	let modalState = $state(false)
 </script>
 
-<div id="sidebar-images" class="space-y-6">
-	{#each sidebarImages as image}
-		<figure class="text-center">
-			<button
-				onclick={() =>
-					modalStore.trigger({
-						type: 'component',
-						component: 'image',
-						meta: { base64: image.base64, imageCaption: image.caption }
-					})}
-			>
-				<img
-					src={`data:image/webp;base64,${image.base64}`}
-					alt={image.caption}
-					class="mx-auto max-h-80"
-				/>
-			</button>
-			{#if image.caption}
-				<figcaption class="card variant-outline-surface text-surface-700-200-token mt-4 px-4 py-2">
-					{@html image.caption}
-				</figcaption>
-			{/if}
-		</figure>
-	{/each}
-</div>
+<figure class="text-center">
+	<Modal bind:open={modalState}>
+		{#snippet trigger()}
+			<img
+				src={`data:image/webp;base64,${sidebarImage.base64}`}
+				alt={sidebarImage.caption}
+				class="mx-auto max-h-80"
+			/>
+		{/snippet}
+		{#snippet content()}
+			<div class="max-w-[80vh] rounded p-4 bg-surface-100-900">
+				<figure>
+					<img
+						src={`data:image/webp;base64,${sidebarImage.base64}`}
+						alt={sidebarImage.caption}
+						class="mx-auto max-h-[80vh]"
+					/>
+					<hr class="hr my-4 border-surface-700-300" />
+					<figcaption class="text-center type-scale-5">
+						{@html sidebarImage.caption}
+					</figcaption>
+				</figure>
+			</div>
+		{/snippet}
+	</Modal>
+	{#if sidebarImage.caption}
+		<figcaption
+			class="mt-4 rounded border-2 border-secondary-900 border-opacity-50 px-4 py-2 preset-tonal-surface"
+		>
+			{@html sidebarImage.caption}
+		</figcaption>
+	{/if}
+</figure>

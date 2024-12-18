@@ -1,20 +1,17 @@
 <script lang="ts">
-    interface Props {
-        breadcrumbs: string[];
-    }
+	interface Props {
+		breadcrumbs: string[]
+		classes?: string
+	}
 
-    let { breadcrumbs }: Props = $props();
+	let { breadcrumbs, classes = '' }: Props = $props()
 </script>
 
-<div class="flex card variant-ghost-surface p-3 my-2 items-center">
-    <ol class="breadcrumb">
-        {#each breadcrumbs as crumb, i}
-            {#if i < breadcrumbs.length - 1}
-                <li class="crumb">{crumb}</li>
-                <li class="crumb-separator" aria-hidden>&rsaquo;</li>
-            {:else}
-                <li class="crumb">{crumb}</li>
-            {/if}
-        {/each}
-    </ol>
-</div>
+<ol id="breadcrumbs" class="flex items-center gap-4 space-y-0 {classes}">
+	{#each breadcrumbs.slice(0, -1) as crumb}
+		<li class="opacity-40">{crumb}</li>
+		<li class="opacity-30" aria-hidden={true}>&rsaquo;</li>
+	{/each}
+
+	<li class="opacity-40">{breadcrumbs[breadcrumbs.length - 1]}</li>
+</ol>
