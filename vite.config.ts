@@ -15,5 +15,6 @@ export default defineConfig(({ mode }) => ({
 			// Workaround to get KaTeX fonts to load correctly in both dev and production
 			$katexfonts: mode === 'production' ? './static/fonts/katex' : '/fonts/katex'
 		}
-	}
+	},
+	assetsInclude: '**/*.db'
 }))

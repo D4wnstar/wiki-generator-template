@@ -14,4 +14,4 @@ src/lib/html
 src/routes/testing
 wiki-generator-template.code-workspace
 *.pem
-/static/data.db
+static/data.db
