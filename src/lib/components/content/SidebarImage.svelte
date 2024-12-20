@@ -1,25 +1,32 @@
 <script lang="ts">
-	import type { ImageRow, SidebarImageRow } from '$lib/schema'
+	import type { SidebarImageRow } from '$lib/schema'
 	import { Modal } from '@skeletonlabs/skeleton-svelte'
 
 	interface Props {
 		sidebarImage: SidebarImageRow
-		image: ImageRow
 	}
 
-	let { sidebarImage, image }: Props = $props()
+	let { sidebarImage }: Props = $props()
 	let modalState = $state(false)
 </script>
 
 <figure class="text-center">
 	<Modal bind:open={modalState}>
 		{#snippet trigger()}
-			<img {src} alt={sidebarImage.caption} class="mx-auto max-h-80" />
+			<img
+				src="/api/v1/image?image_id={sidebarImage.image_id}"
+				alt={sidebarImage.caption}
+				class="mx-auto max-h-80"
+			/>
 		{/snippet}
 		{#snippet content()}
 			<div class="max-w-[80vh] rounded p-4 bg-surface-100-900">
 				<figure>
-					<img {src} alt={sidebarImage.caption} class="mx-auto max-h-[80vh]" />
+					<img
+						src="/api/v1/image?image_id={sidebarImage.image_id}"
+						alt={sidebarImage.caption}
+						class="mx-auto max-h-[80vh]"
+					/>
 					<hr class="hr my-4 border-surface-700-300" />
 					<figcaption class="text-center type-scale-5">
 						{@html sidebarImage.caption}

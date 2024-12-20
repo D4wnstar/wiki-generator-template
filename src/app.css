@@ -53,6 +53,10 @@ a.anchor {
 	@apply underline-offset-4 text-tertiary-800-200 hover:underline;
 }
 
+#note-content * {
+	@apply break-words;
+}
+
 #note-content input[type='checkbox'] {
 	@apply checkbox;
 }

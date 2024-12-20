@@ -23,7 +23,8 @@ export const noteContents = sqliteTable('note_contents', {
 	chunk_id: int().primaryKey(),
 	text: text().notNull(),
 	allowed_users: text(),
-	image_id: int().references((): AnySQLiteColumn => images.id)
+	image_id: int().references((): AnySQLiteColumn => images.id),
+	note_transclusion_id: int().references((): AnySQLiteColumn => notes.id)
 })
 
 export const details = sqliteTable('details', {

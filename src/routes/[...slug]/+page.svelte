@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Breadcrumbs from '$lib/components/content/Breadcrumbs.svelte'
 	import Extras from '$lib/components/content/Extras.svelte'
+	import { fetchNoteTransclusion } from '$lib/notes'
 
 	let { data } = $props()
 	const pageTitle = $derived(data.note.alt_title ?? data.note.title)
@@ -26,17 +27,24 @@
 	<h1 class="h1 text-center">{pageTitle}</h1>
 	<hr class="hr" />
 	{#each data.contents as chunk}
-		<!-- {#if chunk.transclusionType && chunk.transclusionType === 'image'}
-			<img src={chunk.blob} alt="" />
-		{:else} -->
-		{@html chunk.text}
-		<!-- {/if} -->
-		<!-- <hr /> -->
+		{#if chunk.image_id}
+			<img src="/api/v1/image?image_id={chunk.image_id}" alt="" />
+		{:else if chunk.note_transclusion_id}
+			<blockquote class="space-y-4 border-l-2 border-secondary-500 pl-4">
+				{#await fetchNoteTransclusion(chunk.note_transclusion_id) then trChunks}
+					{#each trChunks as trChunk}
+						{@html trChunk.text}
+					{/each}
+				{/await}
+			</blockquote>
+		{:else}
+			{@html chunk.text}
+		{/if}
 	{/each}
 	<hr class="hr" />
 </main>
 <div class="hidden w-[360px] [@media(min-width:1400px)]:block">
 	{#if data.sidebarImages.length > 0 || data.details.length > 0}
-		<Extras sidebarImages={data.sidebarImages} image={data.images} details={data.details} />
+		<Extras sidebarImages={data.sidebarImages} details={data.details} />
 	{/if}
 </div>

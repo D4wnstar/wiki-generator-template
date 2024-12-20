@@ -1,12 +1,10 @@
 import { slug } from 'github-slugger'
 import {
 	details,
-	images,
 	noteContents,
 	notes,
 	sidebarImages,
 	type DetailsRow,
-	type ImageRow,
 	type NoteContentsRow,
 	type NoteRow,
 	type SidebarImageRow
@@ -48,7 +46,6 @@ export async function handlePageSlug(
 		.leftJoin(noteContents, eq(notes.id, noteContents.note_id))
 		.leftJoin(details, eq(notes.id, details.note_id))
 		.leftJoin(sidebarImages, eq(notes.id, sidebarImages.note_id))
-		.leftJoin(images, eq(sidebarImages.image_id, images.id))
 		.where(
 			and(
 				pageCondition,
@@ -69,7 +66,6 @@ export async function handlePageSlug(
 		contents: Map<number, NoteContentsRow>
 		details: Map<number, DetailsRow>
 		sidebarImages: Map<number, SidebarImageRow>
-		images: Map<number, ImageRow>
 	}>(
 		(acc, row) => {
 			if (row.note_contents) {
@@ -84,18 +80,13 @@ export async function handlePageSlug(
 				acc.sidebarImages.set(row.sidebar_images.order, row.sidebar_images)
 			}
 
-			if (row.images) {
-				acc.images.set(row.images.id, row.images)
-			}
-
 			return acc
 		},
 		{
 			note: rows[0].notes,
 			contents: new Map<number, NoteContentsRow>(),
 			details: new Map<number, DetailsRow>(),
-			sidebarImages: new Map<number, SidebarImageRow>(),
-			images: new Map<number, ImageRow>()
+			sidebarImages: new Map<number, SidebarImageRow>()
 		}
 	)
 
@@ -103,8 +94,7 @@ export async function handlePageSlug(
 		note: pageMap.note,
 		contents: [...pageMap.contents.values()],
 		details: [...pageMap.details.values()],
-		sidebarImages: [...pageMap.sidebarImages.values()],
-		images: [...pageMap.images.values()]
+		sidebarImages: [...pageMap.sidebarImages.values()]
 	}
 
 	// Sort details by the given order
@@ -160,6 +150,16 @@ export async function handlePageSlug(
 	)
 
 	return { page }
+}
+
+export async function fetchNoteTransclusion(noteId: number): Promise<NoteContentsRow[]> {
+	const res = await fetch(`/api/v1/note-contents?note_id=${noteId}`)
+	if (!res.ok) {
+		return []
+	}
+	const json = await res.json()
+	console.log(json)
+	return json.contents
 }
 
 export function slugPath(path: string): string {

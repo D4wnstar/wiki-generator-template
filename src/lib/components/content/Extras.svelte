@@ -5,20 +5,16 @@
 
 	interface Props {
 		sidebarImages: SidebarImageRow[]
-		image: ImageRow[]
 		details: DetailsRow[]
 	}
 
-	let { sidebarImages, image, details }: Props = $props()
-	const imageThings = sidebarImages.map((si, i) => {
-		return { si: si, img: image[i] }
-	})
+	let { sidebarImages, details }: Props = $props()
 </script>
 
 {#if sidebarImages.length > 0}
 	<div id="sidebar-images" class="space-y-6">
-		{#each imageThings as thing}
-			<SidebarImage sidebarImage={thing.si} image={thing.img} />
+		{#each sidebarImages as sidebarImage}
+			<SidebarImage {sidebarImage} />
 		{/each}
 	</div>
 
