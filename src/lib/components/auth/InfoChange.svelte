@@ -11,6 +11,7 @@
 	let username = $state(user.username)
 
 	let debounceTimer: NodeJS.Timeout
+	//@ts-ignore
 	let rulesDelayTimer: NodeJS.Timeout = $state()
 	let responseVisibility = $state(false)
 	let responseMessage = $state('Placeholder')

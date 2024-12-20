@@ -1,35 +1,27 @@
 <script lang="ts">
-	import type { PageData } from './$types'
+	import type { ActionData, PageData } from './$types'
 	import { passwordRules, usernameRules } from '$lib/auth'
 	import { Tabs } from '@skeletonlabs/skeleton-svelte'
 	import { UserPlus, User } from 'lucide-svelte'
-	import { goto } from '$app/navigation'
-	import { browser } from '$app/environment'
+	import { enhance } from '$app/forms'
 
-	let { data }: { data: PageData } = $props()
-	if (browser && data.user) {
-		goto('/')
-	}
+	let { data, form }: { data: PageData; form: ActionData } = $props()
 
-	let resultVisibile = $state(false)
-	let resultMessage = $state('')
-	let resultColor = $state('warning')
-	let tabSet: string = $state('login')
+	let tabSet: string = $state(form?.type ?? 'login')
 
 	let loadingUsername = $state(false)
 
 	let isUsernameAvailable = $state(false)
 
 	let debounceTimer: NodeJS.Timeout
+	// @ts-ignore
 	let rulesDelayTimer: NodeJS.Timeout = $state()
 	let usernameRulesVisible = $state(false)
 	let passwordRulesVisible = $state(false)
 
 	// Auth Data
-	let username = $state('')
+	let username = $state(form?.username?.toString() ?? '')
 	let password = $state('')
-
-	let logInButtonRef = $state()
 
 	let isUsernameEmpty = $derived(username.length === 0)
 	let isUsernameValid = $derived(usernameRules.test(username))
@@ -43,7 +35,6 @@
 	function clearData() {
 		password = ''
 		username = ''
-		resultVisibile = false
 	}
 
 	async function checkUsernameAvailability() {
@@ -58,98 +49,15 @@
 		}, 500)
 	}
 
-	function checkCredentialValiditySignUp() {
-		if (isPasswordEmpty || isUsernameEmpty) {
-			resultMessage = 'Please fill in all the fields.'
-			resultColor = 'error'
-			resultVisibile = true
-			return false
-		}
-		if (!isPasswordValid || !isUsernameValid) {
-			resultMessage = 'Please make sure all fields are valid.'
-			resultColor = 'error'
-			resultVisibile = true
-			return false
-		}
-		if (isUsernameTaken) {
-			resultMessage = 'Username already taken. Please use a different username.'
-			resultColor = 'error'
-			resultVisibile = true
-			return false
-		}
-
-		return true
+	async function handleSignupUsernameInput() {
+		clearTimeout(rulesDelayTimer)
+		rulesDelayTimer = setTimeout(() => (usernameRulesVisible = isUsernameValid ? false : true), 500)
+		await checkUsernameAvailability()
 	}
 
-	function checkCredentialValidityLogIn() {
-		if (isUsernameEmpty || isPasswordEmpty) {
-			resultMessage = 'Please fill in all the fields.'
-			resultColor = 'error'
-			resultVisibile = true
-			return false
-		}
-
-		return true
-	}
-
-	async function signUpButton() {
-		const areCredsValid = checkCredentialValiditySignUp()
-		if (!areCredsValid) return
-
-		const res = await fetch('/api/v1/auth/register', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ username, password })
-		})
-		if (!res.ok) {
-			// console.error(res.name, res.message, res.cause, res.status)
-			const data = await res.json()
-			resultMessage = `Failed to sign up. ${data.message}`
-			resultColor = 'error'
-			resultVisibile = true
-		} else {
-			resultMessage = 'Successfully signed up!'
-			resultColor = 'success'
-			resultVisibile = true
-			window.location.pathname = '/'
-		}
-
-		// Login immediately after registering
-		await fetch('/api/v1/auth/login', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ username, password })
-		})
-		window.location.reload()
-	}
-
-	async function logInButton() {
-		const areCredsValid = checkCredentialValidityLogIn()
-		if (!areCredsValid) return
-
-		const res = await fetch('/api/v1/auth/login', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ username, password })
-		})
-		if (!res.ok) {
-			// console.error(res.name, res.message, res.cause, res.status)
-			const data = await res.json()
-			resultMessage = `Failed to log in. ${data.message}.`
-			resultColor = 'error'
-			resultVisibile = true
-		} else {
-			resultMessage = 'Successfully logged in!'
-			resultColor = 'success'
-			resultVisibile = true
-			window.location.href = '/'
-		}
+	async function handleSignupPasswordInput() {
+		clearTimeout(rulesDelayTimer)
+		rulesDelayTimer = setTimeout(() => (passwordRulesVisible = isPasswordValid ? false : true), 500)
 	}
 </script>
 
@@ -157,7 +65,7 @@
 	<title>Login to {data.settings.title}</title>
 </svelte:head>
 
-<div class="mx-auto flex flex-col lg:w-[500px]">
+<div class="mx-auto flex flex-col lg:ml-20 lg:mr-0 lg:w-[500px]">
 	<h1 class="mb-4 type-scale-7">Sign in</h1>
 	<Tabs bind:value={tabSet} onFocusChange={clearData}>
 		{#snippet list()}
@@ -178,51 +86,56 @@
 		{#snippet content()}
 			<!-- Login form -->
 			<Tabs.Panel value="login"
-				><form class="space-y-4 px-4">
-					{#if resultVisibile}
-						<p class="card p-2 text-center preset-filled-{resultColor}-500">
-							{resultMessage}
+				><form class="flex flex-col space-y-4 px-4" method="POST" action="?/login" use:enhance>
+					{#if form && form.message && form.type === 'login'}
+						<p class="card p-2 text-center preset-filled-{form.color}-500">
+							{form.message}
 						</p>
 					{/if}
 					<label class="label">
 						<span>Username</span>
-						<input class="input" bind:value={username} placeholder="Enter username..." />
+						<input
+							class="input"
+							name="username"
+							bind:value={username}
+							placeholder="Enter username..."
+						/>
 					</label>
 					<label class="label">
 						<span>Password</span>
 						<input
 							class="input"
+							name="password"
 							type="password"
 							bind:value={password}
 							placeholder="Enter password..."
 						/>
 					</label>
+					<button
+						class="btn w-min self-end preset-tonal-primary"
+						disabled={isUsernameEmpty || isPasswordEmpty}
+					>
+						Log In
+					</button>
 				</form></Tabs.Panel
 			>
 
 			<!-- Signup form -->
 			<Tabs.Panel value="signup"
-				><form class="space-y-4 px-4">
-					{#if resultVisibile}
-						<p class="card p-2 text-center preset-filled-{resultColor}-500">
-							{resultMessage}
+				><form class="flex flex-col space-y-4 px-4" method="POST" action="?/signup" use:enhance>
+					{#if form && form.message && form.type === 'signup'}
+						<p class="card p-2 text-center preset-filled-{form.color}-500">
+							{form.message}
 						</p>
 					{/if}
 					<label class="label">
 						<span>Username</span>
 						<input
 							class="input"
-							class:input-error={(!isUsernameValid || isUsernameTaken) && !isUsernameEmpty}
+							name="username"
 							type="text"
 							bind:value={username}
-							oninput={async () => {
-								clearTimeout(rulesDelayTimer)
-								rulesDelayTimer = setTimeout(
-									() => (usernameRulesVisible = isUsernameValid ? false : true),
-									500
-								)
-								await checkUsernameAvailability()
-							}}
+							oninput={handleSignupUsernameInput}
 							placeholder="Enter username..."
 						/>
 					</label>
@@ -245,16 +158,10 @@
 						<span>Password</span>
 						<input
 							class="input"
-							class:input-error={!isPasswordValid && !isPasswordEmpty}
+							name="password"
 							type="password"
 							bind:value={password}
-							oninput={() => {
-								clearTimeout(rulesDelayTimer)
-								rulesDelayTimer = setTimeout(
-									() => (passwordRulesVisible = isPasswordValid ? false : true),
-									500
-								)
-							}}
+							oninput={handleSignupPasswordInput}
 							placeholder="Enter password..."
 						/>
 					</label>
@@ -265,33 +172,20 @@
 							</p>
 						</div>
 					{/if}
-					<small class="block pl-1">Passwords cannot be reset!</small>
+					<small class="block pl-1"
+						>Passwords cannot be reset! If you lose your password, you lose your account.</small
+					>
+					<button
+						class="btn w-min self-end preset-tonal-primary"
+						disabled={!isUsernameValid ||
+							isUsernameTaken ||
+							isUsernameEmpty ||
+							!isPasswordValid ||
+							isPasswordEmpty}>Sign Up</button
+					>
 				</form></Tabs.Panel
 			>
 		{/snippet}
 	</Tabs>
 	<hr class="hr mt-4" />
-
-	<footer class="flex w-full justify-end gap-2 pt-4">
-		{#if tabSet === 'login'}
-			<button
-				class="btn preset-tonal-primary"
-				disabled={isUsernameEmpty || isPasswordEmpty}
-				onclick={logInButton}
-				bind:this={logInButtonRef}
-			>
-				Log In
-			</button>
-		{:else if tabSet === 'signup'}
-			<button
-				class="btn preset-tonal-primary"
-				disabled={!isUsernameValid ||
-					isUsernameTaken ||
-					isUsernameEmpty ||
-					!isPasswordValid ||
-					isPasswordEmpty}
-				onclick={signUpButton}>Sign Up</button
-			>
-		{/if}
-	</footer>
 </div>

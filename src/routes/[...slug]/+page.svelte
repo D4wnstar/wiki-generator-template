@@ -2,6 +2,7 @@
 	import Breadcrumbs from '$lib/components/content/Breadcrumbs.svelte'
 	import Extras from '$lib/components/content/Extras.svelte'
 	import { fetchNoteTransclusion } from '$lib/notes'
+	import { EyeOff } from 'lucide-svelte'
 
 	let { data } = $props()
 	const pageTitle = $derived(data.note.alt_title ?? data.note.title)
@@ -37,6 +38,14 @@
 					{/each}
 				{/await}
 			</blockquote>
+		{:else if chunk.allowed_users}
+			<section class="space-y-2 rounded !bg-opacity-50 px-4 py-2 bg-surface-300-700">
+				<header class="flex gap-3">
+					<EyeOff />
+					<span><strong>Secret</strong></span>
+				</header>
+				{@html chunk.text}
+			</section>
 		{:else}
 			{@html chunk.text}
 		{/if}

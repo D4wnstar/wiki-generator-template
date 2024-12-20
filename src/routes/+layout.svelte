@@ -11,7 +11,7 @@
 	import { page } from '$app/state'
 
 	let { children, data } = $props()
-	const noNavRoutes = ['/account', '/login']
+	// const noNavRoutes = ['/account', '/login']
 
 	let drawerState = $state(false)
 
@@ -62,13 +62,13 @@
 </AppBar>
 
 <div class="p-8 lg:flex">
-	{#if !noNavRoutes.includes(page.route.id ?? '')}
-		<nav
-			class="sticky top-4 hidden max-h-[85vh] w-[360px] space-y-3 self-start [@media(min-width:1200px)]:flex [@media(min-width:1200px)]:flex-col [@media(min-width:1200px)]:gap-1"
-		>
-			<Navigation topLevelContent={data.topLevelContent} />
-		</nav>
-	{/if}
+	<!-- {#if !noNavRoutes.includes(page.route.id ?? '')} -->
+	<nav
+		class="sticky top-4 hidden max-h-[85vh] w-[360px] space-y-3 self-start [@media(min-width:1200px)]:flex [@media(min-width:1200px)]:flex-col [@media(min-width:1200px)]:gap-1"
+	>
+		<Navigation topLevelContent={data.topLevelContent} />
+	</nav>
+	<!-- {/if} -->
 
 	{@render children()}
 </div>

@@ -9,6 +9,7 @@
 	import InfoChange from '$lib/components/auth/InfoChange.svelte'
 	import PasswordChange from '$lib/components/auth/PasswordChange.svelte'
 	import AccountSecrets from '$lib/components/auth/AccountSecrets.svelte'
+	import { enhance } from '$app/forms'
 
 	const { data }: { data: PageData } = $props()
 	if (!data.user && browser) {
@@ -26,22 +27,13 @@
 		privateNotes = res.ok ? data.pages : []
 		privateChunks = res.ok ? data.chunks : []
 	})
-
-	async function logOut() {
-		try {
-			await fetch('/api/v1/auth/logout')
-		} catch (error) {
-			console.error(error)
-		}
-		window.location.pathname = '/'
-	}
 </script>
 
 <svelte:head>
 	<title>Account — {data.settings.title}</title>
 </svelte:head>
 
-<div class="mx-auto flex flex-col">
+<div class="mx-auto flex flex-col lg:ml-20 lg:mr-0">
 	<h1 class="text-center type-scale-7 lg:text-left"><strong>Account</strong></h1>
 	<hr class="hr my-4" />
 	<div class="flex flex-col gap-4 lg:min-w-[800px] lg:flex-row lg:gap-0">
@@ -72,6 +64,8 @@
 	</div>
 	<hr class="hr my-4" />
 	<footer class="flex w-full justify-end gap-2">
-		<button class="btn preset-filled-error-200-800" onclick={logOut}> Log Out </button>
+		<form method="POST" action="?/logout" use:enhance>
+			<button class="btn preset-filled-error-200-800"> Log Out </button>
+		</form>
 	</footer>
 </div>

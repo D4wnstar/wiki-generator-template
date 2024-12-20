@@ -6,7 +6,9 @@
 	let newPass = $state('')
 	let newPassConfirm = $state('')
 
+	//@ts-ignore
 	let rulesDelayTimer: NodeJS.Timeout = $state()
+	//@ts-ignore
 	let rulesConfirmDelayTimer: NodeJS.Timeout = $state()
 	let responseVisibility = $state(false)
 	let responseMessage = $state('Placeholder')
@@ -110,7 +112,7 @@
 		<button
 			class="btn preset-filled-surface-200-800"
 			disabled={!isNewPassValid || !isNewPassConfirmValid}
-			onclick={preventDefault(updatePassword)}>Save Changes</button
+			onclick={updatePassword}>Save Changes</button
 		>
 	</form>
 </section>
