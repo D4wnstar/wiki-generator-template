@@ -25,11 +25,18 @@
 	</div>
 	<h1 class="h1 text-center">{pageTitle}</h1>
 	<hr class="hr" />
-	{@html data.pageContent}
+	{#each data.contents as chunk}
+		<!-- {#if chunk.transclusionType && chunk.transclusionType === 'image'}
+			<img src={chunk.blob} alt="" />
+		{:else} -->
+		{@html chunk.text}
+		<!-- {/if} -->
+		<!-- <hr /> -->
+	{/each}
 	<hr class="hr" />
 </main>
 <div class="hidden w-[360px] [@media(min-width:1400px)]:block">
 	{#if data.sidebarImages.length > 0 || data.details.length > 0}
-		<Extras sidebarImages={data.sidebarImages} details={data.details} />
+		<Extras sidebarImages={data.sidebarImages} image={data.images} details={data.details} />
 	{/if}
 </div>

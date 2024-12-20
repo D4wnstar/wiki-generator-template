@@ -1,10 +1,12 @@
 import { slug } from 'github-slugger'
 import {
 	details,
+	images,
 	noteContents,
 	notes,
 	sidebarImages,
 	type DetailsRow,
+	type ImageRow,
 	type NoteContentsRow,
 	type NoteRow,
 	type SidebarImageRow
@@ -46,6 +48,7 @@ export async function handlePageSlug(
 		.leftJoin(noteContents, eq(notes.id, noteContents.note_id))
 		.leftJoin(details, eq(notes.id, details.note_id))
 		.leftJoin(sidebarImages, eq(notes.id, sidebarImages.note_id))
+		.leftJoin(images, eq(sidebarImages.image_id, images.id))
 		.where(
 			and(
 				pageCondition,
@@ -60,13 +63,13 @@ export async function handlePageSlug(
 		error(404, 'Could not find page or you are not authorized to see it.')
 	}
 
-	// Reduce rows to a more manageable data structure
 	// Uniqueness of each element is guaranteed with hashmaps
 	const pageMap = rows.reduce<{
 		note: NoteRow
 		contents: Map<number, NoteContentsRow>
 		details: Map<number, DetailsRow>
 		sidebarImages: Map<number, SidebarImageRow>
+		images: Map<number, ImageRow>
 	}>(
 		(acc, row) => {
 			if (row.note_contents) {
@@ -81,13 +84,18 @@ export async function handlePageSlug(
 				acc.sidebarImages.set(row.sidebar_images.order, row.sidebar_images)
 			}
 
+			if (row.images) {
+				acc.images.set(row.images.id, row.images)
+			}
+
 			return acc
 		},
 		{
 			note: rows[0].notes,
-			contents: new Map<number, NoteContentsRow>(), // Adjust the type as needed
-			details: new Map<number, DetailsRow>(), // Adjust the type as needed
-			sidebarImages: new Map<number, SidebarImageRow>() // Adjust the type as needed
+			contents: new Map<number, NoteContentsRow>(),
+			details: new Map<number, DetailsRow>(),
+			sidebarImages: new Map<number, SidebarImageRow>(),
+			images: new Map<number, ImageRow>()
 		}
 	)
 
@@ -95,7 +103,8 @@ export async function handlePageSlug(
 		note: pageMap.note,
 		contents: [...pageMap.contents.values()],
 		details: [...pageMap.details.values()],
-		sidebarImages: [...pageMap.sidebarImages.values()]
+		sidebarImages: [...pageMap.sidebarImages.values()],
+		images: [...pageMap.images.values()]
 	}
 
 	// Sort details by the given order
@@ -103,8 +112,6 @@ export async function handlePageSlug(
 
 	// and also sidebar images
 	page.sidebarImages.sort((img1, img2) => (img1.order > img2.order ? 1 : -1))
-
-	let pageContent = page.contents.reduce((acc, c) => acc + c.text, '')
 
 	// Initialize the data needed to remove links that the current user shouldn't see
 	const pathToAllowedUsers = (
@@ -132,7 +139,13 @@ export async function handlePageSlug(
 	const stripLinks = async (text: string) => (await processor.process(text)).toString()
 
 	// Run the processor on the main page, the details and the sidebar captions
-	pageContent = await stripLinks(pageContent)
+	// pageContent = await stripLinks(pageContent)
+	page.contents = await Promise.all(
+		page.contents.map(async (c) => {
+			c.text = await stripLinks(c.text)
+			return c
+		})
+	)
 	page.details = await Promise.all(
 		page.details.map(async (d) => {
 			d.detail_content = await stripLinks(d.detail_content)
@@ -146,7 +159,7 @@ export async function handlePageSlug(
 		})
 	)
 
-	return { page, pageContent }
+	return { page }
 }
 
 export function slugPath(path: string): string {

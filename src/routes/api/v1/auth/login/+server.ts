@@ -16,7 +16,11 @@ export const POST: RequestHandler = async ({ cookies, request, locals }) => {
 		return json({ message: 'Missing username or password' }, { status: 400 })
 	}
 
-	const user = await locals.db.select().from(users).where(eq(users.username, username)).get()
+	const user = await locals.db
+		.select()
+		.from(users)
+		.where(eq(users.username, username.toLowerCase()))
+		.get()
 	if (!user) {
 		return json({ message: 'No user found with this username' }, { status: 400 })
 	}

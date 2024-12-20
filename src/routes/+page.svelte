@@ -13,7 +13,10 @@
 <main id="note-content" class="mx-auto max-w-[800px] space-y-4 lg:grow lg:px-8">
 	<h1 class="h1 text-center">{pageTitle}</h1>
 	<hr class="hr" />
-	{@html data.pageContent}
+	{#each data.contents as chunk}
+		{@html chunk.text}
+		<!-- <hr /> -->
+	{/each}
 	<hr class="hr" />
 </main>
 <div class="hidden w-[360px] [@media(min-width:1400px)]:block">
