@@ -21,3 +21,5 @@ export const actions = {
 		return { message: 'Logged out successfully', success: true }
 	}
 } satisfies Actions
+
+export const prerender = false
