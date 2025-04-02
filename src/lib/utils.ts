@@ -1,6 +1,5 @@
 import { sql } from 'drizzle-orm'
 import { noteContents, notes } from './schema'
-import { SQLiteSyncDialect } from 'drizzle-orm/sqlite-core'
 
 /**
  * Create a Drizzle SQL object to filter by the `notes.allowed_users` columns

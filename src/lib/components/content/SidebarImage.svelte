@@ -14,7 +14,7 @@
 	<Modal bind:open={modalState}>
 		{#snippet trigger()}
 			<img
-				src="/api/v1/image?image_id={sidebarImage.image_id}"
+				src="/api/v1/image?image_path={sidebarImage.image_path}"
 				alt={sidebarImage.caption}
 				class="mx-auto max-h-80"
 			/>
@@ -23,7 +23,7 @@
 			<div class="max-w-[80vh] rounded p-4 bg-surface-100-900">
 				<figure>
 					<img
-						src="/api/v1/image?image_id={sidebarImage.image_id}"
+						src="/api/v1/image?image_path={sidebarImage.image_path}"
 						alt={sidebarImage.caption}
 						class="mx-auto max-h-[80vh]"
 					/>

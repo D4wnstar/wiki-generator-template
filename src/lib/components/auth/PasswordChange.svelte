@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { preventDefault } from 'svelte/legacy'
-
 	import { passwordRules } from '$lib/auth'
 
 	let newPass = $state('')

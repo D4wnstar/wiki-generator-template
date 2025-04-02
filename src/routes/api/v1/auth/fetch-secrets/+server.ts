@@ -22,7 +22,7 @@ export const GET: RequestHandler = async ({ locals: { db, user } }) => {
 		.select()
 		.from(noteContents)
 		.where(conditionChunks)
-		.rightJoin(notes, eq(noteContents.note_id, notes.id))
+		.rightJoin(notes, eq(noteContents.note_path, notes.path))
 
 	return json({ pages, chunks })
 }

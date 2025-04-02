@@ -35,4 +35,4 @@ export const load = (async ({ locals: { db, user } }) => {
 	return { /* noteTitles, */ pages, settings, user, topLevelContent }
 }) satisfies LayoutServerLoad
 
-export const prerender = 'auto'
+// export const prerender = 'auto'

@@ -43,9 +43,9 @@ export async function handlePageSlug(
 	const rows = await db
 		.select()
 		.from(notes)
-		.leftJoin(noteContents, eq(notes.id, noteContents.note_id))
-		.leftJoin(details, eq(notes.id, details.note_id))
-		.leftJoin(sidebarImages, eq(notes.id, sidebarImages.note_id))
+		.leftJoin(noteContents, eq(notes.path, noteContents.note_path))
+		.leftJoin(details, eq(notes.path, details.note_path))
+		.leftJoin(sidebarImages, eq(notes.path, sidebarImages.note_path))
 		.where(
 			and(
 				pageCondition,
@@ -129,7 +129,6 @@ export async function handlePageSlug(
 	const stripLinks = async (text: string) => (await processor.process(text)).toString()
 
 	// Run the processor on the main page, the details and the sidebar captions
-	// pageContent = await stripLinks(pageContent)
 	page.contents = await Promise.all(
 		page.contents.map(async (c) => {
 			c.text = await stripLinks(c.text)
@@ -152,13 +151,14 @@ export async function handlePageSlug(
 	return { page }
 }
 
-export async function fetchNoteTransclusion(noteId: number): Promise<NoteContentsRow[]> {
-	const res = await fetch(`/api/v1/note-contents?note_id=${noteId}`)
+export async function fetchNoteTransclusion(notePath: string): Promise<NoteContentsRow[]> {
+	const res = await fetch(`/api/v1/note-contents?note_path=${notePath}`)
+	const json = await res.json()
 	if (!res.ok) {
+		console.error(json.message)
 		return []
 	}
-	const json = await res.json()
-	console.log(json)
+
 	return json.contents
 }
 

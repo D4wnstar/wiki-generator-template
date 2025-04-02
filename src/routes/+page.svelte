@@ -15,11 +15,11 @@
 	<h1 class="h1 text-center">{pageTitle}</h1>
 	<hr class="hr" />
 	{#each data.contents as chunk}
-		{#if chunk.image_id}
-			<img src="/api/v1/image?image_id={chunk.image_id}" alt="" />
-		{:else if chunk.note_transclusion_id}
+		{#if chunk.image_path}
+			<img src="/api/v1/image?image_path={chunk.image_path}" alt="" />
+		{:else if chunk.note_transclusion_path}
 			<blockquote class="space-y-4 border-l-2 border-secondary-500 pl-4">
-				{#await fetchNoteTransclusion(chunk.note_transclusion_id) then trChunks}
+				{#await fetchNoteTransclusion(chunk.note_transclusion_path) then trChunks}
 					{#each trChunks as trChunk}
 						{@html trChunk.text}
 					{/each}

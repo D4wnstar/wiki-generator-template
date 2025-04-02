@@ -4,20 +4,12 @@ import { noteContents } from '$lib/schema'
 import { eq } from 'drizzle-orm'
 
 export const GET: RequestHandler = async ({ url, locals: { db } }) => {
-	const noteIdStr = url.searchParams.get('note_id')
-
-	if (!noteIdStr) {
-		return json({ message: 'Missing note id' }, { status: 400 })
+	const notePath = url.searchParams.get('note_path')
+	if (!notePath) {
+		return json({ message: 'Missing note path' }, { status: 400 })
 	}
 
-	let noteId
-	try {
-		noteId = parseInt(noteIdStr)
-	} catch (error) {
-		return json({ message: 'Could not parse note id' }, { status: 400 })
-	}
-
-	const contents = await db.select().from(noteContents).where(eq(noteContents.note_id, noteId))
+	const contents = await db.select().from(noteContents).where(eq(noteContents.note_path, notePath))
 
 	if (!contents) {
 		return json({ message: 'No contents found' }, { status: 404 })

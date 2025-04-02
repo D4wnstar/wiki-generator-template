@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Details from './Details.svelte'
-	import type { DetailsRow, ImageRow, SidebarImageRow } from '$lib/schema'
+	import type { DetailsRow, SidebarImageRow } from '$lib/schema'
 	import SidebarImage from './SidebarImage.svelte'
 
 	interface Props {

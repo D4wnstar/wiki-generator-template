@@ -1,35 +1,39 @@
 import { blob, int, sqliteTable, text, type AnySQLiteColumn } from 'drizzle-orm/sqlite-core'
 
 export const notes = sqliteTable('notes', {
-	id: int().primaryKey({ autoIncrement: true }),
+	path: text().primaryKey(),
 	title: text().notNull(),
 	alt_title: text(),
-	path: text().notNull().unique(),
 	slug: text().notNull().unique(),
 	frontpage: int({ mode: 'boolean' }).notNull().default(false),
-	allowed_users: text()
+	allowed_users: text(),
+	hash: text().notNull(),
+	last_updated: int().notNull()
 })
 
 export const images = sqliteTable('images', {
-	id: int().primaryKey({ autoIncrement: true }),
+	path: text().primaryKey(),
 	blob: blob().notNull(),
-	alt: text()
+	alt: text(),
+	hash: text().notNull(),
+	last_updated: int().notNull(),
+	compressed: int({ mode: 'boolean' }).notNull()
 })
 
 export const noteContents = sqliteTable('note_contents', {
-	note_id: int()
-		.references((): AnySQLiteColumn => notes.id)
+	note_path: text()
+		.references((): AnySQLiteColumn => notes.path)
 		.primaryKey(),
 	chunk_id: int().primaryKey(),
 	text: text().notNull(),
 	allowed_users: text(),
-	image_id: int().references((): AnySQLiteColumn => images.id),
-	note_transclusion_id: int().references((): AnySQLiteColumn => notes.id)
+	image_path: text().references((): AnySQLiteColumn => images.path),
+	note_transclusion_path: text().references((): AnySQLiteColumn => notes.path)
 })
 
 export const details = sqliteTable('details', {
-	note_id: int()
-		.references((): AnySQLiteColumn => notes.id)
+	note_path: text()
+		.references((): AnySQLiteColumn => notes.path)
 		.primaryKey(),
 	order: int().notNull(),
 	detail_name: text().notNull().primaryKey(),
@@ -37,14 +41,14 @@ export const details = sqliteTable('details', {
 })
 
 export const sidebarImages = sqliteTable('sidebar_images', {
-	note_id: int()
-		.references((): AnySQLiteColumn => notes.id)
+	note_path: text()
+		.references((): AnySQLiteColumn => notes.path)
 		.primaryKey(),
 	order: int().notNull(),
 	image_name: text().notNull().primaryKey(),
-	image_id: int()
+	image_path: text()
 		.notNull()
-		.references((): AnySQLiteColumn => images.id),
+		.references((): AnySQLiteColumn => images.path),
 	caption: text()
 })
 

@@ -111,7 +111,7 @@ export const actions = {
 				success: true
 			}
 		} catch (error) {
-			console.log(error)
+			console.error(error)
 			return fail(500, { ...errorData, message: 'Internal server error.' })
 		}
 	}

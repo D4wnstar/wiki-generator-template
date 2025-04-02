@@ -22,6 +22,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			.where(eq(users.username, locals.user.username))
 		return json({ message: 'Username updated successfully' })
 	} catch (error) {
+		//@ts-expect-error Errors usually have a message
 		return json({ message: `Error updating username: ${error.message}` })
 	}
 }
