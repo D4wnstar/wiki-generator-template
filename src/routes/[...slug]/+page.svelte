@@ -11,7 +11,7 @@
 	// Get breadcrumbs while respecting alt titles
 	let breadcrumbs = $derived.by(() => {
 		const crumbs = data.note.path.split('/')
-		const lastElem = data.note.alt_title ?? crumbs[crumbs.length - 1]
+		const lastElem = data.note.alt_title ?? crumbs[crumbs.length - 1].replace(/\.md$/, '')
 		crumbs[crumbs.length - 1] = lastElem
 		return crumbs
 	})
@@ -29,7 +29,7 @@
 	<hr class="hr" />
 	{#each data.contents as chunk}
 		{#if chunk.image_path}
-			<img src="/api/v1/image?image_path={chunk.image_path}" alt="" />
+			<img class="w-1/3 self-center" src="/api/v1/image?image_path={chunk.image_path}" alt="" />
 		{:else if chunk.note_transclusion_path}
 			<blockquote class="space-y-4 border-l-2 border-secondary-500 pl-4">
 				{#await fetchNoteTransclusion(chunk.note_transclusion_path) then trChunks}
