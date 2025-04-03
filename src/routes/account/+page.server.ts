@@ -14,7 +14,7 @@ export const actions = {
 			path: '/',
 			httpOnly: true,
 			secure: true,
-			sameSite: 'strict'
+			sameSite: 'lax'
 		})
 		locals.user = null
 

@@ -3,8 +3,6 @@
 	import type { LoggedUser } from '$lib/types'
 	import type { NoteContentsRow, NoteRow } from '$lib/schema'
 	import type { PageData } from '../$types'
-	import { browser } from '$app/environment'
-	import { goto } from '$app/navigation'
 	import { Segment } from '@skeletonlabs/skeleton-svelte'
 	import InfoChange from '$lib/components/auth/InfoChange.svelte'
 	import PasswordChange from '$lib/components/auth/PasswordChange.svelte'
@@ -12,10 +10,8 @@
 	import { enhance } from '$app/forms'
 
 	const { data }: { data: PageData } = $props()
-	if (!data.user && browser) {
-		goto('/login')
-	}
 	const user = data.user as LoggedUser
+	console.log(user)
 
 	let currTab: string = $state('info')
 	let privateNotes: NoteRow[] = $state([])

@@ -58,7 +58,7 @@ export const actions = {
 			path: '/',
 			httpOnly: true,
 			secure: true,
-			sameSite: 'strict'
+			sameSite: 'lax'
 		})
 
 		return { type: 'login', message: 'Successfully logged in!', color: 'success', success: true }
