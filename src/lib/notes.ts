@@ -11,10 +11,6 @@ import {
 } from '$lib/schema'
 import type { LibSQLDatabase } from 'drizzle-orm/libsql'
 import { eq, and, or, isNull } from 'drizzle-orm'
-import rehypeParse from 'rehype-parse'
-import rehypeStringify from 'rehype-stringify'
-import { unified } from 'unified'
-import rehypeAuthorizeLinks from './rehype/rehype-authorize-links'
 import type { LoggedUser } from './types'
 import { getAllowedUsersFilter } from './utils'
 import { error } from '@sveltejs/kit'
@@ -32,7 +28,7 @@ export async function handlePageSlug(
 	user: LoggedUser | null,
 	slug: string | undefined = undefined
 ) {
-	const isUserAllowed = user ? getAllowedUsersFilter(user.username, 'notes') : undefined
+	// const isUserAllowed = user ? getAllowedUsersFilter(user.username, 'notes') : undefined
 	const isUserAllowedChunks = user
 		? getAllowedUsersFilter(user.username, 'noteContents')
 		: undefined
@@ -50,14 +46,23 @@ export async function handlePageSlug(
 			and(
 				pageCondition,
 				// The user must either need no permission or be allowed in the page
-				or(isNull(notes.allowed_users), isUserAllowed),
+				// or(isNull(notes.allowed_users), isUserAllowed),
 				// and in each individual chunk
 				or(isNull(noteContents.allowed_users), isUserAllowedChunks)
 			)
 		)
-
 	if (rows.length === 0) {
-		error(404, 'Could not find page or you are not authorized to see it.')
+		error(404, 'Could not find this page. Are you sure you have the right link?')
+	}
+
+	const allowedUsers = rows[0].notes.allowed_users?.toLocaleLowerCase().split('; ')
+	if (allowedUsers) {
+		if (!user?.username) {
+			error(401, 'You are not allowed to see this page. Please log in.')
+		}
+		if (!allowedUsers.includes(user.username)) {
+			error(403, 'You are not allowed to see this page.')
+		}
 	}
 
 	// Uniqueness of each element is guaranteed with hashmaps
@@ -103,52 +108,57 @@ export async function handlePageSlug(
 	// and also sidebar images
 	page.sidebarImages.sort((img1, img2) => (img1.order > img2.order ? 1 : -1))
 
+	// const beforeLinkSelect = Date.now()
 	// Initialize the data needed to remove links that the current user shouldn't see
-	const pathToAllowedUsers = (
-		await db
-			.select({
-				path: notes.slug,
-				allowedUsers: notes.allowed_users
-			})
-			.from(notes)
-	).reduce((acc, row) => {
-		const allowedUsers = row.allowedUsers?.split(';')
-		if (allowedUsers) {
-			acc.set(row.path, allowedUsers)
-		}
+	// const pathToAllowedUsers = (
+	// 	await db
+	// 		.select({
+	// 			path: notes.slug,
+	// 			allowedUsers: notes.allowed_users
+	// 		})
+	// 		.from(notes)
+	// ).reduce((acc, row) => {
+	// 	const allowedUsers = row.allowedUsers?.split(';')
+	// 	if (allowedUsers) {
+	// 		acc.set(row.path, allowedUsers)
+	// 	}
 
-		return acc
-	}, new Map<string, string[]>())
+	// 	return acc
+	// }, new Map<string, string[]>())
+	// const pathToAllowedUsers = new Map<string, string[]>()
+	// const afterLinkSelect = Date.now()
+	// console.log(`And ${afterLinkSelect - beforeLinkSelect} ms fetching link-related data`)
+	// console.log(`In total, that's ${afterLinkSelect - beforeLinkSelect + afterDb - beforeDb} ms`)
 
 	// Initialize the rehype processor to modify the anchor tags
-	const processor = unified()
-		.use(rehypeParse, { fragment: true })
-		.use(rehypeAuthorizeLinks, user?.username, pathToAllowedUsers)
-		.use(rehypeStringify)
+	// const processor = unified()
+	// 	.use(rehypeParse, { fragment: true })
+	// 	.use(rehypeAuthorizeLinks, user?.username, pathToAllowedUsers)
+	// 	.use(rehypeStringify)
 
-	const stripLinks = async (text: string) => (await processor.process(text)).toString()
+	// const stripLinks = async (text: string) => (await processor.process(text)).toString()
 
-	// Run the processor on the main page, the details and the sidebar captions
-	page.contents = await Promise.all(
-		page.contents.map(async (c) => {
-			c.text = await stripLinks(c.text)
-			return c
-		})
-	)
-	page.details = await Promise.all(
-		page.details.map(async (d) => {
-			d.detail_content = await stripLinks(d.detail_content)
-			return d
-		})
-	)
-	page.sidebarImages = await Promise.all(
-		page.sidebarImages.map(async (si) => {
-			if (si.caption) si.caption = await stripLinks(si.caption)
-			return si
-		})
-	)
+	// // Run the processor on the main page, the details and the sidebar captions
+	// page.contents = await Promise.all(
+	// 	page.contents.map(async (c) => {
+	// 		c.text = await stripLinks(c.text)
+	// 		return c
+	// 	})
+	// )
+	// page.details = await Promise.all(
+	// 	page.details.map(async (d) => {
+	// 		d.detail_content = await stripLinks(d.detail_content)
+	// 		return d
+	// 	})
+	// )
+	// page.sidebarImages = await Promise.all(
+	// 	page.sidebarImages.map(async (si) => {
+	// 		if (si.caption) si.caption = await stripLinks(si.caption)
+	// 		return si
+	// 	})
+	// )
 
-	return { page }
+	return page
 }
 
 export async function fetchNoteTransclusion(notePath: string): Promise<NoteContentsRow[]> {
@@ -183,13 +193,12 @@ export type File = {
 	title: string
 	path: string
 	slug: string
-	id?: number | undefined
 	alt_title?: string | null | undefined
-	frontpage?: boolean | undefined
-	allowed_users?: string | null | undefined
 }
 
-export function getNotesTree(pages: NoteRow[]) {
+export function getNotesTree(
+	pages: { path: string; slug: string; title: string; alt_title: string | null }[]
+) {
 	const files: File[] = pages.map((p) => {
 		return { ...p, type: 'file' }
 	})

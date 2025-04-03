@@ -9,7 +9,12 @@ export const load = (async ({ locals: { db, user } }) => {
 	// Select allowed pages
 	const isUserAllowed = user ? getAllowedUsersFilter(user.username, 'notes') : undefined
 	const rows = await db
-		.select()
+		.select({
+			path: notes.path,
+			slug: notes.slug,
+			title: notes.title,
+			alt_title: notes.alt_title
+		})
 		.from(notes)
 		.where(and(eq(notes.frontpage, false), or(isNull(notes.allowed_users), isUserAllowed)))
 
@@ -32,7 +37,7 @@ export const load = (async ({ locals: { db, user } }) => {
 		error(500, 'Failed to fetch wiki settings')
 	}
 
-	return { /* noteTitles, */ pages, settings, user, topLevelContent }
+	return { pages, settings, user, topLevelContent }
 }) satisfies LayoutServerLoad
 
 // export const prerender = 'auto'
