@@ -39,9 +39,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	const hashedPassword = await bcrypt.hash(newPassConfirm, 10)
 	try {
-		await locals.db.update(users).set({
-			password: hashedPassword
-		})
+		await locals.db
+			.update(users)
+			.set({
+				password: hashedPassword
+			})
+			.where(eq(users.username, currentUser.username))
 		return json({ message: 'Successfully update password' })
 	} catch (error) {
 		return json({ message: `Error updating password: ${error}` }, { status: 500 })
