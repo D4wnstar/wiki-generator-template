@@ -11,7 +11,6 @@
 
 	const { data }: { data: PageData } = $props()
 	const user = data.user as LoggedUser
-	console.log(user)
 
 	let currTab: string = $state('info')
 	let privateNotes: NoteRow[] = $state([])
