@@ -3,6 +3,8 @@
 	import Extras from '$lib/components/content/Extras.svelte'
 	import { fetchNoteTransclusion } from '$lib/notes'
 	import { EyeOff } from 'lucide-svelte'
+	import { onMount } from 'svelte'
+	import { SvelteMap } from 'svelte/reactivity'
 
 	let { data } = $props()
 	const pageTitle = $derived(data.note.alt_title ?? data.note.title)
@@ -14,6 +16,24 @@
 		const lastElem = data.note.alt_title ?? crumbs[crumbs.length - 1].replace(/\.md$/, '')
 		crumbs[crumbs.length - 1] = lastElem
 		return crumbs
+	})
+
+	let images: Map<number, { type: 'svg'; svg: string } | { type: 'raster'; blob: Blob }> =
+		new SvelteMap()
+
+	onMount(async () => {
+		// Images are grabbed onMount to avoid long loading times and because we can't run
+		// fetch with a relative path when server-side rendering
+		for (const chunk of data.contents) {
+			if (chunk.image_path) {
+				const res = await fetch(`/api/v1/image?image_path=${chunk.image_path}`)
+				if (res.headers.get('content-type') === 'image/svg+xml') {
+					images.set(chunk.chunk_id, { type: 'svg', svg: await res.text() })
+				} else {
+					images.set(chunk.chunk_id, { type: 'raster', blob: await res.blob() })
+				}
+			}
+		}
 	})
 </script>
 
@@ -29,19 +49,14 @@
 	<hr class="hr" />
 	{#each data.contents as chunk}
 		{#if chunk.image_path}
-			{#await fetch(`/api/v1/image?image_path=${chunk.image_path}`) then response}
-				{#if response.headers.get('content-type') === 'image/svg+xml'}
-					{#await response.text() then text}
-						<div class="self-center">
-							{@html text}
-						</div>
-					{/await}
-				{:else}
-					{#await response.blob() then blob}
-						<img class="w-1/3 self-center" src={URL.createObjectURL(blob)} alt="" />
-					{/await}
-				{/if}
-			{/await}
+			{@const image = images.get(chunk.chunk_id)}
+			{#if image?.type === 'raster'}
+				<img class="w-1/3 self-center" src={URL.createObjectURL(image.blob)} alt="" />
+			{:else if image?.type === 'svg'}
+				<div class="self-center">
+					{@html image.svg}
+				</div>
+			{/if}
 		{:else if chunk.note_transclusion_path}
 			<blockquote class="space-y-4 border-l-2 border-secondary-500 pl-4">
 				{#await fetchNoteTransclusion(chunk.note_transclusion_path) then trChunks}

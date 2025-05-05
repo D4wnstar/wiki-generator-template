@@ -18,7 +18,7 @@ export const GET: RequestHandler = async ({ url, locals: { db } }) => {
 			return new Response(image.svg_text, {
 				headers: {
 					'Content-Type': 'image/svg+xml',
-					'Cache-Control': 'public, max-age=31536000'
+					'Cache-Control': 'public, max-age=86400'
 				}
 			})
 		} else if (image.blob) {
@@ -26,7 +26,7 @@ export const GET: RequestHandler = async ({ url, locals: { db } }) => {
 			return new Response(buf, {
 				headers: {
 					'Content-Type': 'image/webp',
-					'Cache-Control': 'public, max-age=31536000'
+					'Cache-Control': 'public, max-age=86400'
 				}
 			})
 		} else {
