@@ -29,7 +29,19 @@
 	<hr class="hr" />
 	{#each data.contents as chunk}
 		{#if chunk.image_path}
-			<img class="w-1/3 self-center" src="/api/v1/image?image_path={chunk.image_path}" alt="" />
+			{#await fetch(`/api/v1/image?image_path=${chunk.image_path}`) then response}
+				{#if response.headers.get('content-type') === 'image/svg+xml'}
+					{#await response.text() then text}
+						<div class="self-center">
+							{@html text}
+						</div>
+					{/await}
+				{:else}
+					{#await response.blob() then blob}
+						<img class="w-1/3 self-center" src={URL.createObjectURL(blob)} alt="" />
+					{/await}
+				{/if}
+			{/await}
 		{:else if chunk.note_transclusion_path}
 			<blockquote class="space-y-4 border-l-2 border-secondary-500 pl-4">
 				{#await fetchNoteTransclusion(chunk.note_transclusion_path) then trChunks}

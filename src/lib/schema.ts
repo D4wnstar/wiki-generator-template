@@ -13,7 +13,8 @@ export const notes = sqliteTable('notes', {
 
 export const images = sqliteTable('images', {
 	path: text().primaryKey(),
-	blob: blob().notNull(),
+	blob: blob(),
+	svg_text: text(),
 	alt: text(),
 	hash: text().notNull(),
 	last_updated: int().notNull(),

@@ -13,12 +13,24 @@ export const GET: RequestHandler = async ({ url, locals: { db } }) => {
 	if (!image) {
 		return json({ message: 'No image found' }, { status: 404 })
 	} else {
-		const buf = image.blob as Buffer
-		return new Response(buf, {
-			headers: {
-				'Content-Type': 'image/webp',
-				'Cache-Control': 'public, max-age=31536000'
-			}
-		})
+		// Check if it's a raster or an SVG
+		if (image.svg_text) {
+			return new Response(image.svg_text, {
+				headers: {
+					'Content-Type': 'image/svg+xml',
+					'Cache-Control': 'public, max-age=31536000'
+				}
+			})
+		} else if (image.blob) {
+			const buf = image.blob as Buffer
+			return new Response(buf, {
+				headers: {
+					'Content-Type': 'image/webp',
+					'Cache-Control': 'public, max-age=31536000'
+				}
+			})
+		} else {
+			return json({ message: 'Image neither has a blob nor SVG text' }, { status: 500 })
+		}
 	}
 }
