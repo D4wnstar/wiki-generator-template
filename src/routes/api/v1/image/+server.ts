@@ -9,28 +9,33 @@ export const GET: RequestHandler = async ({ url, locals: { db } }) => {
 		return json({ message: 'Missing image path' }, { status: 400 })
 	}
 
-	const image = await db.select().from(images).where(eq(images.path, imagePath)).get()
+	const image = await db
+		.select({
+			svgText: images.svg_text
+		})
+		.from(images)
+		.where(eq(images.path, decodeURIComponent(imagePath)))
+		.get()
 	if (!image) {
 		return json({ message: 'No image found' }, { status: 404 })
 	} else {
 		// Check if it's a raster or an SVG
-		if (image.svg_text) {
-			return new Response(image.svg_text, {
+		if (image.svgText) {
+			return new Response(image.svgText, {
 				headers: {
 					'Content-Type': 'image/svg+xml',
 					'Cache-Control': 'public, max-age=86400'
 				}
 			})
-		} else if (image.blob) {
-			const buf = image.blob as Buffer
-			return new Response(buf, {
+		} else {
+			return new Response(`/api/v1/image-blob?image_path=${encodeURIComponent(imagePath)}`, {
 				headers: {
-					'Content-Type': 'image/webp',
-					'Cache-Control': 'public, max-age=86400'
+					'Content-Type': 'text/plain'
 				}
 			})
-		} else {
-			return json({ message: 'Image neither has a blob nor SVG text' }, { status: 500 })
 		}
+		// } else {
+		// 	return json({ message: 'Image neither has a blob nor SVG text' }, { status: 500 })
+		// }
 	}
 }

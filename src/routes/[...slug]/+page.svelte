@@ -1,10 +1,9 @@
 <script lang="ts">
 	import Breadcrumbs from '$lib/components/content/Breadcrumbs.svelte'
 	import Extras from '$lib/components/content/Extras.svelte'
+	import ImageWithModal from '$lib/components/content/ImageWithModal.svelte'
 	import { fetchNoteTransclusion } from '$lib/notes'
 	import { EyeOff } from 'lucide-svelte'
-	import { onMount } from 'svelte'
-	import { SvelteMap } from 'svelte/reactivity'
 
 	let { data } = $props()
 	const pageTitle = $derived(data.note.alt_title ?? data.note.title)
@@ -17,31 +16,13 @@
 		crumbs[crumbs.length - 1] = lastElem
 		return crumbs
 	})
-
-	let images: Map<number, { type: 'svg'; svg: string } | { type: 'raster'; blob: Blob }> =
-		new SvelteMap()
-
-	onMount(async () => {
-		// Images are grabbed onMount to avoid long loading times and because we can't run
-		// fetch with a relative path when server-side rendering
-		for (const chunk of data.contents) {
-			if (chunk.image_path) {
-				const res = await fetch(`/api/v1/image?image_path=${chunk.image_path}`)
-				if (res.headers.get('content-type') === 'image/svg+xml') {
-					images.set(chunk.chunk_id, { type: 'svg', svg: await res.text() })
-				} else {
-					images.set(chunk.chunk_id, { type: 'raster', blob: await res.blob() })
-				}
-			}
-		}
-	})
 </script>
 
 <svelte:head>
 	<title>{headTitle}</title>
 </svelte:head>
 
-<main id="note-content" class="mx-auto flex max-w-[800px] flex-col space-y-4 lg:grow lg:px-8">
+<main id="note-content" class="mx-auto flex max-w-3xl flex-col space-y-4 lg:grow lg:px-8">
 	<div class="hidden w-full overflow-y-hidden overflow-x-scroll lg:block">
 		<Breadcrumbs {breadcrumbs} />
 	</div>
@@ -49,13 +30,14 @@
 	<hr class="hr" />
 	{#each data.contents as chunk}
 		{#if chunk.image_path}
-			{@const image = images.get(chunk.chunk_id)}
-			{#if image?.type === 'raster'}
-				<img class="w-1/3 self-center" src={URL.createObjectURL(image.blob)} alt="" />
-			{:else if image?.type === 'svg'}
-				<div class="self-center">
-					{@html image.svg}
-				</div>
+			{@const image = data.images.get(chunk.chunk_id)}
+			{#if image}
+				<ImageWithModal
+					url={image.url}
+					svg={image.svg}
+					caption={image.caption ?? ''}
+					baseClassesRaster="w-1/3 self-center"
+				/>
 			{/if}
 		{:else if chunk.note_transclusion_path}
 			<blockquote class="space-y-4 border-l-2 border-secondary-500 pl-4">
