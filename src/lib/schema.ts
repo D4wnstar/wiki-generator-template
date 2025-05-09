@@ -12,7 +12,8 @@ export const notes = sqliteTable('notes', {
 	frontpage: int({ mode: 'boolean' }).notNull().default(false),
 	allowed_users: text(),
 	hash: text().notNull(),
-	last_updated: int().notNull()
+	last_updated: int().notNull(),
+	can_prerender: int({ mode: 'boolean' }).notNull()
 })
 
 export const images = sqliteTable('images', {
@@ -42,7 +43,7 @@ export const details = sqliteTable('details', {
 		.primaryKey(),
 	order: int().notNull(),
 	detail_name: text().notNull().primaryKey(),
-	detail_content: text().notNull()
+	detail_content: text()
 })
 
 export const sidebarImages = sqliteTable('sidebar_images', {

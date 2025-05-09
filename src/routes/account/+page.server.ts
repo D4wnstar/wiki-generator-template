@@ -1,11 +1,18 @@
 import { redirect } from '@sveltejs/kit'
 import type { Actions, PageServerLoad } from './$types'
+import type { NoteContentsRow, NoteRow } from '$lib/schema'
 
-export const load = (async ({ locals: { user } }) => {
+export const load = (async ({ locals: { user }, fetch }) => {
 	if (!user) {
 		redirect(303, '/login')
 	}
-	return {}
+
+	const res = await fetch('/api/v1/auth/fetch-secrets')
+	const data = (await res.json()) as {
+		pages: NoteRow[]
+		chunks: { note_contents: NoteContentsRow | null; notes: NoteRow }[]
+	}
+	return { user, secretPages: data.pages, secretChunks: data.chunks }
 }) satisfies PageServerLoad
 
 export const actions = {

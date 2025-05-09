@@ -203,7 +203,7 @@ export function getNotesTree(
 		slug: string
 		title: string
 		search_terms: string
-		alt_title: string | null
+		alt_title?: string | null
 	}[]
 ) {
 	const files: File[] = pages.map((p) => {
@@ -250,7 +250,14 @@ export function getNotesTree(
 	return root
 }
 
-export function sortFiles(a: File | Folder, b: File | Folder) {
+export function sortFolderRecursively(folder: Folder) {
+	folder.children.sort(sortFiles)
+	for (const child of folder.children) {
+		if (child.type === 'folder') sortFolderRecursively(child)
+	}
+}
+
+function sortFiles(a: File | Folder, b: File | Folder) {
 	if (a.type === 'folder' && b.type === 'file') {
 		return -1
 	} else if (a.type === 'file' && b.type === 'folder') {

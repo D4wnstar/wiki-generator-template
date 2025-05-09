@@ -15,7 +15,7 @@
 		<tbody>
 			{#each details as detail}
 				<tr>
-					{#if detail.detail_content !== ''}
+					{#if detail.detail_content}
 						<td class="px-1 align-text-top lg:min-w-[6em]">{@html detail.detail_name}</td>
 						<td class="px-1">{@html detail.detail_content.replaceAll(/; */g, '<br />')}</td>
 						<!-- {:else if detail.detail_name === "-"}

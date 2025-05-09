@@ -65,7 +65,7 @@
 	<title>Login to {data.settings.title}</title>
 </svelte:head>
 
-<div class="mx-auto flex flex-col lg:ml-20 lg:mr-0 lg:w-[500px]">
+<div class="mx-auto flex flex-col lg:w-[500px]">
 	<h1 class="mb-4 type-scale-7">Sign in</h1>
 	<Tabs bind:value={tabSet} onFocusChange={clearData}>
 		{#snippet list()}

@@ -23,11 +23,13 @@
 			{/if}
 		{/snippet}
 		{#snippet content()}
-			<figure class="max-w-[80vh] rounded p-4 bg-surface-100-900">
+			<figure
+				class="flex max-h-[90vh] max-w-[80vw] flex-col items-center justify-center rounded p-4 bg-surface-100-900"
+			>
 				{#if url}
-					<img src={url} alt={caption} />
+					<img src={url} alt={caption} class="max-h-[80vh] max-w-[80vw] object-contain" />
 				{:else if svg}
-					<div>{@html svg}</div>
+					<div class="max-h-[80vh] max-w-[70vw] overflow-auto">{@html svg}</div>
 				{/if}
 				{#if caption}
 					<hr class="hr my-4 border-surface-700-300" />

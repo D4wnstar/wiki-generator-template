@@ -3,11 +3,11 @@ import { eq } from 'drizzle-orm'
 import type { RequestHandler } from './$types'
 import { json } from '@sveltejs/kit'
 
-export const GET: RequestHandler = async ({ url, locals: { db } }) => {
-	const imagePath = url.searchParams.get('image_path')
-	if (!imagePath) {
-		return json({ message: 'Missing image path' }, { status: 400 })
-	}
+export const GET: RequestHandler = async ({ params: { imagePath }, locals: { db } }) => {
+	// const imagePath = url.searchParams.get('image_path')
+	// if (!imagePath) {
+	// 	return json({ message: 'Missing image path' }, { status: 400 })
+	// }
 
 	const image = await db
 		.select({
@@ -28,7 +28,7 @@ export const GET: RequestHandler = async ({ url, locals: { db } }) => {
 				}
 			})
 		} else {
-			return new Response(`/api/v1/image-blob?image_path=${encodeURIComponent(imagePath)}`, {
+			return new Response(`/api/v1/image-blob/${encodeURIComponent(imagePath)}`, {
 				headers: {
 					'Content-Type': 'text/plain'
 				}

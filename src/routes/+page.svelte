@@ -8,7 +8,7 @@
 
 	let { data } = $props()
 	const pageTitle = $derived(data.note.alt_title ?? data.note.title)
-	const headTitle = $derived(`${pageTitle} — ${data.settings.title}`)
+	const headTitle = $derived(`${pageTitle} - ${data.settings.title}`)
 
 	let images: Map<number, { type: 'svg'; svg: string } | { type: 'raster'; blob: Blob }> =
 		new SvelteMap()

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { sortFiles, type File, type Folder } from '$lib/notes'
+	import { type File, type Folder } from '$lib/notes'
 	import { ChevronDown } from 'lucide-svelte'
 	import TreeFile from './TreeFile.svelte'
 	import TreeFolder from './TreeFolder.svelte'
@@ -10,7 +10,7 @@
 		title: string
 		children: (File | Folder)[]
 	}
-	let { expanded = $bindable(false), title, children }: Props = $props()
+	let { expanded = false, title, children }: Props = $props()
 
 	function toggle() {
 		expanded = !expanded
@@ -24,7 +24,7 @@
 
 {#if expanded}
 	<ul transition:slide={{ duration: 300 }} class="space-y-3 pl-1">
-		{#each children.sort(sortFiles) as child}
+		{#each children as child}
 			<li class="pl-1">
 				{#if child.type === 'folder'}
 					<TreeFolder {...child} expanded={false} />

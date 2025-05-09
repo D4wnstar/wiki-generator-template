@@ -6,8 +6,9 @@
 	import { EyeOff } from 'lucide-svelte'
 
 	let { data } = $props()
+
 	const pageTitle = $derived(data.note.alt_title ?? data.note.title)
-	const headTitle = $derived(`${pageTitle} — ${data.settings.title}`)
+	const headTitle = $derived(`${pageTitle} - ${data.settings.title}`)
 
 	// Get breadcrumbs while respecting alt titles
 	let breadcrumbs = $derived.by(() => {

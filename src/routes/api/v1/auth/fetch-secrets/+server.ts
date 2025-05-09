@@ -5,7 +5,7 @@ import { eq } from 'drizzle-orm'
 import { getAllowedUsersFilter } from '$lib/utils'
 
 /**
- * Get all pages marked as secred that the user is allowed to see.
+ * Get all pages marked as secret that the user is allowed to see.
  */
 export const GET: RequestHandler = async ({ locals: { db, user } }) => {
 	if (!user) {
@@ -15,8 +15,7 @@ export const GET: RequestHandler = async ({ locals: { db, user } }) => {
 	const conditionPages = getAllowedUsersFilter(user.username, 'notes')
 	const conditionChunks = getAllowedUsersFilter(user.username, 'noteContents')
 
-	const query = db.select().from(notes).where(conditionPages)
-	const pages = await query
+	const pages = await db.select().from(notes).where(conditionPages)
 
 	const chunks = await db
 		.select()

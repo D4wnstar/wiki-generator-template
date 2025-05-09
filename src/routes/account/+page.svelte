@@ -1,8 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte'
-	import type { LoggedUser } from '$lib/types'
-	import type { NoteContentsRow, NoteRow } from '$lib/schema'
-	import type { PageData } from '../$types'
+	import type { PageData } from './$types'
 	import { Segment } from '@skeletonlabs/skeleton-svelte'
 	import InfoChange from '$lib/components/auth/InfoChange.svelte'
 	import PasswordChange from '$lib/components/auth/PasswordChange.svelte'
@@ -10,25 +7,14 @@
 	import { enhance } from '$app/forms'
 
 	const { data }: { data: PageData } = $props()
-	const user = data.user as LoggedUser
-
 	let currTab: string = $state('info')
-	let privateNotes: NoteRow[] = $state([])
-	let privateChunks: { note_contents: NoteContentsRow | null; notes: NoteRow }[] = $state([])
-
-	onMount(async () => {
-		const res = await fetch('/api/v1/auth/fetch-secrets')
-		const data = await res.json()
-		privateNotes = res.ok ? data.pages : []
-		privateChunks = res.ok ? data.chunks : []
-	})
 </script>
 
 <svelte:head>
 	<title>Account — {data.settings.title}</title>
 </svelte:head>
 
-<div class="mx-auto flex flex-col lg:ml-20 lg:mr-0">
+<div class="mx-auto flex flex-col">
 	<h1 class="text-center type-scale-7 lg:text-left"><strong>Account</strong></h1>
 	<hr class="hr my-4" />
 	<div class="flex flex-col gap-4 lg:min-w-[800px] lg:flex-row lg:gap-0">
@@ -49,11 +35,11 @@
 			class="space-y-4 border-t-[1px] px-4 pt-4 border-surface-200-800 lg:border-l-[1px] lg:border-t-0 lg:pt-0"
 		>
 			{#if currTab === 'info'}
-				<InfoChange {user} />
+				<InfoChange user={data.user} />
 				<hr class="hr" />
 				<PasswordChange />
 			{:else if currTab === 'secrets'}
-				<AccountSecrets {privateNotes} {privateChunks} />
+				<AccountSecrets secretNotes={data.secretPages} secretChunks={data.secretChunks} />
 			{/if}
 		</div>
 	</div>

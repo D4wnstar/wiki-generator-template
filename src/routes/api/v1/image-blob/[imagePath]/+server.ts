@@ -3,11 +3,11 @@ import type { RequestHandler } from './$types'
 import { eq } from 'drizzle-orm'
 import { images } from '$lib/schema'
 
-export const GET: RequestHandler = async ({ url, locals: { db } }) => {
-	const imagePath = url.searchParams.get('image_path')
-	if (!imagePath) {
-		return json({ message: 'Missing image path' }, { status: 400 })
-	}
+export const GET: RequestHandler = async ({ params: { imagePath }, locals: { db } }) => {
+	// const imagePath = url.searchParams.get('image_path')
+	// if (!imagePath) {
+	// 	return json({ message: 'Missing image path' }, { status: 400 })
+	// }
 
 	const image = await db
 		.select({
