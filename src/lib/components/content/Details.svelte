@@ -18,8 +18,8 @@
 					{#if detail.detail_content}
 						<td class="px-1 align-text-top lg:min-w-[6em]">{@html detail.detail_name}</td>
 						<td class="px-1">{@html detail.detail_content.replaceAll(/; */g, '<br />')}</td>
-						<!-- {:else if detail.detail_name === "-"}
-                    <td colspan="2" class="text-center"><hr /></td> -->
+					{:else if detail.detail_content === ''}
+						<td colspan="2" class="pt-2 text-center"><hr class="hr" /></td>
 					{:else}
 						<td colspan="2" class="pt-2 text-center">
 							<h3 class="text-lg">{@html detail.detail_name}</h3>
