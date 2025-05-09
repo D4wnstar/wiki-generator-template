@@ -1,11 +1,11 @@
 <script lang="ts">
 	import Details from './Details.svelte'
-	import type { DetailsRow } from '$lib/schema'
+	import type { DetailsRow, SidebarImageRow } from '$lib/schema'
 	import ImageWithModal from './ImageWithModal.svelte'
 	import type { LoadedImage } from '$lib/types'
 
 	interface Props {
-		sidebarImages: LoadedImage[]
+		sidebarImages: SidebarImageRow[]
 		details: DetailsRow[]
 	}
 
@@ -15,7 +15,10 @@
 {#if sidebarImages.length > 0}
 	<div id="sidebar-images" class="space-y-6">
 		{#each sidebarImages as img}
-			<ImageWithModal svg={img.svg} url={img.url} caption={img.caption} />
+			<ImageWithModal
+				url="/api/v1/image/{encodeURIComponent(img.image_path)}"
+				caption={img.caption}
+			/>
 		{/each}
 	</div>
 

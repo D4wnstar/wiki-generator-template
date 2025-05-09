@@ -31,15 +31,11 @@
 	<hr class="hr" />
 	{#each data.contents as chunk}
 		{#if chunk.image_path}
-			{@const image = data.images.get(chunk.chunk_id)}
-			{#if image}
-				<ImageWithModal
-					url={image.url}
-					svg={image.svg}
-					caption={image.caption ?? ''}
-					baseClassesRaster="w-1/3 self-center"
-				/>
-			{/if}
+			<ImageWithModal
+				url="/api/v1/image/{encodeURIComponent(chunk.image_path)}"
+				caption={chunk.text}
+				baseClasses="w-1/3 self-center"
+			/>
 		{:else if chunk.note_transclusion_path}
 			<blockquote class="space-y-4 border-l-2 border-secondary-500 pl-4">
 				{#await fetchNoteTransclusion(chunk.note_transclusion_path) then trChunks}

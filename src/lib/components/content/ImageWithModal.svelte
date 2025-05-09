@@ -2,35 +2,25 @@
 	import { Modal } from '@skeletonlabs/skeleton-svelte'
 
 	interface Props {
-		url?: string
-		svg?: string
+		url: string
 		caption: string | null
-		baseClassesRaster?: string
-		baseClassesSvg?: string
+		baseClasses?: string
 	}
 
-	let { url, svg, caption, baseClassesRaster, baseClassesSvg }: Props = $props()
+	let { url, caption, baseClasses }: Props = $props()
 	let modalState = $state(false)
 </script>
 
-<figure class={['text-center', url && baseClassesRaster, svg && baseClassesSvg]}>
+<figure class={['text-center', url && baseClasses]}>
 	<Modal bind:open={modalState}>
 		{#snippet trigger()}
-			{#if url}
-				<img src={url} alt={caption} />
-			{:else if svg}
-				<div>{@html svg}</div>
-			{/if}
+			<img src={url} alt={caption} />
 		{/snippet}
 		{#snippet content()}
 			<figure
 				class="flex max-h-[90vh] max-w-[80vw] flex-col items-center justify-center rounded p-4 bg-surface-100-900"
 			>
-				{#if url}
-					<img src={url} alt={caption} class="max-h-[80vh] max-w-[80vw] object-contain" />
-				{:else if svg}
-					<div class="max-h-[80vh] max-w-[70vw] overflow-auto">{@html svg}</div>
-				{/if}
+				<img src={url} alt={caption} class="max-h-[80vh] max-w-[80vw] object-contain" />
 				{#if caption}
 					<hr class="hr my-4 border-surface-700-300" />
 					<figcaption class="text-center type-scale-3">

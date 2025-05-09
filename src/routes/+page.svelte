@@ -44,7 +44,7 @@
 					url={image.url}
 					svg={image.svg}
 					caption={image.caption ?? ''}
-					baseClassesRaster="w-1/3 self-center"
+					baseClasses="w-1/3 self-center"
 				/>
 			{/if}
 		{:else if chunk.note_transclusion_path}

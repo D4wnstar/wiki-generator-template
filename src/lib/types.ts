@@ -5,6 +5,4 @@ export type LoggedUser = {
 	exp: number
 }
 
-export type LoadedImage =
-	| { type: 'svg'; svg: string; url?: never; caption: string | null }
-	| { type: 'raster'; svg?: never; url: string; caption: string | null }
+export type LoadedImage = { url: string; caption: string | null }
