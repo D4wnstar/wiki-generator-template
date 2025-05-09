@@ -191,16 +191,23 @@ export type Folder = {
 export type File = {
 	type: 'file'
 	title: string
+	search_terms: string[]
 	path: string
 	slug: string
 	alt_title?: string | null | undefined
 }
 
 export function getNotesTree(
-	pages: { path: string; slug: string; title: string; alt_title: string | null }[]
+	pages: {
+		path: string
+		slug: string
+		title: string
+		search_terms: string
+		alt_title: string | null
+	}[]
 ) {
 	const files: File[] = pages.map((p) => {
-		return { ...p, type: 'file' }
+		return { ...p, type: 'file', search_terms: p.search_terms.split(';') }
 	})
 	const root: Folder = {
 		type: 'folder',

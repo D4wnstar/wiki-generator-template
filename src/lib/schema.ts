@@ -4,6 +4,10 @@ export const notes = sqliteTable('notes', {
 	path: text().primaryKey(),
 	title: text().notNull(),
 	alt_title: text(),
+	/**
+	 * Semicolon separated list
+	 */
+	search_terms: text().notNull(),
 	slug: text().notNull().unique(),
 	frontpage: int({ mode: 'boolean' }).notNull().default(false),
 	allowed_users: text(),

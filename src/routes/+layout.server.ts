@@ -13,6 +13,7 @@ export const load = (async ({ locals: { db, user } }) => {
 			path: notes.path,
 			slug: notes.slug,
 			title: notes.title,
+			search_terms: notes.search_terms,
 			alt_title: notes.alt_title
 		})
 		.from(notes)

@@ -12,11 +12,11 @@
 
 	function searchInTree(searchTerm: string, tree: Folder) {
 		let namePathPairs: { title: string; slug: string }[] = []
+		searchTerm = searchTerm.toLocaleLowerCase()
 		for (const obj of tree.children) {
 			if (
 				obj.type === 'file' &&
-				(obj.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-					obj.alt_title?.toLowerCase().includes(searchTerm.toLowerCase()))
+				obj.search_terms.some((term) => term.toLocaleLowerCase().includes(searchTerm))
 			) {
 				namePathPairs.push({ title: obj.alt_title ?? obj.title, slug: obj.slug })
 				continue
