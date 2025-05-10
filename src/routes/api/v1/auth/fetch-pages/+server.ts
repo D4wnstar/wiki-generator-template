@@ -17,5 +17,10 @@ export const GET: RequestHandler = async ({ locals: { db, user } }) => {
 		.from(notes)
 		.where(and(eq(notes.frontpage, false), authorized))
 
-	return json(pages)
+	return json(pages, {
+		headers: {
+			'cache-control': 'public, max-age=21600',
+			vary: 'cookie'
+		}
+	})
 }

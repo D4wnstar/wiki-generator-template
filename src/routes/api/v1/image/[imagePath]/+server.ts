@@ -20,8 +20,8 @@ export const GET: RequestHandler = async ({ params: { imagePath }, locals: { db 
 		if (image.svgText) {
 			return new Response(image.svgText, {
 				headers: {
-					'Content-Type': 'image/svg+xml',
-					'Cache-Control': 'public, max-age=86400'
+					'content-type': 'image/svg+xml',
+					'cache-control': 'public, max-age=86400'
 				}
 			})
 		} else if (image.blob) {

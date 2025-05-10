@@ -20,5 +20,9 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		.get()
 
 	const isUsernameAvailable = maybe_user ? false : true
-	return json(isUsernameAvailable)
+	return json(isUsernameAvailable, {
+		headers: {
+			'cache-control': 'public, max-age=300'
+		}
+	})
 }

@@ -23,5 +23,13 @@ export const GET: RequestHandler = async ({ locals: { db, user } }) => {
 		.where(conditionChunks)
 		.rightJoin(notes, eq(noteContents.note_path, notes.path))
 
-	return json({ pages, chunks })
+	return json(
+		{ pages, chunks },
+		{
+			headers: {
+				'cache-control': 'public, max-age=21600',
+				vary: 'cookie'
+			}
+		}
+	)
 }

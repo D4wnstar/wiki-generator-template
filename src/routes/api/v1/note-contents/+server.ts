@@ -14,6 +14,14 @@ export const GET: RequestHandler = async ({ url, locals: { db } }) => {
 	if (!contents) {
 		return json({ message: 'No contents found' }, { status: 404 })
 	} else {
-		return json({ message: 'Retrieved contents', contents })
+		return json(
+			{ message: 'Retrieved contents', contents },
+			{
+				headers: {
+					'cache-control': 'public, max-age=21600',
+					vary: 'cookie'
+				}
+			}
+		)
 	}
 }
