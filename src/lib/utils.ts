@@ -2,8 +2,8 @@ import { sql } from 'drizzle-orm'
 import { noteContents, notes } from './schema'
 
 /**
- * Create a Drizzle SQL object to filter by the `notes.allowed_users` columns
- * for the given username. It will check if the *full* username is among the allowed
+ * Create a Drizzle SQL object to filter by the `allowed_users` columns
+ * for the given username and table. It will check if the *full* username is among the allowed
  * ones. It avoids partial matches that a normal `LIKE` would cause (such as "Jon"
  * matching "Jonathan" despite being different users) and is also case-insensitive.
  * @param username The username to filter by

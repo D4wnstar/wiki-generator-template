@@ -162,7 +162,7 @@ export async function handlePageSlug(
 }
 
 export async function fetchNoteTransclusion(notePath: string): Promise<NoteContentsRow[]> {
-	const res = await fetch(`/api/v1/note-contents?note_path=${notePath}`)
+	const res = await fetch(`/api/v1/note-contents/${encodeURIComponent(notePath)}`)
 	const json = await res.json()
 	if (!res.ok) {
 		console.error(json.message)
