@@ -40,14 +40,6 @@ a[href^="https://"]::after
 	@apply pl-2;
 }
 
-/* #note-content em {
-	@apply text-secondary-800-200;
-}
-
-#note-content strong {
-	@apply text-primary-800-200;
-} */
-
 /* Change how anchors look */
 a.anchor {
 	@apply underline-offset-4 text-tertiary-800-200 hover:underline;

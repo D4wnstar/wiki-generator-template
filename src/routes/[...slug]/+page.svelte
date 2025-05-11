@@ -34,7 +34,7 @@
 			<ImageWithModal
 				url="/api/v1/image/{encodeURIComponent(chunk.image_path)}"
 				caption={chunk.text}
-				baseClasses="w-1/3 self-center"
+				baseClasses="max-w-[500px] self-center"
 			/>
 		{:else if chunk.note_transclusion_path}
 			<blockquote class="space-y-4 border-l-2 border-secondary-500 pl-4">
