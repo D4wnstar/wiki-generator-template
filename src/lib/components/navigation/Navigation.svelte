@@ -1,14 +1,49 @@
 <script lang="ts">
-	import type { File, Folder } from '$lib/notes'
+	import { getNotesTree, sortFolderRecursively, type Folder, type Tree } from '$lib/notes'
 	import { Popover } from '@skeletonlabs/skeleton-svelte'
 	import TreeFile from './TreeFile.svelte'
 	import TreeFolder from './TreeFolder.svelte'
+	import { onMount } from 'svelte'
+	import type { NoteRow } from '$lib/schema'
+	import { fade, slide } from 'svelte/transition'
 
-	let { topLevelContent }: { topLevelContent: (File | Folder)[] } = $props()
-
+	let root: Tree = $state([])
 	let searchQuery = $state('')
 	let popoverState = $state(false)
 	let autocompleteLinks: { title: string; slug: string }[] = $state([])
+
+	function saveExpandedStates() {
+		const states: Record<string, boolean> = {}
+		const collectStates = (items: Tree) => {
+			for (const item of items) {
+				// Save only open folders, everything else is default closed anyway
+				if (item.type === 'folder' && item.expanded) {
+					states[item.path] = item.expanded
+					collectStates(item.children)
+				}
+			}
+		}
+		collectStates(root)
+		localStorage.setItem('navOpenFolders', JSON.stringify(states))
+	}
+
+	function loadExpandedStates(content: Tree) {
+		const saved = localStorage.getItem('navOpenFolders')
+		if (!saved) return
+
+		const states: Record<string, boolean> = JSON.parse(saved)
+		const applyStates = (items: Tree) => {
+			for (const item of items) {
+				if (item.type === 'folder') {
+					if (states[item.path] !== undefined) {
+						item.expanded = states[item.path]
+					}
+					applyStates(item.children)
+				}
+			}
+		}
+		applyStates(content)
+	}
 
 	function searchInTree(searchTerm: string, tree: Folder) {
 		let namePathPairs: { title: string; slug: string }[] = []
@@ -37,11 +72,26 @@
 		autocompleteLinks = searchInTree(searchQuery, {
 			type: 'folder',
 			title: '',
-			children: topLevelContent
+			path: '',
+			children: root,
+			expanded: true
 		})
 
 		popoverState = true
 	}
+
+	onMount(async () => {
+		// Navigation content is grabbed on the fly because it should not be prerendered
+		const res = await fetch('/api/v1/auth/fetch-pages')
+		if (!res.ok) return
+		const pages = (await res.json()) as NoteRow[]
+		const tree = getNotesTree(pages)
+		sortFolderRecursively(tree)
+		root = tree.children
+		console.log($state.snapshot(tree))
+
+		loadExpandedStates(root)
+	})
 </script>
 
 <header class="text-center type-scale-5"><strong>Navigation</strong></header>
@@ -79,12 +129,14 @@
 
 <hr class="border-surface-700-300" />
 <div class="space-y-3 overflow-auto">
-	{#each topLevelContent as obj}
-		{#if obj.type === 'folder'}
-			<TreeFolder {...obj} expanded={false} />
-		{:else}
-			<TreeFile title={obj.alt_title ?? obj.title} slug={obj.slug} />
-		{/if}
+	{#each root as _, idx}
+		<div transition:slide={{ duration: 500, axis: 'y' }}>
+			{#if root[idx].type === 'folder'}
+				<TreeFolder bind:folder={root[idx]} {saveExpandedStates} />
+			{:else}
+				<TreeFile title={root[idx].alt_title ?? root[idx].title} slug={root[idx].slug} />
+			{/if}
+		</div>
 	{/each}
 </div>
 <hr class="border-surface-700-300" />

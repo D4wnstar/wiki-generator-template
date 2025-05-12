@@ -185,7 +185,9 @@ export function slugPath(path: string): string {
 export type Folder = {
 	type: 'folder'
 	title: string
-	children: (File | Folder)[]
+	path: string
+	children: Tree
+	expanded: boolean
 }
 
 export type File = {
@@ -196,6 +198,8 @@ export type File = {
 	slug: string
 	alt_title?: string | null | undefined
 }
+
+export type Tree = (File | Folder)[]
 
 export function getNotesTree(
 	pages: {
@@ -212,7 +216,9 @@ export function getNotesTree(
 	const root: Folder = {
 		type: 'folder',
 		title: 'Root',
-		children: []
+		path: '',
+		children: [],
+		expanded: true
 	}
 
 	// Go through each file
@@ -234,10 +240,14 @@ export function getNotesTree(
 
 				// If it doesn't, create it and add it to the tree
 				if (!childFolder) {
+					// File paths don't have a lead / for the root so by convention we avoid them here too
+					const path = currentFolder.path ? currentFolder.path + '/' + part : part
 					childFolder = {
 						type: 'folder',
 						title: part,
-						children: []
+						path,
+						children: [],
+						expanded: false
 					}
 					currentFolder.children.push(childFolder)
 				}

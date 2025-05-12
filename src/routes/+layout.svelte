@@ -8,27 +8,13 @@
 	import { Menu, UserCircle, X } from 'lucide-svelte'
 	import Lightswitch from '$lib/components/utils/Lightswitch.svelte'
 	import Navigation from '$lib/components/navigation/Navigation.svelte'
-	import { type NoteRow } from '$lib/schema'
-	import { type Folder, type File, getNotesTree, sortFolderRecursively } from '$lib/notes'
-	import { afterNavigate } from '$app/navigation'
 
 	let { children, data } = $props()
 
 	let drawerState = $state(false)
-	let topLevelContent: (File | Folder)[] = $state([])
 
 	const drawerOpen = () => (drawerState = true)
 	const drawerClose = () => (drawerState = false)
-
-	afterNavigate(async () => {
-		// Navigation content is grabbed on the fly because it should not be prerendered
-		const res = await fetch('/api/v1/auth/fetch-pages')
-		if (!res.ok) return
-		const pages = (await res.json()) as NoteRow[]
-		const topFolder = getNotesTree(pages)
-		sortFolderRecursively(topFolder)
-		topLevelContent = topFolder.children
-	})
 </script>
 
 <Modal
@@ -45,7 +31,7 @@
 			<button class="btn-icon-lg self-start" onclick={drawerClose}>
 				<X />
 			</button>
-			<Navigation {topLevelContent} />
+			<Navigation />
 		</div>
 	{/snippet}
 </Modal>
@@ -77,7 +63,7 @@
 	<nav
 		class="sticky top-4 hidden max-h-[85vh] w-[360px] space-y-3 self-start [@media(min-width:1200px)]:flex [@media(min-width:1200px)]:flex-col [@media(min-width:1200px)]:gap-1"
 	>
-		<Navigation {topLevelContent} />
+		<Navigation />
 	</nav>
 
 	{@render children()}
