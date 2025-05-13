@@ -31,7 +31,7 @@
 		{/snippet}
 	</Modal>
 	{#if caption}
-		<figcaption class="mt-4 rounded border-2 border-secondary-900 px-4 py-1">
+		<figcaption class="mt-4 rounded border-2 border-secondary-900 px-4 py-1 text-center">
 			{@html caption}
 		</figcaption>
 	{/if}
