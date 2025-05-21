@@ -5,7 +5,9 @@
 	import TreeFolder from './TreeFolder.svelte'
 	import { onMount } from 'svelte'
 	import type { NoteRow } from '$lib/schema'
-	import { fade, slide } from 'svelte/transition'
+	import { slide } from 'svelte/transition'
+
+	let { animate = true }: { animate?: boolean } = $props()
 
 	let root: Tree = $state([])
 	let searchQuery = $state('')
@@ -128,9 +130,9 @@
 </Popover>
 
 <hr class="border-surface-700-300" />
-<div class="space-y-3 overflow-auto">
+<div class="overflow-auto">
 	{#each root as _, idx}
-		<div transition:slide={{ duration: 500, axis: 'y' }}>
+		<div transition:slide={{ duration: animate ? 500 : 0, axis: 'y' }}>
 			{#if root[idx].type === 'folder'}
 				<TreeFolder bind:folder={root[idx]} {saveExpandedStates} />
 			{:else}

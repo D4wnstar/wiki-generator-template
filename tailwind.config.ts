@@ -39,6 +39,7 @@ export default {
 		'break-words',
 		'blockquote',
 		'table-cell',
+		'code',
 		// For lists
 		'list-outside',
 		'list-disc',
