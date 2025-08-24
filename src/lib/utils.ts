@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm'
-import { noteContents, notes } from './schema'
+import { notes } from './schema'
 
 /**
  * Create a Drizzle SQL object to filter by the `allowed_users` columns
@@ -14,7 +14,8 @@ export function getAllowedUsersFilter(username: string, table: 'notes' | 'noteCo
 	// Fetch only pages which list the FULL username in the semicolon separated list
 	// or if the only allowed user is the current user
 	username = username.toLowerCase()
-	const noteTable = table === 'notes' ? notes : noteContents
+	// const noteTable = table === 'notes' ? notes : noteContents
+	const noteTable = notes
 	// Query does not appear to work without using sql.raw on the username. Not sure why but needs to be fixed
 	return sql`'; ' || LOWER(${noteTable.allowed_users}) || ';' LIKE '%; ${sql.raw(username)};%' OR LOWER(${noteTable.allowed_users}) = '${sql.raw(username)}'`
 }

@@ -90,7 +90,6 @@
 		const tree = getNotesTree(pages)
 		sortFolderRecursively(tree)
 		root = tree.children
-		console.log($state.snapshot(tree))
 
 		loadExpandedStates(root)
 	})

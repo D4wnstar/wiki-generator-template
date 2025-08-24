@@ -39,7 +39,7 @@
 				<hr class="hr" />
 				<PasswordChange />
 			{:else if currTab === 'secrets'}
-				<AccountSecrets secretNotes={data.secretPages} secretChunks={data.secretChunks} />
+				<AccountSecrets secretNotes={data.secretPages} />
 			{/if}
 		</div>
 	</div>

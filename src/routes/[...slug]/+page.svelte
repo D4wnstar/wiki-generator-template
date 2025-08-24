@@ -2,13 +2,12 @@
 	import Breadcrumbs from '$lib/components/content/Breadcrumbs.svelte'
 	import Extras from '$lib/components/content/Extras.svelte'
 	import ImageWithModal from '$lib/components/content/ImageWithModal.svelte'
-	import { fetchNoteTransclusion } from '$lib/notes'
-	import { EyeOff } from 'lucide-svelte'
+	import { mount, unmount } from 'svelte'
 
 	let { data } = $props()
 
-	const pageTitle = $derived(data.note.alt_title ?? data.note.title)
-	const headTitle = $derived(`${pageTitle} - ${data.settings.title}`)
+	let pageTitle = $derived(data.note.alt_title ?? data.note.title)
+	let headTitle = $derived(`${pageTitle} - ${data.settings.title}`)
 
 	// Get breadcrumbs while respecting alt titles
 	let breadcrumbs = $derived.by(() => {
@@ -17,49 +16,101 @@
 		crumbs[crumbs.length - 1] = lastElem
 		return crumbs
 	})
+
+	// Store references to event listeners for cleanup
+	let eventListeners: Array<{ element: HTMLElement; handler: EventListener }> = []
+
+	function initializeCollapsibleCallouts() {
+		// Clean up existing event listeners
+		eventListeners.forEach(({ element, handler }) => element.removeEventListener('click', handler))
+		eventListeners = []
+
+		// Add event listeners to all collapsible callouts
+		document.querySelectorAll('.callout.is-collapsible').forEach((callout) => {
+			const title = callout.querySelector('.callout-title') as HTMLElement | null
+			const content = callout.querySelector('.callout-content') as HTMLElement | null
+			const fold = callout.querySelector('.callout-fold') as HTMLElement | null
+			const svg = fold?.querySelector('svg') as SVGElement | null
+
+			if (title && content) {
+				content.style.display = callout.classList.contains('is-collapsed') ? 'none' : 'block'
+
+				const clickHandler: EventListener = () => {
+					callout.classList.toggle('is-collapsed')
+
+					const isNowCollapsed = callout.classList.contains('is-collapsed')
+					content.style.display = isNowCollapsed ? 'none' : 'block'
+
+					// Rotate SVG icon if it exists
+					if (svg) {
+						svg.style.transform = isNowCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)'
+					}
+				}
+
+				// Store event listener reference for cleanup
+				eventListeners.push({ element: title, handler: clickHandler })
+				title.addEventListener('click', clickHandler)
+			}
+		})
+	}
+
+	function initializeImageModals() {
+		document.querySelectorAll('#content img').forEach((el) => {
+			const img = el as HTMLImageElement
+			const url = img.src
+			const caption = img.alt ?? null
+			const classes = img.className ?? undefined
+			const width = img.getAttribute('width') ?? undefined
+
+			// Create a temporary and mount the component
+			const tempContainer = document.createElement('div')
+			mount(ImageWithModal, {
+				target: tempContainer,
+				props: {
+					url,
+					caption,
+					baseClasses: classes,
+					width
+				}
+			})
+
+			// Replace the image with the component
+			const fragment = document.createDocumentFragment()
+			while (tempContainer.firstChild) {
+				fragment.appendChild(tempContainer.firstChild)
+			}
+			img.parentNode?.replaceChild(fragment, img)
+		})
+	}
+
+	// Update page content every time it changes
+	$effect(() => {
+		data.note.html_content
+		initializeCollapsibleCallouts()
+		initializeImageModals()
+		//@ts-expect-error provided by the global mermaid script
+		mermaid.run()
+	})
 </script>
 
 <svelte:head>
 	<title>{headTitle}</title>
 </svelte:head>
 
-<main id="note-content" class="mx-auto flex max-w-3xl flex-col space-y-4 lg:grow lg:px-8">
+<main class="mx-auto flex max-w-3xl flex-col space-y-6 lg:grow lg:px-8">
 	<div class="hidden w-full overflow-y-hidden overflow-x-scroll lg:block">
 		<Breadcrumbs {breadcrumbs} />
 	</div>
 	<h1 class="h1 text-center">{pageTitle}</h1>
 	<hr class="hr" />
-	{#each data.contents as chunk}
-		{#if chunk.image_path}
-			<ImageWithModal
-				url="/api/v1/image/{encodeURIComponent(chunk.image_path)}"
-				caption={chunk.text}
-				baseClasses="max-w-[500px] self-center"
-			/>
-		{:else if chunk.note_transclusion_path}
-			<blockquote class="space-y-4 border-l-2 border-secondary-500 pl-4">
-				{#await fetchNoteTransclusion(chunk.note_transclusion_path) then trChunks}
-					{#each trChunks as trChunk}
-						{@html trChunk.text}
-					{/each}
-				{/await}
-			</blockquote>
-		{:else if chunk.allowed_users}
-			<section class="space-y-2 rounded !bg-opacity-50 px-4 py-2 bg-surface-300-700">
-				<header class="flex gap-3">
-					<EyeOff />
-					<span><strong>Secret</strong></span>
-				</header>
-				{@html chunk.text}
-			</section>
-		{:else}
-			{@html chunk.text}
-		{/if}
-	{/each}
+	<article id="content" class="space-y-4">
+		{@html data.note.html_content}
+	</article>
 	<hr class="hr" />
 </main>
-<div class="hidden w-[360px] [@media(min-width:1400px)]:block">
+
+<aside class="hidden w-[360px] [@media(min-width:1400px)]:block">
 	{#if data.sidebarImages.length > 0 || data.details.length > 0}
 		<Extras sidebarImages={data.sidebarImages} details={data.details} />
 	{/if}
-</div>
+</aside>

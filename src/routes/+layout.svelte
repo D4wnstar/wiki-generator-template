@@ -1,9 +1,6 @@
 <script lang="ts">
 	import '../app.css'
 	import '../prism-night-owl.css'
-	// import '../prism-line-numbers.css'
-	import '../rehype-callouts.css'
-	import '../katex.css'
 	import { AppBar, Modal } from '@skeletonlabs/skeleton-svelte'
 	import { Menu, UserCircle, X } from 'lucide-svelte'
 	import Lightswitch from '$lib/components/utils/Lightswitch.svelte'

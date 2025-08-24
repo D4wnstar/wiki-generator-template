@@ -1,12 +1,13 @@
 import { TURSO_AUTH_TOKEN, TURSO_URL } from '$env/static/private'
-import { handlePageSlug } from '$lib/notes'
+import { handlePageSlug } from '$lib/loading'
 import { drizzle } from 'drizzle-orm/libsql'
 import type { EntryGenerator, PageServerLoad } from './$types'
 import { notes } from '$lib/schema'
 import { eq } from 'drizzle-orm'
 
 export const load = (async ({ locals: { db, user }, params: { slug } }) => {
-	return await handlePageSlug(db, user, slug)
+	const page = await handlePageSlug(db, user, slug)
+	return { user, ...page }
 }) satisfies PageServerLoad
 
 export const prerender = 'auto'

@@ -13,7 +13,8 @@ export const notes = sqliteTable('notes', {
 	allowed_users: text(),
 	hash: text().notNull(),
 	last_updated: int().notNull(),
-	can_prerender: int({ mode: 'boolean' }).notNull()
+	can_prerender: int({ mode: 'boolean' }).notNull(),
+	html_content: text().notNull()
 })
 
 export const images = sqliteTable('images', {
@@ -24,17 +25,6 @@ export const images = sqliteTable('images', {
 	hash: text().notNull(),
 	last_updated: int().notNull(),
 	compressed: int({ mode: 'boolean' }).notNull()
-})
-
-export const noteContents = sqliteTable('note_contents', {
-	note_path: text()
-		.references((): AnySQLiteColumn => notes.path)
-		.primaryKey(),
-	chunk_id: int().primaryKey(),
-	text: text().notNull(),
-	allowed_users: text(),
-	image_path: text().references((): AnySQLiteColumn => images.path),
-	note_transclusion_path: text().references((): AnySQLiteColumn => notes.path)
 })
 
 export const details = sqliteTable('details', {
@@ -73,7 +63,6 @@ export const users = sqliteTable('users', {
 /* TYPES */
 export type NoteRow = typeof notes.$inferInsert
 export type ImageRow = typeof images.$inferInsert
-export type NoteContentsRow = typeof noteContents.$inferSelect
 export type DetailsRow = typeof details.$inferSelect
 export type SidebarImageRow = typeof sidebarImages.$inferSelect
 export type WikiSettingsRow = typeof wikiSettings.$inferSelect

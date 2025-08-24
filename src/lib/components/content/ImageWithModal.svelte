@@ -5,16 +5,17 @@
 		url: string
 		caption: string | null
 		baseClasses?: string
+		width?: string
 	}
 
-	let { url, caption, baseClasses }: Props = $props()
+	let { url, caption, baseClasses, width }: Props = $props()
 	let modalState = $state(false)
 </script>
 
 <figure class={['text-center', url && baseClasses]}>
 	<Modal bind:open={modalState}>
 		{#snippet trigger()}
-			<img src={url} alt={caption} />
+			<img src={url} alt={caption} {width} />
 		{/snippet}
 		{#snippet content()}
 			<figure
@@ -31,8 +32,17 @@
 		{/snippet}
 	</Modal>
 	{#if caption}
-		<figcaption class="mt-4 rounded border-2 border-secondary-900 px-4 py-1 text-center">
+		<figcaption
+			class="mx-auto mb-8 self-center border-b-2 border-l-0 border-b-surface-500 pb-1"
+			style="width: {width}px;"
+		>
 			{@html caption}
 		</figcaption>
 	{/if}
 </figure>
+
+<!--
+img + blockquote {
+    @apply mx-16 -mt-4 mb-8 border-b-2 border-l-0 border-b-surface-500 pb-1 text-center;
+}
+-->
