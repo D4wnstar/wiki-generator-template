@@ -32,7 +32,7 @@ a[href^="https://"]::after
 }
 
 /* Styles for prerendered HTML */
-#content {
+.pre-html {
 	* {
 		@apply break-words;
 	}

@@ -23,7 +23,7 @@
 			>
 				<img src={url} alt={caption} class="max-h-[80vh] max-w-[80vw] object-contain" />
 				{#if caption}
-					<hr class="hr my-4 border-surface-700-300" />
+					<hr class="hr my-4 border-surface-500" />
 					<figcaption class="text-center type-scale-3">
 						{@html caption}
 					</figcaption>
@@ -33,16 +33,10 @@
 	</Modal>
 	{#if caption}
 		<figcaption
-			class="mx-auto mb-8 self-center border-b-2 border-l-0 border-b-surface-500 pb-1"
+			class="pre-html mx-auto mb-8 self-center border-b-2 border-l-0 border-b-surface-500 pb-1"
 			style="width: {width}px;"
 		>
 			{@html caption}
 		</figcaption>
 	{/if}
 </figure>
-
-<!--
-img + blockquote {
-    @apply mx-16 -mt-4 mb-8 border-b-2 border-l-0 border-b-surface-500 pb-1 text-center;
-}
--->

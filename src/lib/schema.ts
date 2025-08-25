@@ -32,8 +32,8 @@ export const details = sqliteTable('details', {
 		.references((): AnySQLiteColumn => notes.path)
 		.primaryKey(),
 	order: int().notNull(),
-	detail_name: text().notNull().primaryKey(),
-	detail_content: text()
+	key: text().primaryKey(),
+	value: text()
 })
 
 export const sidebarImages = sqliteTable('sidebar_images', {

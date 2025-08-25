@@ -103,7 +103,7 @@
 	</div>
 	<h1 class="h1 text-center">{pageTitle}</h1>
 	<hr class="hr" />
-	<article id="content" class="space-y-4">
+	<article id="content" class="pre-html space-y-4">
 		{@html data.note.html_content}
 	</article>
 	<hr class="hr" />

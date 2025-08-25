@@ -12,19 +12,19 @@
 <div id="details" class="space-y-2">
 	<h3 class="h3"><Library class="inline" /> Details</h3>
 	<table class="w-full">
-		<tbody>
+		<tbody class="pre-html">
 			{#each details as detail}
 				<tr>
-					{#if detail.detail_content}
-						<td class="px-1 align-text-top lg:min-w-[6em]">{@html detail.detail_name}</td>
-						<td class="px-1">{@html detail.detail_content.replaceAll(/; */g, '<br />')}</td>
-					{:else if detail.detail_content === ''}
-						<td colspan="2" class="pt-2 text-center"><hr class="hr" /></td>
-					{:else}
+					{#if detail.value}
+						<td class="px-1 align-text-top lg:min-w-[6em]">{@html detail.key}</td>
+						<td class="px-1">{@html detail.value}</td>
+					{:else if detail.key}
 						<td colspan="2" class="pt-2 text-center">
-							<h3 class="text-lg">{@html detail.detail_name}</h3>
-							<hr class="pb-2 border-surface-700-300" />
+							<header class="text-lg">{@html detail.key}</header>
+							<hr class="mt-1 pb-2 border-surface-700-300" />
 						</td>
+					{:else}
+						<td colspan="2" class="py-2 text-center"><hr class="hr" /></td>
 					{/if}
 				</tr>
 			{/each}
