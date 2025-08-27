@@ -6,7 +6,7 @@ import { notes } from '$lib/schema'
 import { eq } from 'drizzle-orm'
 
 export const load = (async ({ locals: { db, user }, params: { slug } }) => {
-	const page = await handlePageSlug(db, user, slug)
+	const page = await handlePageSlug(db, user, encodeURIComponent(slug))
 	return { user, ...page }
 }) satisfies PageServerLoad
 
@@ -21,7 +21,7 @@ export const entries: EntryGenerator = async () => {
 
 	const prerenderableSlugs = await db
 		.select({
-			slug: notes.slug
+			slug: notes.route
 		})
 		.from(notes)
 		.where(eq(notes.can_prerender, true))

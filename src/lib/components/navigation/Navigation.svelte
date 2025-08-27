@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getNotesTree, sortFolderRecursively, type Folder, type Tree } from '$lib/notes'
+	import { createNavTree, sortFolderRecursively, type Folder, type Tree } from '$lib/notes'
 	import { Popover } from '@skeletonlabs/skeleton-svelte'
 	import TreeFile from './TreeFile.svelte'
 	import TreeFolder from './TreeFolder.svelte'
@@ -12,7 +12,7 @@
 	let root: Tree = $state([])
 	let searchQuery = $state('')
 	let popoverState = $state(false)
-	let autocompleteLinks: { title: string; slug: string }[] = $state([])
+	let autocompleteLinks: { title: string; route: string }[] = $state([])
 
 	function saveExpandedStates() {
 		const states: Record<string, boolean> = {}
@@ -48,14 +48,14 @@
 	}
 
 	function searchInTree(searchTerm: string, tree: Folder) {
-		let namePathPairs: { title: string; slug: string }[] = []
+		let namePathPairs: { title: string; route: string }[] = []
 		searchTerm = searchTerm.toLocaleLowerCase()
 		for (const obj of tree.children) {
 			if (
 				obj.type === 'file' &&
 				obj.search_terms.some((term) => term.toLocaleLowerCase().includes(searchTerm))
 			) {
-				namePathPairs.push({ title: obj.alt_title ?? obj.title, slug: obj.slug })
+				namePathPairs.push({ title: obj.alt_title ?? obj.title, route: obj.route })
 				continue
 			}
 
@@ -87,7 +87,7 @@
 		const res = await fetch('/api/v1/auth/fetch-pages')
 		if (!res.ok) return
 		const pages = (await res.json()) as NoteRow[]
-		const tree = getNotesTree(pages)
+		const tree = createNavTree(pages)
 		sortFolderRecursively(tree)
 		root = tree.children
 
@@ -95,7 +95,7 @@
 	})
 </script>
 
-<header class="text-center type-scale-5"><strong>Navigation</strong></header>
+<header class="text-center type-scale-5"><b>Navigation</b></header>
 <hr class="border-surface-700-300" />
 
 <Popover
@@ -120,7 +120,7 @@
 	{#snippet content()}
 		<div class="flex w-full flex-col items-start space-y-2">
 			{#each autocompleteLinks as link}
-				<a class="btn block w-full text-left hover:bg-surface-200-800" href={`/${link.slug}`}
+				<a class="btn block w-full text-left hover:bg-surface-200-800" href={`/${link.route}`}
 					>{link.title}</a
 				>
 			{/each}
@@ -135,7 +135,7 @@
 			{#if root[idx].type === 'folder'}
 				<TreeFolder bind:folder={root[idx]} {saveExpandedStates} />
 			{:else}
-				<TreeFile title={root[idx].alt_title ?? root[idx].title} slug={root[idx].slug} />
+				<TreeFile title={root[idx].alt_title ?? root[idx].title} route={root[idx].route} />
 			{/if}
 		</div>
 	{/each}

@@ -2,7 +2,7 @@
 	import Breadcrumbs from '$lib/components/content/Breadcrumbs.svelte'
 	import Extras from '$lib/components/content/Extras.svelte'
 	import ImageWithModal from '$lib/components/content/ImageWithModal.svelte'
-	import { mount, unmount } from 'svelte'
+	import { mount } from 'svelte'
 
 	let { data } = $props()
 
@@ -21,10 +21,6 @@
 	let eventListeners: Array<{ element: HTMLElement; handler: EventListener }> = []
 
 	function initializeCollapsibleCallouts() {
-		// Clean up existing event listeners
-		eventListeners.forEach(({ element, handler }) => element.removeEventListener('click', handler))
-		eventListeners = []
-
 		// Add event listeners to all collapsible callouts
 		document.querySelectorAll('.callout.is-collapsible').forEach((callout) => {
 			const title = callout.querySelector('.callout-title') as HTMLElement | null
@@ -62,7 +58,13 @@
 			const classes = img.className ?? undefined
 			const width = img.getAttribute('width') ?? undefined
 
-			// Create a temporary and mount the component
+			// Check if image already has a modal wrapper to avoid duplication
+			const parent = img.parentNode as Element | null
+			if (parent?.classList?.contains('image-with-modal-wrapper')) {
+				return
+			}
+
+			// Create a temporary element and mount the component
 			const tempContainer = document.createElement('div')
 			mount(ImageWithModal, {
 				target: tempContainer,
@@ -90,6 +92,14 @@
 		initializeImageModals()
 		//@ts-expect-error provided by the global mermaid script
 		mermaid.run()
+
+		// Clean up event listeners each effect and when component unmounts
+		return () => {
+			eventListeners.forEach(({ element, handler }) =>
+				element.removeEventListener('click', handler)
+			)
+			eventListeners = []
+		}
 	})
 </script>
 
@@ -104,7 +114,9 @@
 	<h1 class="h1 text-center">{pageTitle}</h1>
 	<hr class="hr" />
 	<article id="content" class="pre-html space-y-4">
-		{@html data.note.html_content}
+		{#key data.note.html_content}
+			{@html data.note.html_content}
+		{/key}
 	</article>
 	<hr class="hr" />
 </main>

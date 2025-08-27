@@ -18,21 +18,17 @@ import { error } from '@sveltejs/kit'
  * Meant to be used in the page.server.ts load function.
  * @param db A Drizzle LibSQLDatabase instance
  * @param user The currently logged-in user, if any
- * @param slug The slug of the page to handle. Leave undefined for the front page
+ * @param route The route of the page to handle. Leave undefined for the front page
  * @returns The page data and its content
  */
 export async function handlePageSlug(
 	db: LibSQLDatabase,
 	user: LoggedUser | null,
-	slug: string | undefined = undefined
+	route: string | undefined = undefined
 ) {
-	// const isUserAllowed = user ? getAllowedUsersFilter(user.username, 'notes') : undefined
-	const isUserAllowedChunks = user
-		? getAllowedUsersFilter(user.username, 'noteContents')
-		: undefined
-
-	// Current page must match the URL slug or be the frontpage, depending on how the function is called
-	const pageCondition = slug ? eq(notes.slug, slug) : eq(notes.frontpage, true)
+	// Find page based on route or be frontpage flag
+	const pageCondition = route ? eq(notes.route, route) : eq(notes.frontpage, true)
+	const isUserAllowed = user ? getAllowedUsersFilter(user.username, 'notes') : undefined
 
 	const rows = await db
 		.select()
@@ -40,13 +36,8 @@ export async function handlePageSlug(
 		.leftJoin(details, eq(notes.path, details.note_path))
 		.leftJoin(sidebarImages, eq(notes.path, sidebarImages.note_path))
 		.where(
-			and(
-				pageCondition,
-				// The user must either need no permission or be allowed in the page
-				// or(isNull(notes.allowed_users), isUserAllowed),
-				// and in each individual chunk
-				or(isNull(notes.allowed_users), isUserAllowedChunks)
-			)
+			// The user must either need no permission or be allowed in the page
+			and(pageCondition, or(isNull(notes.allowed_users), isUserAllowed))
 		)
 	if (rows.length === 0) {
 		error(404, 'Could not find this page. Are you sure you have the right link?')
