@@ -37,8 +37,7 @@ export function createNavTree(pages: NoteRow[]) {
 			search_terms: p.search_terms.split(';').map((t) => t.trim()),
 			path: p.path,
 			route: p.route,
-			title: p.title,
-			alt_title: p.alt_title ?? null
+			title: p.title
 		}
 	})
 

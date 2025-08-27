@@ -6,13 +6,12 @@
 
 	let { data } = $props()
 
-	let pageTitle = $derived(data.note.alt_title ?? data.note.title)
-	let headTitle = $derived(`${pageTitle} - ${data.settings.title}`)
+	let headTitle = $derived(`${data.note.title} - ${data.settings.title}`)
 
 	// Get breadcrumbs while respecting alt titles
 	let breadcrumbs = $derived.by(() => {
 		const crumbs = data.note.path.split('/')
-		const lastElem = data.note.alt_title ?? crumbs[crumbs.length - 1].replace(/\.md$/, '')
+		const lastElem = crumbs[crumbs.length - 1].replace(/\.md$/, '')
 		crumbs[crumbs.length - 1] = lastElem
 		return crumbs
 	})
@@ -111,7 +110,7 @@
 	<div class="hidden w-full overflow-y-hidden overflow-x-scroll lg:block">
 		<Breadcrumbs {breadcrumbs} />
 	</div>
-	<h1 class="h1 text-center">{pageTitle}</h1>
+	<h1 class="h1 text-center">{data.note.title}</h1>
 	<hr class="hr" />
 	<article id="content" class="pre-html space-y-4">
 		{#key data.note.html_content}

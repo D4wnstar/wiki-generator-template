@@ -2,7 +2,7 @@
 	import Extras from '$lib/components/content/Extras.svelte'
 
 	let { data } = $props()
-	const pageTitle = $derived(data.note.alt_title ?? data.note.title)
+	const pageTitle = $derived(data.note.title)
 	const headTitle = $derived(`${pageTitle} - ${data.settings.title}`)
 </script>
 

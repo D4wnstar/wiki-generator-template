@@ -4,7 +4,7 @@ export const notes = sqliteTable('notes', {
 	path: text().primaryKey(),
 	route: text().notNull().unique(),
 	title: text().notNull(),
-	alt_title: text(),
+	// alt_title: text(),
 	/**
 	 * Semicolon separated list
 	 */

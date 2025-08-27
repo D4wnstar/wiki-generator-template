@@ -20,21 +20,11 @@
 			<h3 class="h3 mb-2">Secret pages</h3>
 			{#each secretNotes as note}
 				<li class="list-inside list-disc pl-4">
-					<a href={`/${note.slug}`} class="underline hover:underline lg:no-underline"
-						>{note.alt_title ?? note.title}</a
+					<a href={`/wiki/${note.route}`} class="underline hover:underline lg:no-underline"
+						>{note.title}</a
 					>
 				</li>
 			{/each}
 		{/if}
-		<!-- {#if secretChunks.length > 0}
-			<h3 class="h3 mb-2 mt-2">Pages with secret sections</h3>
-			{#each secretChunks as chunk}
-				<li class="list-inside list-disc pl-4">
-					<a href={`/${chunk.notes.slug}`} class="underline hover:underline lg:no-underline"
-						>{chunk.notes.alt_title ?? chunk.notes.title}</a
-					>
-				</li>
-			{/each}
-		{/if} -->
 	</ul>
 </div>
