@@ -11,8 +11,7 @@
 	// Get breadcrumbs while respecting alt titles
 	let breadcrumbs = $derived.by(() => {
 		const crumbs = data.note.path.split('/')
-		const lastElem = crumbs[crumbs.length - 1].replace(/\.md$/, '')
-		crumbs[crumbs.length - 1] = lastElem
+		crumbs[crumbs.length - 1] = data.note.title
 		return crumbs
 	})
 
