@@ -4,6 +4,8 @@
 	import ImageWithModal from '$lib/components/content/ImageWithModal.svelte'
 	import { mount } from 'svelte'
 
+	// This file and the front page one should always be synced
+
 	let { data } = $props()
 
 	let headTitle = $derived(`${data.note.title} - ${data.settings.title}`)
@@ -52,7 +54,7 @@
 		document.querySelectorAll('#content img').forEach((el) => {
 			const img = el as HTMLImageElement
 			const url = img.src
-			const caption = img.alt ?? null
+			const caption = img.getAttribute('data-caption') ?? ''
 			const classes = img.className ?? undefined
 			const width = img.getAttribute('width') ?? undefined
 
