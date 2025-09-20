@@ -12,10 +12,10 @@
 	let modalState = $state(false)
 </script>
 
-<figure class={['text-center', url && baseClasses]}>
+<figure class={['py-4 text-center', url && baseClasses]}>
 	<Modal bind:open={modalState}>
 		{#snippet trigger()}
-			<img src={url} alt={caption} {width} />
+			<img src={url} alt={caption} {width} class="max-h-[500px]" />
 		{/snippet}
 		{#snippet content()}
 			<figure
@@ -33,7 +33,7 @@
 	</Modal>
 	{#if caption}
 		<figcaption
-			class="pre-html mx-auto mb-8 self-center border-b-2 border-l-0 border-b-surface-500 pb-1"
+			class="pre-html mx-auto self-center border-b-2 border-l-0 border-b-surface-500 pb-1"
 			style="width: {width}px;"
 		>
 			{@html caption}

@@ -120,8 +120,10 @@
 	{#snippet content()}
 		<div class="flex w-full flex-col items-start space-y-2">
 			{#each autocompleteLinks as link}
-				<a class="btn block w-full text-left hover:bg-surface-200-800" href={`/${link.route}`}
-					>{link.title}</a
+				<a
+					class="btn block w-full text-left hover:bg-surface-200-800"
+					href={`/wiki/${link.route}`}
+					onclick={() => (searchQuery = '')}>{link.title}</a
 				>
 			{/each}
 		</div>
