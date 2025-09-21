@@ -9,7 +9,7 @@
 	import { Popover } from '@skeletonlabs/skeleton-svelte'
 	import TreeFile from './TreeFile.svelte'
 	import TreeFolder from './TreeFolder.svelte'
-	import { onMount } from 'svelte'
+	import { onDestroy, onMount } from 'svelte'
 	import { browser } from '$app/environment'
 	import { API } from '$lib/api'
 
@@ -25,39 +25,46 @@
 	sortFolderRecursively(tree)
 	root = tree.children
 
-	onMount(() => {
+	onMount(async () => {
 		loadExpandedStates(root)
 
 		// Listen for login events if the wiki permits it
 		if (!browser || !allowLogins) return
 
-		// Reset tree with secret pages on login
-		const handleLogin = async () => {
-			const secrets = await API.secretPages()
-			if (secrets.length > 0) {
-				const tree = createNavTree([...pages, ...secrets])
-				sortFolderRecursively(tree)
-				root = tree.children
-				loadExpandedStates(root)
-			}
-		}
+		const secrets = await API.secretPages()
+		const tree = createNavTree([...pages, ...secrets])
+		sortFolderRecursively(tree)
+		root = tree.children
+		loadExpandedStates(root)
 
-		// Reset tree with no secrets on logout
-		const handleLogout = () => {
-			const tree = createNavTree(pages)
+		window.addEventListener('userLogin', handleLogin)
+		window.addEventListener('userLogout', handleLogout)
+	})
+
+	onDestroy(() => {
+		if (!browser || !allowLogins) return
+		window.removeEventListener('userLogin', handleLogin)
+		window.removeEventListener('userLogout', handleLogout)
+	})
+
+	// Reset tree with secret pages on login
+	async function handleLogin() {
+		const secrets = await API.secretPages()
+		if (secrets.length > 0) {
+			const tree = createNavTree([...pages, ...secrets])
 			sortFolderRecursively(tree)
 			root = tree.children
 			loadExpandedStates(root)
 		}
+	}
 
-		window.addEventListener('userLogin', handleLogin)
-		window.addEventListener('userLogout', handleLogout)
-
-		return () => {
-			window.removeEventListener('userLogin', handleLogin)
-			window.removeEventListener('userLogout', handleLogout)
-		}
-	})
+	// Reset tree with no secrets on logout
+	function handleLogout() {
+		const tree = createNavTree(pages)
+		sortFolderRecursively(tree)
+		root = tree.children
+		loadExpandedStates(root)
+	}
 
 	function saveExpandedStates() {
 		if (!browser) return
