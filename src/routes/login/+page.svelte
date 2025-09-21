@@ -44,7 +44,7 @@
 		loadingUsername = true
 
 		debounceTimer = setTimeout(async () => {
-			const res = await fetch(`/api/v1/auth/user?username=${username}`)
+			const res = await fetch(`/api/auth/user?username=${username}`)
 			isUsernameAvailable = await res.json()
 			loadingUsername = false
 		}, 500)

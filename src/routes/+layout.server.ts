@@ -10,7 +10,7 @@ export const load = (async ({ locals: { db, user }, fetch }) => {
 	}
 
 	// Get page metadata for the navbar
-	const res = await fetch('/api/v1/public-pages')
+	const res = await fetch('/api/public-pages')
 	let pages: NoteMeta[] = []
 	if (res.ok) {
 		pages = (await res.json()) as NoteMeta[]

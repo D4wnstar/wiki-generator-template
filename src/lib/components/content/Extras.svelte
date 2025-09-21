@@ -15,10 +15,7 @@
 {#if sidebarImages.length > 0}
 	<div id="sidebar-images" class="space-y-6">
 		{#each sidebarImages as img}
-			<ImageWithModal
-				url="/api/v1/image/{encodeURIComponent(img.image_path)}"
-				caption={img.caption}
-			/>
+			<ImageWithModal url="/api/image/{encodeURIComponent(img.image_path)}" caption={img.caption} />
 		{/each}
 	</div>
 

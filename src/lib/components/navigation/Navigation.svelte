@@ -32,7 +32,7 @@
 
 		// Reset tree with secret pages on login
 		const handleLogin = async () => {
-			const res = await fetch('/api/v1/auth/secret-pages')
+			const res = await fetch('/api/auth/secret-pages')
 			if (res.ok) {
 				const noteMeta = (await res.json()) as NoteMeta[]
 				const tree = createNavTree([...pages, ...noteMeta])

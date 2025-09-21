@@ -5,7 +5,7 @@ import type { NoteMeta } from '$lib/notes'
 export const load = (async ({ locals: { user }, fetch }) => {
 	if (!user) redirect(303, '/login')
 
-	const res = await fetch('/api/v1/auth/secret-pages')
+	const res = await fetch('/api/auth/secret-pages')
 	const secretPages = (await res.json()) as NoteMeta[]
 	return { user, secretPages }
 }) satisfies PageServerLoad

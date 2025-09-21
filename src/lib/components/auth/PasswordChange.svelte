@@ -33,7 +33,7 @@
 		const areCredsValid = checkCredentialValidity()
 		if (!areCredsValid) return
 
-		const res = await fetch('/api/v1/auth/update-password', {
+		const res = await fetch('/api/auth/update-password', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
