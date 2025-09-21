@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { API } from '$lib/api'
 	import { usernameRules } from '$lib/auth'
 	import type { LoggedUser } from '$lib/types'
 
@@ -37,8 +38,7 @@
 				return
 			}
 
-			const res = await fetch(`/api/auth/user?username=${username}`)
-			isUsernameAvailable = await res.json()
+			isUsernameAvailable = await API.usernameAvailable(username)
 			loadingUsername = false
 		}, 500)
 	}
@@ -64,15 +64,8 @@
 		const areCredsValid = checkCredentialValidity()
 		if (!areCredsValid) return
 
-		const res = await fetch('/api/auth/update-username', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ username })
-		})
+		const res = await API.updateUsername(username)
 		if (!res.ok) {
-			// console.error(res.name, res.message, res.cause, res.status)
 			const data = await res.json()
 			responseMessage = `Failed to update username. ${data.message}`
 			responseColor = 'error'

@@ -5,6 +5,7 @@
 	import { UserPlus, User } from 'lucide-svelte'
 	import { enhance } from '$app/forms'
 	import type { SubmitFunction } from '@sveltejs/kit'
+	import { API } from '$lib/api'
 
 	let { data, form }: { data: PageData; form: ActionData } = $props()
 
@@ -44,8 +45,7 @@
 		loadingUsername = true
 
 		debounceTimer = setTimeout(async () => {
-			const res = await fetch(`/api/auth/user?username=${username}`)
-			isUsernameAvailable = await res.json()
+			isUsernameAvailable = await API.usernameAvailable(username)
 			loadingUsername = false
 		}, 500)
 	}

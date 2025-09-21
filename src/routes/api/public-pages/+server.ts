@@ -4,13 +4,6 @@ import type { RequestHandler } from './$types'
 import { json } from '@sveltejs/kit'
 
 export const GET: RequestHandler = async ({ locals: { db } }) => {
-	// let authorized
-	// if (user) {
-	// 	authorized = or(isNull(notes.allowed_users), getAllowedUsersFilter(user.username, 'notes'))
-	// } else {
-	// 	authorized = isNull(notes.allowed_users)
-	// }
-
 	const pages = await db
 		.select({
 			title: notes.title,

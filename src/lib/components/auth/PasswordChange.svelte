@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { API } from '$lib/api'
 	import { passwordRules } from '$lib/auth'
 
 	let newPass = $state('')
@@ -33,13 +34,7 @@
 		const areCredsValid = checkCredentialValidity()
 		if (!areCredsValid) return
 
-		const res = await fetch('/api/auth/update-password', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ newPass, newPassConfirm })
-		})
+		const res = await API.updatePassword(newPass, newPassConfirm)
 		if (!res.ok) {
 			const data = await res.json()
 			responseMessage = `Failed to update password. ${data.message}`

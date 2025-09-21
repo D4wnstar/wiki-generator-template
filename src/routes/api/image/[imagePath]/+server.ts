@@ -25,8 +25,7 @@ export const GET: RequestHandler = async ({ params: { imagePath }, locals: { db 
 				}
 			})
 		} else if (image.blob) {
-			const buf = image.blob as Buffer
-			return new Response(buf, {
+			return new Response(new Uint8Array(image.blob as Buffer), {
 				headers: {
 					'content-type': 'image/webp',
 					'cache-control': 'public, max-age=864000'

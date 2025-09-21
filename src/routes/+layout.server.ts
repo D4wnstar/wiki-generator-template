@@ -1,7 +1,7 @@
 import { wikiSettings } from '$lib/schema'
 import { error } from '@sveltejs/kit'
 import type { LayoutServerLoad } from './$types'
-import type { NoteMeta } from '$lib/notes'
+import { API } from '$lib/api'
 
 export const load = (async ({ locals: { db, user }, fetch }) => {
 	const settings = await db.select().from(wikiSettings).get()
@@ -10,11 +10,7 @@ export const load = (async ({ locals: { db, user }, fetch }) => {
 	}
 
 	// Get page metadata for the navbar
-	const res = await fetch('/api/public-pages')
-	let pages: NoteMeta[] = []
-	if (res.ok) {
-		pages = (await res.json()) as NoteMeta[]
-	}
+	const pages = await API.publicPages(fetch)
 
 	return { settings, user, pages }
 }) satisfies LayoutServerLoad

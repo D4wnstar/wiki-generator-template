@@ -1,12 +1,13 @@
 import { redirect } from '@sveltejs/kit'
 import type { Actions, PageServerLoad } from './$types'
-import type { NoteMeta } from '$lib/notes'
+import { API } from '$lib/api'
 
 export const load = (async ({ locals: { user }, fetch }) => {
 	if (!user) redirect(303, '/login')
 
-	const res = await fetch('/api/auth/secret-pages')
-	const secretPages = (await res.json()) as NoteMeta[]
+	// Get secret pages to make a list for the user
+	const secretPages = await API.secretPages(fetch)
+
 	return { user, secretPages }
 }) satisfies PageServerLoad
 

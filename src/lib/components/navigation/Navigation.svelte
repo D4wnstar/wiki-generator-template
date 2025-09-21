@@ -11,6 +11,7 @@
 	import TreeFolder from './TreeFolder.svelte'
 	import { onMount } from 'svelte'
 	import { browser } from '$app/environment'
+	import { API } from '$lib/api'
 
 	let { pages, allowLogins }: { pages: NoteMeta[]; allowLogins: boolean } = $props()
 
@@ -32,10 +33,9 @@
 
 		// Reset tree with secret pages on login
 		const handleLogin = async () => {
-			const res = await fetch('/api/auth/secret-pages')
-			if (res.ok) {
-				const noteMeta = (await res.json()) as NoteMeta[]
-				const tree = createNavTree([...pages, ...noteMeta])
+			const secrets = await API.secretPages()
+			if (secrets.length > 0) {
+				const tree = createNavTree([...pages, ...secrets])
 				sortFolderRecursively(tree)
 				root = tree.children
 				loadExpandedStates(root)
