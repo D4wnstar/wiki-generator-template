@@ -1,5 +1,5 @@
 import { users } from '$lib/schema'
-import { fail, redirect, type Actions } from '@sveltejs/kit'
+import { error, fail, redirect, type Actions } from '@sveltejs/kit'
 import { eq } from 'drizzle-orm'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
@@ -7,7 +7,9 @@ import { JWT_SECRET } from '$env/static/private'
 import type { LoggedUser } from '$lib/types'
 import type { PageServerLoad } from './$types'
 
-export const load = (async ({ locals: { user } }) => {
+export const load = (async ({ locals: { user }, parent }) => {
+	const layoutData = await parent()
+	if (!layoutData.settings.allow_logins) error(403, 'This wiki does not allow user accounts.')
 	if (user) redirect(303, '/account')
 	return {}
 }) satisfies PageServerLoad
