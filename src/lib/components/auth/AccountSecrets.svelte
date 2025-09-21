@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { NoteRow } from '$lib/schema'
+	import type { NoteMeta } from '$lib/notes'
 
 	interface Props {
-		secretNotes: NoteRow[]
+		secretNotes: NoteMeta[]
 	}
 	let { secretNotes }: Props = $props()
 </script>

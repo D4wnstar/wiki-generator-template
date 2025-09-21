@@ -1,5 +1,4 @@
 import { slug } from 'github-slugger'
-import type { NoteRow } from './schema'
 
 export function slugPath(path: string): string {
 	const elems = path.split('/').filter((elem) => elem !== '')
@@ -30,7 +29,14 @@ export type File = {
 
 export type Tree = (File | Folder)[]
 
-export function createNavTree(pages: NoteRow[]) {
+export type NoteMeta = {
+	title: string
+	route: string
+	path: string
+	search_terms: string
+}
+
+export function createNavTree(pages: NoteMeta[]) {
 	const files: File[] = pages.map((p) => {
 		return {
 			type: 'file',

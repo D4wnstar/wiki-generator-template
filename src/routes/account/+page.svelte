@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { PageData } from './$types'
+	import type { PageData, SubmitFunction } from './$types'
 	import { Segment } from '@skeletonlabs/skeleton-svelte'
 	import InfoChange from '$lib/components/auth/InfoChange.svelte'
 	import PasswordChange from '$lib/components/auth/PasswordChange.svelte'
@@ -8,6 +8,13 @@
 
 	const { data }: { data: PageData } = $props()
 	let currTab: string = $state('info')
+
+	const handleLogout: SubmitFunction = () => {
+		return async ({ result, update }) => {
+			if (result.type === 'success') window.dispatchEvent(new CustomEvent('userLogout'))
+			await update()
+		}
+	}
 </script>
 
 <svelte:head>
@@ -45,7 +52,7 @@
 	</div>
 	<hr class="hr my-4" />
 	<footer class="flex w-full justify-end gap-2">
-		<form method="POST" action="?/logout" use:enhance>
+		<form method="POST" action="?/logout" use:enhance={handleLogout}>
 			<button class="btn preset-filled-error-200-800"> Log Out </button>
 		</form>
 	</footer>

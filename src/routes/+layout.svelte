@@ -5,7 +5,6 @@
 	import { Menu, UserCircle, X } from 'lucide-svelte'
 	import Lightswitch from '$lib/components/utils/Lightswitch.svelte'
 	import Navigation from '$lib/components/navigation/Navigation.svelte'
-	import { onMount } from 'svelte'
 
 	let { children, data } = $props()
 
@@ -13,10 +12,6 @@
 
 	const drawerOpen = () => (drawerState = true)
 	const drawerClose = () => (drawerState = false)
-
-	// Get window width to determine if navbar mounting should be animated
-	let isLargeScreen = $state(true)
-	onMount(() => (isLargeScreen = window.matchMedia('(min-width: 1200px)').matches))
 </script>
 
 <Modal
@@ -33,7 +28,7 @@
 			<button class="btn-icon-lg self-start" onclick={drawerClose}>
 				<X />
 			</button>
-			<Navigation animate={isLargeScreen} />
+			<Navigation pages={data.pages} allowLogins={data.settings.allow_logins} />
 		</div>
 	{/snippet}
 </Modal>
@@ -65,7 +60,7 @@
 	<nav
 		class="sticky top-4 hidden max-h-[85vh] w-[360px] space-y-3 self-start [@media(min-width:1200px)]:flex [@media(min-width:1200px)]:flex-col [@media(min-width:1200px)]:gap-1"
 	>
-		<Navigation />
+		<Navigation pages={data.pages} allowLogins={data.settings.allow_logins} />
 	</nav>
 
 	{@render children()}

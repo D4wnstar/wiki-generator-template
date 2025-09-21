@@ -4,6 +4,7 @@
 	import { Tabs } from '@skeletonlabs/skeleton-svelte'
 	import { UserPlus, User } from 'lucide-svelte'
 	import { enhance } from '$app/forms'
+	import type { SubmitFunction } from '@sveltejs/kit'
 
 	let { data, form }: { data: PageData; form: ActionData } = $props()
 
@@ -59,6 +60,13 @@
 		clearTimeout(rulesDelayTimer)
 		rulesDelayTimer = setTimeout(() => (passwordRulesVisible = isPasswordValid ? false : true), 500)
 	}
+
+	const handleLogin: SubmitFunction = () => {
+		return async ({ result, update }) => {
+			if (result.type === 'success') window.dispatchEvent(new CustomEvent('userLogin'))
+			await update()
+		}
+	}
 </script>
 
 <svelte:head>
@@ -86,7 +94,12 @@
 		{#snippet content()}
 			<!-- Login form -->
 			<Tabs.Panel value="login"
-				><form class="flex flex-col space-y-4 px-4" method="POST" action="?/login" use:enhance>
+				><form
+					class="flex flex-col space-y-4 px-4"
+					method="POST"
+					action="?/login"
+					use:enhance={handleLogin}
+				>
 					{#if form && form.message && form.type === 'login'}
 						<p class="card p-2 text-center preset-filled-{form.color}-500">
 							{form.message}
@@ -122,7 +135,12 @@
 
 			<!-- Signup form -->
 			<Tabs.Panel value="signup"
-				><form class="flex flex-col space-y-4 px-4" method="POST" action="?/signup" use:enhance>
+				><form
+					class="flex flex-col space-y-4 px-4"
+					method="POST"
+					action="?/signup"
+					use:enhance={handleLogin}
+				>
 					{#if form && form.message && form.type === 'signup'}
 						<p class="card p-2 text-center preset-filled-{form.color}-500">
 							{form.message}

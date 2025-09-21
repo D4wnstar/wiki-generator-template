@@ -1,20 +1,67 @@
 <script lang="ts">
-	import { createNavTree, sortFolderRecursively, type Folder, type Tree } from '$lib/notes'
+	import {
+		createNavTree,
+		sortFolderRecursively,
+		type Folder,
+		type NoteMeta,
+		type Tree
+	} from '$lib/notes'
 	import { Popover } from '@skeletonlabs/skeleton-svelte'
 	import TreeFile from './TreeFile.svelte'
 	import TreeFolder from './TreeFolder.svelte'
 	import { onMount } from 'svelte'
-	import type { NoteRow } from '$lib/schema'
-	import { slide } from 'svelte/transition'
+	import { browser } from '$app/environment'
 
-	let { animate = true }: { animate?: boolean } = $props()
+	let { pages, allowLogins }: { pages: NoteMeta[]; allowLogins: boolean } = $props()
 
 	let root: Tree = $state([])
 	let searchQuery = $state('')
 	let popoverState = $state(false)
 	let autocompleteLinks: { title: string; route: string }[] = $state([])
 
+	// Initialize the tree with the provided pages
+	const tree = createNavTree(pages)
+	sortFolderRecursively(tree)
+	root = tree.children
+
+	onMount(() => {
+		loadExpandedStates(root)
+
+		// Listen for login events if the wiki permits it
+		if (!browser || !allowLogins) return
+
+		// Reset tree with secret pages on login
+		const handleLogin = async () => {
+			const res = await fetch('/api/v1/auth/secret-pages')
+			if (res.ok) {
+				const noteMeta = (await res.json()) as NoteMeta[]
+				const tree = createNavTree([...pages, ...noteMeta])
+				sortFolderRecursively(tree)
+				root = tree.children
+				loadExpandedStates(root)
+			}
+		}
+
+		// Reset tree with no secrets on logout
+		const handleLogout = () => {
+			const tree = createNavTree(pages)
+			sortFolderRecursively(tree)
+			root = tree.children
+			loadExpandedStates(root)
+		}
+
+		window.addEventListener('userLogin', handleLogin)
+		window.addEventListener('userLogout', handleLogout)
+
+		return () => {
+			window.removeEventListener('userLogin', handleLogin)
+			window.removeEventListener('userLogout', handleLogout)
+		}
+	})
+
 	function saveExpandedStates() {
+		if (!browser) return
+
 		const states: Record<string, boolean> = {}
 		const collectStates = (items: Tree) => {
 			for (const item of items) {
@@ -30,6 +77,8 @@
 	}
 
 	function loadExpandedStates(content: Tree) {
+		if (!browser) return
+
 		const saved = localStorage.getItem('navOpenFolders')
 		if (!saved) return
 
@@ -81,18 +130,6 @@
 
 		popoverState = true
 	}
-
-	onMount(async () => {
-		// Navigation content is grabbed on the fly because it should not be prerendered
-		const res = await fetch('/api/v1/auth/fetch-pages')
-		if (!res.ok) return
-		const pages = (await res.json()) as NoteRow[]
-		const tree = createNavTree(pages)
-		sortFolderRecursively(tree)
-		root = tree.children
-
-		loadExpandedStates(root)
-	})
 </script>
 
 <header class="text-center type-scale-5"><b>Navigation</b></header>
@@ -132,8 +169,8 @@
 
 <hr class="border-surface-700-300" />
 <div class="overflow-auto">
-	{#each root as _, idx}
-		<div transition:slide={{ duration: animate ? 500 : 0, axis: 'y' }}>
+	{#each root as entry, idx (entry.path)}
+		<div>
 			{#if root[idx].type === 'folder'}
 				<TreeFolder bind:folder={root[idx]} {saveExpandedStates} />
 			{:else}

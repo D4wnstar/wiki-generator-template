@@ -8,9 +8,7 @@ import type { LoggedUser } from '$lib/types'
 import type { PageServerLoad } from './$types'
 
 export const load = (async ({ locals: { user } }) => {
-	if (user) {
-		redirect(303, '/account')
-	}
+	if (user) redirect(303, '/account')
 	return {}
 }) satisfies PageServerLoad
 
