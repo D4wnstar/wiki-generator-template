@@ -103,18 +103,16 @@ export function hideSecretBlocks(html: string, username: string | undefined): st
 	const dom = new JSDOM(html)
 	const document = dom.window.document
 
-	// Find all elements with data-allowed-users attribute
-	const secretElements = document.querySelectorAll('[data-allowed-users]')
+	// Find all sections with data-allowed-users attribute
+	const secretBlocks = document.querySelectorAll('section[data-allowed-users]')
 
 	// Process each secret element
-	secretElements.forEach((element) => {
+	secretBlocks.forEach((element) => {
 		// Get the allowed users from the attribute
 		const allowedUsers = element.getAttribute('data-allowed-users')
 
 		// If no users are specified, leave the element as is
-		if (!allowedUsers) {
-			return
-		}
+		if (!allowedUsers) return
 
 		// Split the allowed users by semicolon
 		const allowedUsersList = allowedUsers
