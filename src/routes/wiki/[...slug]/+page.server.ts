@@ -6,7 +6,7 @@ import { notes } from '$lib/schema'
 import { eq } from 'drizzle-orm'
 
 export const load = (async ({ locals: { db, user }, params: { slug } }) => {
-	const page = await handlePageSlug(db, user, encodeURIComponent(slug))
+	const page = await handlePageSlug(db, user, slug)
 	return { user, ...page }
 }) satisfies PageServerLoad
 

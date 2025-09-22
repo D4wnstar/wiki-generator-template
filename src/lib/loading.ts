@@ -26,7 +26,7 @@ export async function handlePageSlug(
 	user: LoggedUser | null,
 	route: string | undefined = undefined
 ) {
-	// Find page based on route or be frontpage flag
+	// Find page based on route or the frontpage flag
 	const pageCondition = route ? eq(notes.route, route) : eq(notes.frontpage, true)
 	const isUserAllowed = user ? getAllowedUsersFilter(user.username, 'notes') : undefined
 
