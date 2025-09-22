@@ -36,5 +36,3 @@ export const GET: RequestHandler = async ({ params: { imagePath }, locals: { db 
 		}
 	}
 }
-
-export const prerender = true
