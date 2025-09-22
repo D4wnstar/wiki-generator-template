@@ -21,3 +21,5 @@ export const GET: RequestHandler = async ({ locals: { db } }) => {
 		}
 	})
 }
+
+export const prerender = true
